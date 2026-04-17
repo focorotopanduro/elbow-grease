@@ -1,0 +1,29 @@
+# Node
+node_modules
+dist
+dist-ssr
+.vite
+*.log
+
+# Tauri
+src-tauri/target
+src-tauri/gen/schemas
+
+# Never commit signing keys or the onboarding secrets handoff.
+*.key
+*.key.pub
+LOCAL_SECRETS.md
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+
+# Logs / crash reports
+*.crash
+*.dmp
+
+# TypeScript incremental builds
+*.tsbuildinfo

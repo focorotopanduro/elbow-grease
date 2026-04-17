@@ -1,0 +1,74 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "ELBOW GREASE",
+  "version": "0.1.0",
+  "identifier": "com.beitbuilding.elbowgrease",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "ELBOW GREASE — Plumbing CAD",
+        "width": 1600,
+        "height": 1000,
+        "minWidth": 1024,
+        "minHeight": 720,
+        "resizable": true,
+        "maximized": true,
+        "fullscreen": false,
+        "center": true,
+        "decorations": true,
+        "transparent": false,
+        "alwaysOnTop": false,
+        "focus": true,
+        "visible": true,
+        "dragDropEnabled": true,
+        "theme": "Dark"
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["msi", "nsis"],
+    "publisher": "Beit Building Contractors LLC",
+    "copyright": "© 2026 Beit Building Contractors LLC",
+    "category": "DeveloperTool",
+    "shortDescription": "Videogame-styled plumbing CAD + estimator",
+    "longDescription": "ELBOW GREASE is a 3D plumbing design tool built for contractors. Draft routes, place fixtures, run hydraulic simulation, and export phased bill-of-materials for underground, rough-in, and trim phases.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "createUpdaterArtifacts": true,
+    "windows": {
+      "wix": {
+        "language": ["en-US"]
+      },
+      "nsis": {
+        "installMode": "perMachine",
+        "installerIcon": "icons/icon.ico",
+        "displayLanguageSelector": false,
+        "languages": ["English"]
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/beitbuilding/elbow-grease/releases/latest/download/latest.json"
+      ],
+      "dialog": false,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDI4RjEyQUY5NzBFMThGNzUKUldSMWorRncrU3J4S01GNDIvcGhWUXIwWEdxdDRQL0tqZ2tZcFhubkNNSElNVlBaaWZEL2N4VjUK"
+    }
+  }
+}

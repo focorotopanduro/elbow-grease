@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="12" fill="#0a0a1a"/>
+  <!-- Pipe elbow -->
+  <path d="M16 16 L16 38 Q16 48 26 48 L48 48" stroke="#00e5ff" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Inner pipe line -->
+  <path d="M16 16 L16 38 Q16 48 26 48 L48 48" stroke="#0a0a1a" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Connection dots -->
+  <circle cx="16" cy="16" r="4" fill="#00e676"/>
+  <circle cx="48" cy="48" r="4" fill="#ffa726"/>
+</svg>

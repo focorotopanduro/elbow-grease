@@ -1,0 +1,103 @@
+name: Release
+
+# Cuts a Windows release whenever a `vX.Y.Z` tag is pushed, or when
+# manually triggered from the Actions tab. Produces:
+#
+#   ELBOW-GREASE_<ver>_x64-setup.exe       (NSIS installer — user-scope capable)
+#   ELBOW-GREASE_<ver>_x64_en-US.msi       (WiX installer — enterprise GPO-friendly)
+#   ELBOW-GREASE_<ver>_x64-setup.exe.sig   (minisign signature)
+#   ELBOW-GREASE_<ver>_x64_en-US.msi.sig   (minisign signature)
+#   latest.json                            (the updater manifest)
+#
+# All artifacts are attached to the GitHub Release, so the app's
+# updater URL ( .../releases/latest/download/latest.json ) resolves
+# without any extra hosting.
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version_override:
+        description: 'Release version (e.g. 0.2.3). Leave blank to use current tauri.conf.json version.'
+        required: false
+
+permissions:
+  contents: write  # needed to create the GitHub Release
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── Node + cached npm ─────────────────────────────────────
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install JS deps
+        run: npm ci
+
+      # ── Rust + cached cargo ───────────────────────────────────
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      # ── Compute version for release name ──────────────────────
+      - name: Resolve version
+        id: ver
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            # strip leading 'v' from tag
+            VER="${GITHUB_REF_NAME#v}"
+          elif [[ -n "${{ github.event.inputs.version_override }}" ]]; then
+            VER="${{ github.event.inputs.version_override }}"
+          else
+            VER=$(node -p "require('./package.json').version")
+          fi
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VER" >> "$GITHUB_OUTPUT"
+
+      # ── Build + sign + publish ────────────────────────────────
+      # tauri-action:
+      #   - runs `tauri build`, which invokes our beforeBuildCommand
+      #     (npm run build) to produce dist/, then builds the bundles.
+      #   - if TAURI_SIGNING_PRIVATE_KEY is set, signs each artifact
+      #     and emits the matching .sig file + latest.json.
+      #   - creates a GitHub Release (draft-first for safety) and
+      #     uploads every bundle + sig + latest.json to it.
+      - name: Build & publish
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Minisign keypair used to sign the installers. Generated once
+          # via `npx @tauri-apps/cli signer generate` on the maintainer's
+          # workstation and saved as repo secrets — see RELEASING.md.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ steps.ver.outputs.tag }}
+          releaseName: 'ELBOW GREASE ${{ steps.ver.outputs.tag }}'
+          releaseBody: |
+            Automated Windows build.
+
+            - Installer (NSIS, recommended): `ELBOW-GREASE_${{ steps.ver.outputs.version }}_x64-setup.exe`
+            - Installer (MSI, for enterprise/GPO): `ELBOW-GREASE_${{ steps.ver.outputs.version }}_x64_en-US.msi`
+
+            Installed copies auto-update on launch.
+          releaseDraft: false
+          prerelease: false
+          includeUpdaterJson: true
+          args: --bundles nsis,msi,updater
