@@ -65,7 +65,7 @@
   "plugins": {
     "updater": {
       "endpoints": [
-        "https://github.com/beitbuilding/elbow-grease/releases/latest/download/latest.json"
+        "https://github.com/focorotopanduro/elbow-grease/releases/latest/download/latest.json"
       ],
       "dialog": false,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDI4RjEyQUY5NzBFMThGNzUKUldSMWorRncrU3J4S01GNDIvcGhWUXIwWEdxdDRQL0tqZ2tZcFhubkNNSElNVlBaaWZEL2N4VjUK"
