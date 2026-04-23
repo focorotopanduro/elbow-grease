@@ -26,7 +26,7 @@ import { type ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import { usePipeStore, type CommittedPipe } from '@store/pipeStore';
 import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
-import { useLayerStore } from '@store/layerStore';
+import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 import { useFloorParams } from '@store/floorStore';
 import { useFeatureFlagStore } from '@store/featureFlagStore';
 import { beginExtend } from './ExtendSession';
@@ -290,7 +290,7 @@ export function PipeHitboxes() {
   const pipes = usePipeStore((s) => s.pipes);
   const mode = usePlumbingDrawStore((s) => s.mode);
   const pivoting = usePipeStore((s) => s.pivotSession !== null);
-  const systemVis = useLayerStore((s) => s.systems);
+  const systemVis = usePlumbingLayerStore((s) => s.systems);
   const getFloorParams = useFloorParams();
 
   // Active in select mode, plus stays active during an ongoing pivot so

@@ -13,7 +13,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { usePipeStore, getColorForDiameter } from '@store/pipeStore';
-import { useLayerStore } from '@store/layerStore';
+import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 import { autoSave } from '@core/project/AutoSave';
 import { exportProjectFile, importProjectFile } from '@core/project/ProjectFileIO';
 import type { SerializeInput } from '@core/project/ProjectSerializer';
@@ -38,7 +38,7 @@ export function ProjectPanel({
   onNewProject,
 }: ProjectPanelProps) {
   const pipes = usePipeStore((s) => s.pipes);
-  const layers = useLayerStore();
+  const layers = usePlumbingLayerStore();
   const pipeCount = Object.keys(pipes).length;
 
   const [projectName, setProjectName] = useState('Untitled Project');

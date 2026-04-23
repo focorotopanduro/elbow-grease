@@ -79,7 +79,7 @@ function buildScene(n: number): Record<string, CommittedPipe> {
 
 describe('14.AC.2 guardrail — SegmentExtractCache hit rate', () => {
   // STABLE ref objects that mirror how the real hooks behave:
-  //   • useLayerStore((s) => s.systems)     — stable until layers toggle
+  //   • usePlumbingLayerStore((s) => s.systems)     — stable until layers toggle
   //   • useFloorParams()                    — module-level function
   //   • usePhaseFilter()                    — useMemo'd
   // If any of these start returning fresh refs per render the cache

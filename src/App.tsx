@@ -118,7 +118,7 @@ import { RulerCatcher, MeasurementLines, ScaleCalibratorDialog } from '@ui/measu
 import { BackdropLayer } from '@ui/backdrop/BackdropPlane';
 import { MeasureToolbar } from '@ui/measure/MeasureToolbar';
 import { useMeasureShortcuts } from '@ui/measure/useMeasureShortcuts';
-import { useLayerStore } from '@store/layerStore';
+import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 
 import { GlowRing, CollisionFlash, SnapBurst, CompletePulse } from '@ui/SensoryFeedback';

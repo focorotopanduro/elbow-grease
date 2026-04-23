@@ -15,7 +15,7 @@
 import { useMemo, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { usePipeStore } from '@store/pipeStore';
-import { useLayerStore } from '@store/layerStore';
+import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 import { useFloorParams } from '@store/floorStore';
 import { usePhaseFilter } from '@store/phaseStore';
 import { shouldPhaseRender } from '@core/phases/PhaseTypes';
@@ -1283,8 +1283,8 @@ function FittingGroup({ group }: { group: FittingGroup }) {
 
 export function FittingRenderer() {
   const pipes = usePipeStore((state) => state.pipes);
-  const fittingsVisible = useLayerStore((s) => s.fittings);
-  const systemVisibility = useLayerStore((s) => s.systems);
+  const fittingsVisible = usePlumbingLayerStore((s) => s.fittings);
+  const systemVisibility = usePlumbingLayerStore((s) => s.systems);
   const getFloorParams = useFloorParams();
   const phaseFilter = usePhaseFilter();
 

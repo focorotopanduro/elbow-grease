@@ -14,7 +14,7 @@
 import { useMemo } from 'react';
 import { CapPlug } from '@ui/pipe/CapPlug';
 import { useCappedEndpointStore } from '@store/cappedEndpointStore';
-import { useLayerStore } from '@store/layerStore';
+import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 import { useFloorParams } from '@store/floorStore';
 
 // System → accent color for the cap's retaining ring.
@@ -28,7 +28,7 @@ const SYSTEM_RING_COLOR: Record<string, string> = {
 
 export function CappedEndpoints() {
   const caps = useCappedEndpointStore((s) => s.caps);
-  const systemVis = useLayerStore((s) => s.systems);
+  const systemVis = usePlumbingLayerStore((s) => s.systems);
   const getFloorParams = useFloorParams();
 
   const list = useMemo(() => Object.values(caps), [caps]);

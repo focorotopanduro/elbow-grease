@@ -13,7 +13,7 @@
  * coordinate. The PipeRenderer queries this store to apply visibility
  * and opacity overrides on non-active floors.
  *
- * The layerStore handles system-level visibility (waste/vent/supply)
+ * The plumbingLayerStore handles system-level visibility (waste/vent/supply)
  * while this store handles elevation-level visibility (by floor).
  * The two are orthogonal — you can show ONLY waste pipes on floor 2.
  */

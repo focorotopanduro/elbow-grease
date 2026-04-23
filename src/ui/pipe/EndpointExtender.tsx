@@ -20,7 +20,7 @@ import { Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { usePipeStore, type CommittedPipe } from '@store/pipeStore';
 import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
-import { useLayerStore } from '@store/layerStore';
+import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 import { useFloorParams } from '@store/floorStore';
 import { useFeatureFlagStore } from '@store/featureFlagStore';
 import { useReducedMotion } from '@core/a11y/useReducedMotion';
@@ -47,7 +47,7 @@ export function EndpointExtender() {
   const mode = usePlumbingDrawStore((s) => s.mode);
   const pivoting = usePipeStore((s) => s.pivotSession !== null);
   const enabled = useFeatureFlagStore((s) => s.pipeExtendDrag);
-  const systemVis = useLayerStore((s) => s.systems);
+  const systemVis = usePlumbingLayerStore((s) => s.systems);
   const getFloorParams = useFloorParams();
 
   // Gate: select mode, flag on, not pivoting.

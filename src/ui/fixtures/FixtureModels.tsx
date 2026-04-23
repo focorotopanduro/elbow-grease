@@ -22,7 +22,7 @@ import { GlowRing } from '@ui/SensoryFeedback';
 import { useReducedMotion } from '@core/a11y/useReducedMotion';
 import { useFSM } from '@hooks/useFSM';
 import { userFSM } from '@core/UserProgressFSM';
-import { useLayerStore } from '@store/layerStore';
+import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 import { useFloorParams } from '@store/floorStore';
 import { useFixtureStore, type FixtureInstance } from '@store/fixtureStore';
 import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
@@ -1822,7 +1822,7 @@ interface FixtureLayerProps {
 }
 
 export function FixtureLayer({ fixtures }: FixtureLayerProps) {
-  const fixturesVisible = useLayerStore((s) => s.fixtures);
+  const fixturesVisible = usePlumbingLayerStore((s) => s.fixtures);
   const getFloorParams = useFloorParams();
 
   if (!fixturesVisible) return null;
@@ -1865,7 +1865,7 @@ export function FixtureLayerFromStore() {
   const fixtureMap = useFixtureStore((s) => s.fixtures);
   const selectedId = useFixtureStore((s) => s.selectedFixtureId);
   const selectFixture = useFixtureStore((s) => s.selectFixture);
-  const fixturesVisible = useLayerStore((s) => s.fixtures);
+  const fixturesVisible = usePlumbingLayerStore((s) => s.fixtures);
   const getFloorParams = useFloorParams();
   const phaseFilter = usePhaseFilter();
 

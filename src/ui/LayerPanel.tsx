@@ -10,11 +10,11 @@
 
 import { useMemo } from 'react';
 import {
-  useLayerStore,
+  usePlumbingLayerStore,
   SYSTEM_COLORS,
   SYSTEM_LABELS,
   type LayerState,
-} from '@store/layerStore';
+} from '@store/plumbingLayerStore';
 import { usePipeStore } from '@store/pipeStore';
 import type { SystemType } from '../engine/graph/GraphNode';
 
@@ -107,7 +107,7 @@ function ComponentButton({
 // ── Main panel ──────────────────────────────────────────────────
 
 export function LayerPanel() {
-  const store = useLayerStore();
+  const store = usePlumbingLayerStore();
   const pipes = usePipeStore((s) => s.pipes);
 
   // Count pipes per system

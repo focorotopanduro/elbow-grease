@@ -13,7 +13,7 @@
 import { useMemo } from 'react';
 import { Text, Billboard } from '@react-three/drei';
 import { usePipeStore } from '@store/pipeStore';
-import { useLayerStore } from '@store/layerStore';
+import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 import { useFloorParams } from '@store/floorStore';
 import type { Vec3 } from '@core/events';
 
@@ -76,7 +76,7 @@ function DimLabel({ position, text, color = '#aaa', size = 0.08, offset = 0.25 }
 export function DimensionHelpers() {
   const selectedId = usePipeStore((s) => s.selectedId);
   const pipe = usePipeStore((s) => s.selectedId ? s.pipes[s.selectedId] : null);
-  const dimensionsVisible = useLayerStore((s) => s.dimensions);
+  const dimensionsVisible = usePlumbingLayerStore((s) => s.dimensions);
   const getFloorParams = useFloorParams();
 
   const labels = useMemo(() => {
@@ -170,13 +170,13 @@ export function DimensionHelpers() {
 //   red    > 0.01"/ft   (slope exists but is below code minimum)
 //
 // Purely additive — doesn't touch the existing selected-pipe dim
-// flow. Toggleable via the same `layerStore.dimensions` flag so
+// flow. Toggleable via the same `plumbingLayerStore.dimensions` flag so
 // users who find it noisy can hide all labels at once.
 
 export function PitchIndicators() {
   const pipes = usePipeStore((s) => s.pipes);
   const pipeOrder = usePipeStore((s) => s.pipeOrder);
-  const dimensionsVisible = useLayerStore((s) => s.dimensions);
+  const dimensionsVisible = usePlumbingLayerStore((s) => s.dimensions);
   const getFloorParams = useFloorParams();
 
   const labels = useMemo(() => {

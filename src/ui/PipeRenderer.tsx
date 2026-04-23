@@ -10,7 +10,7 @@ import { useEffect, useMemo } from 'react';
 import { type ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import { usePipeStore, type CommittedPipe } from '@store/pipeStore';
-import { useLayerStore } from '@store/layerStore';
+import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 // Phase 14.I — multi-select layer. Bare click = single-select (existing
 // behavior). Shift+click = toggle into the multi-select set.
 import { useMultiSelectStore } from '@store/multiSelectStore';
@@ -384,7 +384,7 @@ export function PipeRenderer() {
   const pipes = usePipeStore((s) => s.pipes);
   const selectPipe = usePipeStore((s) => s.selectPipe);
   const selectedId = usePipeStore((s) => s.selectedId);
-  const systemVis = useLayerStore((s) => s.systems);
+  const systemVis = usePlumbingLayerStore((s) => s.systems);
   const quality = usePlumbingDrawStore((s) => s.pipeQuality);
   const pivotingPipeId = usePipeStore((s) => s.pivotSession?.pipeId ?? null);
   const getFloorParams = useFloorParams();

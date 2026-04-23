@@ -17,7 +17,7 @@
 import { useRef, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
 import { usePipeStore } from '@store/pipeStore';
-import { useLayerStore } from '@store/layerStore';
+import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 import { useFloorParams } from '@store/floorStore';
 import { usePhaseFilter } from '@store/phaseStore';
 import { getPipeMaterial } from '../PipeMaterial';
@@ -116,7 +116,7 @@ function InstancedBucket({
 
 export function PipeInstanceRenderer() {
   const pipes = usePipeStore((s) => s.pipes);
-  const systemVisibility = useLayerStore((s) => s.systems);
+  const systemVisibility = usePlumbingLayerStore((s) => s.systems);
   const getFloorParams = useFloorParams();
   const phaseFilter = usePhaseFilter();
 

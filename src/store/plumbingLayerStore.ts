@@ -1,5 +1,15 @@
 /**
- * Layer Store — Zustand store for system-level visibility toggles.
+ * plumbingLayerStore — Zustand store for plumbing-system
+ * visibility toggles.
+ *
+ * Renamed from `layerStore` in Phase 6b of the hybrid-architecture
+ * refactor (ARCHITECTURE.md §7.8). The store controls which
+ * PLUMBING systems (waste / vent / cold / hot / storm) render in
+ * the 3D scene — roofing uses its own layer model inside `roofStore`
+ * (the `layers` array of `PDF Blueprint` / `Measurements` / `Roof
+ * Sections` / `Ridge / Hip` / `Annotations`). Prefixing makes the
+ * domain scope explicit so a future contributor doesn't try to
+ * reuse this store for roofing visibility.
  *
  * Controls which plumbing systems are visible in the 3D scene.
  * PipeRenderer, FittingRenderer, FixtureLayer, and DimensionHelpers
@@ -71,7 +81,7 @@ export const SYSTEM_KEYS: Record<string, SystemType> = {
 
 const ALL_SYSTEMS: SystemType[] = ['waste', 'vent', 'cold_supply', 'hot_supply', 'storm', 'condensate'];
 
-export const useLayerStore = create<LayerState>((set) => ({
+export const usePlumbingLayerStore = create<LayerState>((set) => ({
   systems: {
     waste: true,
     vent: true,
@@ -123,5 +133,5 @@ export const useLayerStore = create<LayerState>((set) => ({
 // ── Convenience hook: is a system visible? ──────────────────────
 
 export function useSystemVisible(system: SystemType): boolean {
-  return useLayerStore((s) => s.systems[system]);
+  return usePlumbingLayerStore((s) => s.systems[system]);
 }
