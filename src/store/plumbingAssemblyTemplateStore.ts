@@ -1,5 +1,13 @@
 /**
- * assemblyTemplateStore — Phase 14.C
+ * plumbingAssemblyTemplateStore — Phase 14.C
+ *
+ * Renamed from `assemblyTemplateStore` in Phase 7 of the
+ * hybrid-architecture refactor (ARCHITECTURE.md §3). The payload is
+ * strictly plumbing: `CommittedPipe[]` + `FixtureInstance[]` pulled
+ * from the plumbing entity stores. A future "roof section template"
+ * library would need a parallel `roofingTemplateStore` with a
+ * polygon + slope + material payload — generalising this store
+ * would force a sum-type payload that benefits neither side.
  *
  * A persisted library of AssemblyTemplates. Each template is a
  * reusable snapshot of pipes + fixtures (normalized around their
@@ -127,7 +135,7 @@ function readCurrentScene(): { pipes: CommittedPipe[]; fixtures: FixtureInstance
 
 // ── Store ─────────────────────────────────────────────────────
 
-export const useAssemblyTemplateStore = create<TemplateState>((set, get) => {
+export const usePlumbingAssemblyTemplateStore = create<TemplateState>((set, get) => {
   const initial = loadState();
   return {
     templates: initial.templates,
@@ -235,6 +243,6 @@ export const useAssemblyTemplateStore = create<TemplateState>((set, get) => {
 // ── Non-React getter for programmatic access ─────────────────
 
 export function getActiveTemplates(): AssemblyTemplate[] {
-  const s = useAssemblyTemplateStore.getState();
+  const s = usePlumbingAssemblyTemplateStore.getState();
   return s.order.map((id) => s.templates[id]).filter((t): t is AssemblyTemplate => !!t);
 }

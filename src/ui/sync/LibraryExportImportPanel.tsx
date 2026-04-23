@@ -24,7 +24,7 @@ import { logger } from '@core/logger/Logger';
 import { downloadFile } from '../../engine/export/BOMExporter';
 import { useContractorProfileStore } from '@store/contractorProfileStore';
 import { usePricingStore } from '@store/pricingStore';
-import { useAssemblyTemplateStore } from '@store/assemblyTemplateStore';
+import { usePlumbingAssemblyTemplateStore } from '@store/plumbingAssemblyTemplateStore';
 import { useProposalRevisionStore } from '@store/proposalRevisionStore';
 import {
   buildLibrary,
@@ -128,7 +128,7 @@ function ExportView() {
   // Live counts of what WOULD be in the export.
   const contractorName = useContractorProfileStore((s) => s.profile.companyName);
   const pricingName = usePricingStore((s) => s.profile.name);
-  const templateCount = useAssemblyTemplateStore((s) => s.order.length);
+  const templateCount = usePlumbingAssemblyTemplateStore((s) => s.order.length);
   const revisionStore = useProposalRevisionStore((s) => s.byBase);
   const revisionCount = Object.values(revisionStore).reduce((sum, list) => sum + list.length, 0);
   const revisionBaseCount = Object.keys(revisionStore).length;
@@ -145,8 +145,8 @@ function ExportView() {
       contractorProfile: includeContractor ? useContractorProfileStore.getState().profile : undefined,
       pricingProfile: includePricing ? usePricingStore.getState().profile : undefined,
       templates: includeTemplates ? {
-        order: [...useAssemblyTemplateStore.getState().order],
-        byId: { ...useAssemblyTemplateStore.getState().templates },
+        order: [...usePlumbingAssemblyTemplateStore.getState().order],
+        byId: { ...usePlumbingAssemblyTemplateStore.getState().templates },
       } : undefined,
       revisions: includeRevisions ? {
         byBase: { ...useProposalRevisionStore.getState().byBase },
@@ -298,8 +298,8 @@ function ImportView({ onClose }: ImportViewProps) {
       contractorProfile: useContractorProfileStore.getState().profile,
       pricingProfile: usePricingStore.getState().profile,
       templates: {
-        order: useAssemblyTemplateStore.getState().order,
-        byId: useAssemblyTemplateStore.getState().templates,
+        order: usePlumbingAssemblyTemplateStore.getState().order,
+        byId: usePlumbingAssemblyTemplateStore.getState().templates,
       },
       revisions: {
         byBase: useProposalRevisionStore.getState().byBase,
@@ -315,9 +315,9 @@ function ImportView({ onClose }: ImportViewProps) {
       usePricingStore.getState().setProfile(next.pricingProfile);
     }
     if (next.templates && includeTemplates) {
-      // The assemblyTemplateStore doesn't expose a setAll, so we call
+      // The plumbingAssemblyTemplateStore doesn't expose a setAll, so we call
       // the internal setter directly via setState.
-      useAssemblyTemplateStore.setState({
+      usePlumbingAssemblyTemplateStore.setState({
         templates: next.templates.byId,
         order: next.templates.order,
       });

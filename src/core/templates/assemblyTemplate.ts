@@ -17,7 +17,7 @@
  *     without ID collisions.
  *   - The compose + instantiate functions are pure — no React, no
  *     Zustand, no store access. Store wiring lives in
- *     assemblyTemplateStore.applyTemplateToScene().
+ *     plumbingAssemblyTemplateStore.applyTemplateToScene().
  */
 
 import type { Vec3 } from '@core/events';

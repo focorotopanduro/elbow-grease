@@ -19,7 +19,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useFocusTrap } from '@core/a11y/useFocusTrap';
-import { useAssemblyTemplateStore } from '@store/assemblyTemplateStore';
+import { usePlumbingAssemblyTemplateStore } from '@store/plumbingAssemblyTemplateStore';
 import { usePipeStore } from '@store/pipeStore';
 import { useFixtureStore } from '@store/fixtureStore';
 // Phase 14.I — "save selection only" option, driven by multi-select.
@@ -28,12 +28,12 @@ import { useMultiSelectStore } from '@store/multiSelectStore';
 type Mode = 'browse' | 'save';
 
 export function AssemblyTemplatesPanel() {
-  const order = useAssemblyTemplateStore((s) => s.order);
-  const templates = useAssemblyTemplateStore((s) => s.templates);
-  const saveCurrent = useAssemblyTemplateStore((s) => s.saveCurrentSceneAsTemplate);
-  const deleteTemplate = useAssemblyTemplateStore((s) => s.deleteTemplate);
-  const renameTemplate = useAssemblyTemplateStore((s) => s.renameTemplate);
-  const applyTemplate = useAssemblyTemplateStore((s) => s.applyTemplateToScene);
+  const order = usePlumbingAssemblyTemplateStore((s) => s.order);
+  const templates = usePlumbingAssemblyTemplateStore((s) => s.templates);
+  const saveCurrent = usePlumbingAssemblyTemplateStore((s) => s.saveCurrentSceneAsTemplate);
+  const deleteTemplate = usePlumbingAssemblyTemplateStore((s) => s.deleteTemplate);
+  const renameTemplate = usePlumbingAssemblyTemplateStore((s) => s.renameTemplate);
+  const applyTemplate = usePlumbingAssemblyTemplateStore((s) => s.applyTemplateToScene);
 
   // Scene summary — used by the SAVE mode preview so the user knows
   // what's about to get captured.
