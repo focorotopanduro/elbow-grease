@@ -16,22 +16,25 @@
 
 ## TL;DR
 
-- **8 phases, 19 commits, zero test regressions.**
+- **8 phases + opportunistic Phase 9, 24 commits, zero test regressions.**
 - **13 stores renamed**, 0 behaviour changes. All renames carry
   historical notes in their own docstrings.
-- **3 shared-shell additions**: `isAnyDrawActive()` selector,
-  `domainPresence` module, extracted `KeyboardHandler`.
-- **3 correctness fixes**: mode-guarded plumbing shortcuts, mode-
+- **4 shared-shell additions**: `isAnyDrawActive()` selector,
+  `domainPresence` module, extracted `KeyboardHandler`, transient-
+  roofing reset path on `applyBundle`.
+- **5 correctness fixes**: mode-guarded plumbing shortcuts, mode-
   stamped commands with per-mode undo partitioning, plumbing-only
-  guard at the top of `SimulationBridge.PIPE_COMPLETE`.
-- **Test count: 2946 → 3011** (+65 net). No previously-passing test
+  guard at the top of `SimulationBridge.PIPE_COMPLETE`, mode-
+  gated `StatusBar` + mode-filtered `HelpOverlay`, and
+  transient-interaction-store reset on `applyBundle`.
+- **Test count: 2946 → 3016** (+70 net). No previously-passing test
   was modified to accommodate a rename.
 - **ARCHITECTURE.md**: §3 store classification rewritten to reflect
   post-rename state; §8 open-decisions log updated; §2 gained a
   CONTRIBUTING-style checklist for new events.
-- **One known flake** (unrelated to this refactor): the CommandBus
-  p95-latency perf test occasionally fails on first run and passes
-  on rerun. Tracked as noise.
+- **The CommandBus p95 flake** — tracked during Phase 1–8 as noise,
+  root-caused in Phase 9.3 as a JIT-warmup issue. Fixed. Three
+  full-suite runs post-fix all clean.
 
 ---
 
@@ -62,6 +65,10 @@ sentence purpose. `vitest run` was green at every row.
 | 7 wrap | `678e2b3` | 1 | +53 / −41 | `ARCHITECTURE.md` §3 classification + §8 decision log. |
 | 8 | `3ea3d0d` | 2 | +49 / −2 | Event-naming convention documented in `events.ts` docstring. |
 | 8 wrap | `0c78f7d` | 1 | +25 / −0 | `ARCHITECTURE.md` §2 CONTRIBUTING checklist for new events. |
+| capstone | `114f8d0` | 1 | +337 / −0 | `MIGRATION_REPORT.md` — this file. |
+| 9.1 | `23b253a` | 4 | +136 / −9 | Mode-gate `StatusBar` mount + `HelpOverlay` shortcut filter (§6). |
+| 9.2 | `0bf1d53` | 3 | +99 / −12 | `applyBundle` resets transient roofing interaction stores (post-§4.4 bug). |
+| 9.3 | `cced10a` | 2 | +26 / −2 | CommandBus perf-test JIT warmup — stabilises the p95 flake. |
 
 ---
 
@@ -157,6 +164,28 @@ and boot-function name (where applicable) changed.
    table. 10 integration tests lock this in. Roofing-side line-item
    rendering is feature work, not part of this refactor.
 
+6. **Phase 9.1 — mode-gate `StatusBar` + `HelpOverlay` (§6
+   root-level UI audit).** `Toolbar` / `LayerPanel` /
+   `ExportPanel` were already gated in the Phase 14.R.3 roofing
+   introduction. `StatusBar` was missed — rendered plumbing draw
+   state (`NAVIGATE`, "0 pipes") in roofing mode. `HelpOverlay`
+   showed all ~50 shortcuts regardless of active workspace,
+   despite Phase 2a having tagged each entry with `mode`. Fixed
+   by gating `StatusBar` mount in `App.tsx` and running
+   `HelpOverlay`'s filter through `shortcutMatchesMode()`.
+
+7. **Phase 9.2 — `applyBundle` resets transient roofing
+   interaction stores.** Opening a file mid-drag / mid-calibrate
+   / mid-rotate left the interaction session pointing at entities
+   in the OLD file. Subsequent pointer events would compute
+   deltas against stale anchors or land calibration clicks
+   against the wrong PDF. The plumbing side already reset its
+   equivalents (`pivotSession`, `drawSession`,
+   `pendingStart`); the six roofing counterparts were missed in
+   R.26's roof-slice addition. Fixed via a
+   `resetTransientRoofingStores()` helper called inside
+   `applyRoofBundle`.
+
 ---
 
 ## Test count delta
@@ -174,7 +203,10 @@ and boot-function name (where applicable) changed.
 | Phase 6a–6b | 3011 | 0 |
 | Phase 7 | 3011 | 0 |
 | Phase 8 | 3011 | 0 |
-| **Final** | **3011** | **+65** |
+| Phase 9.1 (StatusBar + HelpOverlay gates) | 3014 | +3 |
+| Phase 9.2 (applyBundle transient reset) | 3016 | +2 |
+| Phase 9.3 (CommandBus perf-test warmup) | 3016 | 0 |
+| **Final** | **3016** | **+70** |
 
 No previously-passing test was modified. Renames propagated cleanly
 through to test files because every spec imported via
@@ -251,11 +283,12 @@ doc drift.
 
 ## Known issues / surprises
 
-- **CommandBus `p95 < 0.2ms` perf test flakes under full-suite
-  load.** Occasional first-run fail, passes on rerun. Not caused by
-  this refactor — observed on `main` before Phase 1. Worth
-  investigating separately (raise the bar, or mock `performance.now`
-  in the test).
+- **CommandBus `p95 < 0.2ms` perf test flake — FIXED in Phase 9.3.**
+  Tracked as noise across Phases 1–8. Root cause: the measurement
+  loop ate cold-path costs (V8 inline-cache misses, JIT warmup
+  on the `pipe.add` handler's snapshot path). Fixed with a
+  50-iteration warmup before measurement; three full-suite runs
+  post-fix all clean.
 
 - **Pre-refactor working tree.** `main` had ~67 modified files +
   ~140 untracked representing the entire R.4–R.27 roofing domain.
@@ -276,22 +309,13 @@ doc drift.
 
 **Recommended priority — highest user-impact first:**
 
-1. **§6 root-level UI audit.** `Toolbar` specifically. It's the
-   most-visible plumbing-only control in the shared shell and
-   will confuse roofing users the moment they try to draw. The
-   `KeyboardHandler` extract-pattern from Phase 2a is a workable
-   template. My read: branch-by-mode is likely right for
-   `Toolbar` (a lot of mode-specific state; a split would duplicate
-   the shell scaffolding), whereas `HelpOverlay` and `StatusBar`
-   can probably stay shared with a mode-aware content slot.
-
-2. **§4.3 roofing commands onto the CommandBus.** Phase 3 shipped
+1. **§4.3 roofing commands onto the CommandBus.** Phase 3 shipped
    the partitioning infrastructure. When roofing operations
    (section.add, section.remove, penetration.place, etc.) start
    going through the bus, Ctrl+Z in the roofing workspace
    "just works" thanks to the mode-stamped undo.
 
-3. **§4.8 roofing line-item pipeline.** Makes
+2. **§4.8 roofing line-item pipeline.** Makes
    `PrintableProposal`'s `presence.roofing` branch actually
    render something. Gated infrastructure is already there.
 
@@ -313,13 +337,25 @@ doc drift.
 - [x] §4.6 floorStore shared + FloorResolver plumbing-only
   (documented in doc baseline; no code change needed).
 - [x] §4.8 domain-presence gating (Phase 5).
+- [x] §6 root-level UI audit (Phase 9.1) — `StatusBar` mount
+  gated on plumbing mode; `HelpOverlay` filters shortcuts by
+  active workspace. The three pre-gated components
+  (`Toolbar` / `LayerPanel` / `ExportPanel`) verified; only
+  `StatusBar` + `HelpOverlay` were actually leaky.
+- [x] `applyBundle` resets transient roofing interaction stores
+  (Phase 9.2) — extends the §4.4 bundle insurance to cover
+  the "open a file mid-interaction" scenario.
+- [x] CommandBus p95 perf-test flake (Phase 9.3) — stabilised
+  with a JIT warmup loop.
 
 ---
 
 ## Merge checklist
 
 - [x] `tsc --noEmit` clean.
-- [x] `vitest run` — 130 files, 3011 tests, all passing.
+- [x] `vitest run` — 131 files, 3016 tests, all passing.
+  Three consecutive full-suite runs clean after the Phase 9.3
+  perf-test warmup fix.
 - [x] No `any` / `@ts-ignore` / `@ts-expect-error` added.
 - [x] Every rename has a historical note in its docstring.
 - [x] Every phase is a discrete commit or sub-commit series — no
