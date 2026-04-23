@@ -307,18 +307,19 @@ describe('roofing bundle roundtrip — transient stores are out of scope', () =>
     expect(roofSlice).toBeDefined();
     expect(roofSlice && 'pdfCalib' in roofSlice).toBe(false);
 
-    // Applying a bundle does not touch the calib store — its
-    // draft state remains whatever the local UI had. That's the
-    // correct default: a file open shouldn't jump the user into
-    // someone else's half-finished calibration.
-    const calibBefore = useRoofingCalibrationStore.getState();
+    // Phase 9 — applyBundle now RESETS in-progress roofing
+    // sessions to idle. Mid-calibrate state from before the
+    // load must not bleed into the newly-opened file, where
+    // subsequent clicks would land calibration anchors against
+    // the wrong PDF.
     applyBundle(bundle);
     const calibAfter = useRoofingCalibrationStore.getState();
-    expect(calibAfter.mode).toBe(calibBefore.mode);
-    expect(calibAfter.firstPoint).toEqual(calibBefore.firstPoint);
+    expect(calibAfter.mode).toBe('idle');
+    expect(calibAfter.firstPoint).toBeNull();
+    expect(calibAfter.secondPoint).toBeNull();
   });
 
-  it('roofingDragStore in-progress session is NOT serialized', () => {
+  it('roofingDragStore in-progress session is RESET on apply', () => {
     // Simulate a user mid-drag.
     useRoofingDragStore.setState({
       mode: 'dragging',
@@ -332,10 +333,54 @@ describe('roofing bundle roundtrip — transient stores are out of scope', () =>
     const roofSlice = bundle.data.roof;
     expect(roofSlice && 'sectionDrag' in roofSlice).toBe(false);
 
-    const dragBefore = useRoofingDragStore.getState();
+    // Phase 9 — applyBundle ends the drag session. Without this,
+    // pointer-move callbacks would compute deltas against the
+    // pre-load section's anchors and drag the newly-loaded
+    // section to a nonsense position on first pointer move.
     applyBundle(bundle);
     const dragAfter = useRoofingDragStore.getState();
-    expect(dragAfter).toEqual(dragBefore);
+    expect(dragAfter.mode).toBe('idle');
+    expect(dragAfter.sectionId).toBeNull();
+    expect(dragAfter.pointerStart).toBeNull();
+    expect(dragAfter.sectionStart).toBeNull();
+  });
+
+  it('roofingDrawStore in-progress draw is RESET on apply', async () => {
+    const { useRoofingDrawStore } = await import('@store/roofingDrawStore');
+    useRoofingDrawStore.setState({
+      mode: 'draw-polygon',
+      polygonVertices: [[0, 0], [5, 0], [5, 5]],
+      draftEnd: [3, 3],
+    });
+    seedRichRoofingScene();
+
+    applyBundle(captureBundle());
+    const draw = useRoofingDrawStore.getState();
+    expect(draw.mode).toBe('idle');
+    expect(draw.polygonVertices).toEqual([]);
+    expect(draw.draftEnd).toBeNull();
+  });
+
+  it('roofingVertexDragStore, roofingRotationDragStore, roofingAxisDragStore all reset on apply', async () => {
+    const [vertex, rotation, axis] = await Promise.all([
+      import('@store/roofingVertexDragStore'),
+      import('@store/roofingRotationDragStore'),
+      import('@store/roofingAxisDragStore'),
+    ]);
+
+    vertex.useRoofingVertexDragStore.setState({ mode: 'dragging', sectionId: 'X', vertexIdx: 2 });
+    rotation.useRoofingRotationDragStore.setState({ mode: 'rotating', sectionId: 'Y' });
+    axis.useRoofingAxisDragStore.setState({ mode: 'dragging', sectionId: 'Z' });
+    seedRichRoofingScene();
+
+    applyBundle(captureBundle());
+
+    expect(vertex.useRoofingVertexDragStore.getState().mode).toBe('idle');
+    expect(vertex.useRoofingVertexDragStore.getState().sectionId).toBeNull();
+    expect(rotation.useRoofingRotationDragStore.getState().mode).toBe('idle');
+    expect(rotation.useRoofingRotationDragStore.getState().sectionId).toBeNull();
+    expect(axis.useRoofingAxisDragStore.getState().mode).toBe('idle');
+    expect(axis.useRoofingAxisDragStore.getState().sectionId).toBeNull();
   });
 });
 

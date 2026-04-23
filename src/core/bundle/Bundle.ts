@@ -44,6 +44,15 @@ import { useCustomerStore } from '@store/customerStore';
 // projects.
 import { useRoofStore } from '@store/roofStore';
 import { useRoofingProjectStore, type RoofingProjectInput } from '@store/roofingProjectStore';
+// Phase 9 — transient roofing interaction stores. Reset to idle
+// on applyBundle so a file open never lands in the middle of a
+// stale drag / calibrate / rotate session.
+import { useRoofingDrawStore } from '@store/roofingDrawStore';
+import { useRoofingCalibrationStore } from '@store/roofingCalibrationStore';
+import { useRoofingDragStore } from '@store/roofingDragStore';
+import { useRoofingVertexDragStore } from '@store/roofingVertexDragStore';
+import { useRoofingRotationDragStore } from '@store/roofingRotationDragStore';
+import { useRoofingAxisDragStore } from '@store/roofingAxisDragStore';
 import {
   type RoofGraphSnapshot,
   emptyRoofSnapshot,
@@ -510,6 +519,16 @@ function applyRoofBundle(roof: BundleRoof | undefined): void {
       dirtyDuringBatch: false,
     });
 
+    // Phase 9 (post-Phase-4 cleanup) — reset every transient roofing
+    // interaction store to idle. Without this, opening a file while
+    // the user is mid-drag / mid-calibrate / mid-rotate would leave
+    // the interaction session pointing at entities in the OLD file,
+    // and the next pointer event would corrupt the newly-loaded
+    // state. Matches what the plumbing-side `setState` calls above
+    // already do for the equivalent transient slices
+    // (pipivotSession, drawSession, pendingStart on walls/measures).
+    resetTransientRoofingStores();
+
     // Project input: if the bundle has one, apply it; otherwise the
     // roofingProjectStore keeps its existing (localStorage-restored)
     // state, which is usually the user's own per-machine defaults.
@@ -519,6 +538,29 @@ function applyRoofBundle(roof: BundleRoof | undefined): void {
   } catch (err) {
     log.warn('roof bundle restore skipped', err);
   }
+}
+
+/**
+ * Phase 9 — drop every in-progress roofing interaction session to
+ * idle. Called from `applyRoofBundle` so opening a file can never
+ * strand a half-finished drag / calibrate / rotate session pointing
+ * at entities that no longer exist (or exist in a different
+ * file's coordinate frame).
+ *
+ * Each store exposes its own no-arg "end" action; we call them
+ * rather than hand-constructing the idle state so the idle shape
+ * stays owned by the store module. Wrapped in try/catch because
+ * one malformed store shouldn't block the other resets — the whole
+ * `applyRoofBundle` is also wrapped, but defence-in-depth is cheap
+ * here.
+ */
+function resetTransientRoofingStores(): void {
+  try { useRoofingDrawStore.getState().cancelDraft(); } catch { /* ignore */ }
+  try { useRoofingCalibrationStore.getState().reset(); } catch { /* ignore */ }
+  try { useRoofingDragStore.getState().endDrag(); } catch { /* ignore */ }
+  try { useRoofingVertexDragStore.getState().endDrag(); } catch { /* ignore */ }
+  try { useRoofingRotationDragStore.getState().endRotate(); } catch { /* ignore */ }
+  try { useRoofingAxisDragStore.getState().endDrag(); } catch { /* ignore */ }
 }
 
 /**
