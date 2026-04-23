@@ -24,7 +24,7 @@
  * Only mounts when `appMode === 'roofing'` (see `App.tsx`).
  */
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { APP_MODE_ACCENTS } from '@store/appModeStore';
 import {
   useRoofingProjectStore,
@@ -367,6 +367,74 @@ function sectionToPricingLike(sec: RoofSection): RoofSectionLike {
 // ── Main panel ─────────────────────────────────────────────────
 
 export function RoofingInspector() {
+  // Collapsed by default — renders as a small bottom-right chip.
+  // Click to expand into the full form panel. Mirrors the plumbing
+  // workflow where the FixtureMiniCard sits bottom-right when
+  // collapsed. Keeps the roofing workspace's right column free for
+  // VIEW MODE + FLOORS until the user specifically wants the
+  // estimator surface.
+  const [expanded, setExpanded] = useState(false);
+
+  if (!expanded) {
+    return <RoofingInspectorCollapsedChip onExpand={() => setExpanded(true)} />;
+  }
+
+  return <RoofingInspectorExpanded onCollapse={() => setExpanded(false)} />;
+}
+
+// ── Collapsed chip ─────────────────────────────────────────────
+//
+// Bottom-right affordance. Click to expand into the full form. Sized
+// small so it doesn't compete visually with FloorSelectorRail
+// directly above it, but prominent enough that a user looking for
+// "where's my estimator?" finds it immediately.
+
+function RoofingInspectorCollapsedChip({ onExpand }: { onExpand: () => void }) {
+  return (
+    <button
+      onClick={onExpand}
+      style={{
+        position: 'fixed',
+        bottom: 48, // above RoofingStatusBar (32px tall + small gap)
+        right: 16,
+        zIndex: 30,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        padding: '10px 14px',
+        background: 'rgba(10,10,15,0.92)',
+        border: `1px solid ${APP_MODE_ACCENTS.roofing}`,
+        borderRadius: 10,
+        color: APP_MODE_ACCENTS.roofing,
+        fontFamily: "'Segoe UI', system-ui, sans-serif",
+        fontSize: 11,
+        fontWeight: 700,
+        letterSpacing: 1,
+        textTransform: 'uppercase',
+        cursor: 'pointer',
+        boxShadow: `0 2px 14px rgba(0,0,0,0.5), 0 0 12px ${APP_MODE_ACCENTS.roofing}33`,
+        transition: 'transform 100ms ease, box-shadow 200ms ease',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'scale(1.02)';
+        e.currentTarget.style.boxShadow = `0 2px 14px rgba(0,0,0,0.5), 0 0 20px ${APP_MODE_ACCENTS.roofing}66`;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'scale(1)';
+        e.currentTarget.style.boxShadow = `0 2px 14px rgba(0,0,0,0.5), 0 0 12px ${APP_MODE_ACCENTS.roofing}33`;
+      }}
+      title="Expand the roofing estimator panel"
+    >
+      <span style={{ fontSize: 14 }}>🏠</span>
+      <span>Roofing Estimator</span>
+      <span style={{ fontSize: 10, opacity: 0.7 }}>▲</span>
+    </button>
+  );
+}
+
+// ── Expanded panel ─────────────────────────────────────────────
+
+function RoofingInspectorExpanded({ onCollapse }: { onCollapse: () => void }) {
   const input = useRoofingProjectStore((s) => s.input);
   const update = useRoofingProjectStore((s) => s.update);
   const reset = useRoofingProjectStore((s) => s.reset);
@@ -529,7 +597,10 @@ export function RoofingInspector() {
         // strip and the top `ModeAccentStripe`.
         borderLeft: `3px solid ${APP_MODE_ACCENTS.roofing}`,
         borderRadius: 10,
-        zIndex: 20,
+        // Higher than FloorVisibilityControls (41) + FloorSelectorRail
+        // (40) so the expanded inspector overlays them when the user
+        // opens it. Collapsed chip sits at 30 (below these panels).
+        zIndex: 50,
         display: 'flex',
         flexDirection: 'column',
         fontFamily: "'Segoe UI', system-ui, sans-serif",
@@ -566,22 +637,41 @@ export function RoofingInspector() {
             FL code-compliant estimate · AROYH + fl_roofing
           </div>
         </div>
-        <button
-          onClick={reset}
-          title="Reset all fields to defaults"
-          style={{
-            background: 'transparent',
-            color: '#999',
-            border: '1px solid #333',
-            borderRadius: 4,
-            padding: '3px 8px',
-            fontSize: 10,
-            cursor: 'pointer',
-            fontFamily: 'system-ui, sans-serif',
-          }}
-        >
-          Reset
-        </button>
+        <div style={{ display: 'flex', gap: 4 }}>
+          <button
+            onClick={reset}
+            title="Reset all fields to defaults"
+            style={{
+              background: 'transparent',
+              color: '#999',
+              border: '1px solid #333',
+              borderRadius: 4,
+              padding: '3px 8px',
+              fontSize: 10,
+              cursor: 'pointer',
+              fontFamily: "'Segoe UI', system-ui, sans-serif",
+            }}
+          >
+            Reset
+          </button>
+          <button
+            onClick={onCollapse}
+            title="Collapse the estimator to a bottom-right chip"
+            style={{
+              background: 'transparent',
+              color: APP_MODE_ACCENTS.roofing,
+              border: `1px solid ${APP_MODE_ACCENTS.roofing}`,
+              borderRadius: 4,
+              padding: '3px 10px',
+              fontSize: 11,
+              fontWeight: 700,
+              cursor: 'pointer',
+              fontFamily: "'Segoe UI', system-ui, sans-serif",
+            }}
+          >
+            ▼
+          </button>
+        </div>
       </div>
 
       {/* Scrollable body */}

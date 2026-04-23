@@ -23,7 +23,7 @@
 
 import { useMemo } from 'react';
 import { useFloorStore } from '@store/floorStore';
-import { useAppModeStore } from '@store/appModeStore';
+import { useAppModeStore, SHARED_CHROME_ACCENTS } from '@store/appModeStore';
 import { usePipeStore } from '@store/pipeStore';
 import { aggregatePipesPerFloor } from '@core/floor/FloorResolver';
 
@@ -82,14 +82,11 @@ export function FloorSelectorRail() {
     }
   };
 
-  // Workspace-aware anchor: right-side column in plumbing mode.
-  // In roofing mode, RoofingInspector owns the right column so we
-  // shift the rail to the left, below IsoCameraHUD + FloorVisibility-
-  // Controls (also mode-shifted). All three now stack in the
-  // left-mid region past the RoofingToolbar (which ends at left: 256).
-  const anchorStyle: React.CSSProperties = appMode === 'roofing'
-    ? { top: 260, left: 272 }
-    : { top: 260, right: 12 };
+  // Both modes anchor on the right (below FloorVisibilityControls).
+  // In roofing, the RoofingInspector starts collapsed as a small
+  // bottom-right chip so it doesn't steal this column; expanding
+  // the inspector overlays these via higher z-index.
+  const anchorStyle: React.CSSProperties = { top: 260, right: 12 };
 
   return (
     <div
@@ -123,15 +120,25 @@ export function FloorSelectorRail() {
         const pipeCount = agg?.pipeCount ?? 0;
         const lengthFt = agg?.totalLengthFt ?? 0;
 
+        // Selection-highlight accent is workspace-aware: amber in
+        // roofing, per-floor color in plumbing. Keeps each floor's
+        // identity bar (left edge) but makes "which floor is active"
+        // read the same across both modes. In roofing, the golden
+        // ring also visually pairs with the amber VIEW MODE buttons
+        // so the user's eye groups "meta chrome" correctly.
+        const selectionAccent = appMode === 'roofing'
+          ? SHARED_CHROME_ACCENTS.roofing
+          : floor.color;
+
         const tileStyle: React.CSSProperties = {
           ...baseTileStyle,
           borderColor: isActive
-            ? floor.color
+            ? selectionAccent
             : isHidden
               ? 'rgba(255, 80, 80, 0.4)'
               : baseTileStyle.border as string,
           boxShadow: isActive
-            ? `0 0 18px ${hexToRgba(floor.color, 0.55)}, inset 0 0 14px ${hexToRgba(floor.color, 0.18)}`
+            ? `0 0 18px ${hexToRgba(selectionAccent, 0.55)}, inset 0 0 14px ${hexToRgba(selectionAccent, 0.18)}`
             : '0 2px 6px rgba(0, 0, 0, 0.35)',
           opacity: isHidden ? 0.45 : 1,
           transform: isActive ? 'translateX(-4px) scale(1.02)' : 'none',
@@ -166,7 +173,7 @@ export function FloorSelectorRail() {
 
             {/* Header row */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: 8 }}>
-              <div style={{ fontSize: 18, filter: isActive ? `drop-shadow(0 0 4px ${floor.color})` : 'none' }}>
+              <div style={{ fontSize: 18, filter: isActive ? `drop-shadow(0 0 4px ${selectionAccent})` : 'none' }}>
                 {floor.icon}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -174,11 +181,11 @@ export function FloorSelectorRail() {
                   style={{
                     fontSize: 12,
                     fontWeight: 600,
-                    color: isActive ? floor.color : '#d6e8f0',
+                    color: isActive ? selectionAccent : '#d6e8f0',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    textShadow: isActive ? `0 0 6px ${hexToRgba(floor.color, 0.8)}` : 'none',
+                    textShadow: isActive ? `0 0 6px ${hexToRgba(selectionAccent, 0.8)}` : 'none',
                   }}
                 >
                   {floor.name}
@@ -236,14 +243,17 @@ export function FloorSelectorRail() {
               <span>⟷ {lengthFt.toFixed(1)}ft</span>
             </div>
 
-            {/* Active pulse */}
+            {/* Active pulse — uses the same selectionAccent so the
+                ring, text, icon-shadow, and pulse all read as one
+                coherent highlight (amber in roofing, per-floor in
+                plumbing). */}
             {isActive && (
               <div
                 style={{
                   position: 'absolute',
                   inset: -1,
                   borderRadius: 9,
-                  border: `1px solid ${hexToRgba(floor.color, 0.4)}`,
+                  border: `1px solid ${hexToRgba(selectionAccent, 0.4)}`,
                   pointerEvents: 'none',
                   animation: 'floorPulse 2.2s ease-in-out infinite',
                 }}

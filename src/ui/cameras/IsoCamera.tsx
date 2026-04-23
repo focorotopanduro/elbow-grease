@@ -246,12 +246,14 @@ export function IsoCameraHUD() {
 
   const active = VIEW_PRESETS.find((p) => p.mode === mode);
 
-  // In roofing mode, shift the HUD out of the left column
-  // (RoofingToolbar occupies left: 12 → 256) and anchor it just
-  // past the toolbar at the top. Plumbing mode keeps the existing
-  // position below LayerPanel.
+  // Both modes anchor the camera HUD in the left-mid region — same
+  // relative position. Plumbing: past LayerPanel (left: 192).
+  // Roofing: past RoofingToolbar (left: 272, which is 12 + 244 + 16
+  // buffer). Same vertical anchor (top: 380) for visual parity so
+  // the eye finds "camera controls" in the same place regardless
+  // of mode.
   const hudPositionStyle: React.CSSProperties = appMode === 'roofing'
-    ? { position: 'fixed', top: 56, left: 272 }
+    ? { position: 'fixed', top: 380, left: 272 }
     : { position: 'absolute', top: 380, left: 192 };
 
   return (

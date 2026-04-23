@@ -88,11 +88,11 @@ export function FloorVisibilityControls() {
     ids.forEach((id) => st.toggleFloorHidden(id));
   };
 
-  // Workspace-aware anchor: right side in plumbing, left side in
-  // roofing (where the RoofingInspector owns the right column).
-  const anchorStyle: React.CSSProperties = appMode === 'roofing'
-    ? { left: 272, top: 12 }
-    : { right: 12, top: 12 };
+  // Both modes anchor top-right — in roofing, the RoofingInspector
+  // is now a bottom-right collapsible chip by default, so the right
+  // column is free for the floor panels. When the user expands the
+  // inspector it overlays these via higher z-index.
+  const anchorStyle: React.CSSProperties = { right: 12, top: 12 };
 
   return (
     <div
