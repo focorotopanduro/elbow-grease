@@ -4,6 +4,13 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  // Production source maps are cheap (~2s Vite overhead) and turn
+  // the otherwise-unreadable minified crash stack into real
+  // file:line references. Worth it during iteration. Flip to
+  // `false` if build size becomes a deploy concern.
+  build: {
+    sourcemap: true,
+  },
   resolve: {
     alias: {
       '@core': path.resolve(__dirname, 'src/core'),
