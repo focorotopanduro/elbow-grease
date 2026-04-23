@@ -192,6 +192,8 @@ const styles: Record<string, React.CSSProperties> = {
   },
   meta: {
     fontSize: 10,
-    color: '#555',
+    // Mirrors plumbing StatusBar's meta colour so the two status
+    // bars read the same weight when comparing side-by-side.
+    color: '#444',
   },
 };

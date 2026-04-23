@@ -510,13 +510,18 @@ export function RoofingInspector() {
   return (
     <div
       style={{
+        // Style mirrors plumbing PipeInspector — same background
+        // opacity, same border treatment, same font stack. The only
+        // trade-specific difference is the accent colour (orange vs
+        // cyan on the canvas-facing left edge) + the wider width
+        // because roofing's form has more live inputs.
         position: 'fixed',
         top: 50,
         right: 12,
         bottom: 44, // above StatusBar
         width: 420,
-        background: 'rgba(10, 10, 15, 0.96)',
-        border: '1px solid #222',
+        background: 'rgba(10,10,15,0.92)',
+        border: '1px solid #333',
         // Workspace-accent left border — orange for roofing. The
         // panel only mounts in roofing mode so the hardcoded
         // accent is always correct. Frames the edge that faces
@@ -527,25 +532,37 @@ export function RoofingInspector() {
         zIndex: 20,
         display: 'flex',
         flexDirection: 'column',
-        fontFamily: 'system-ui, sans-serif',
+        fontFamily: "'Segoe UI', system-ui, sans-serif",
         color: '#eee',
         boxShadow: '0 4px 24px rgba(0,0,0,0.6)',
-        backdropFilter: 'blur(6px)',
+        // No `backdropFilter` — plumbing's PipeInspector uses a
+        // fully-opaque dark surface. Glass-morphism is reserved for
+        // overlay utility panels (FloorVisibilityControls,
+        // FloorSelectorRail) so trade-specific toolbars / inspectors
+        // keep visual weight.
       }}
     >
-      {/* Header */}
+      {/* Header — matches PipeInspector's 10px/700 uppercase title
+          convention. Roofing specialises the subtitle with its
+          estimator stack (FL code + AROYH + fl_roofing). */}
       <div style={{
-        padding: '10px 14px',
+        padding: '12px 14px',
         borderBottom: '1px solid #222',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
       }}>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#ff9800' }}>
-            🏠 Roofing Inspector
+          <div style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: APP_MODE_ACCENTS.roofing,
+            letterSpacing: 2,
+            textTransform: 'uppercase',
+          }}>
+            ROOFING INSPECTOR
           </div>
-          <div style={{ fontSize: 10, color: '#666', marginTop: 1 }}>
+          <div style={{ fontSize: 10, color: '#666', marginTop: 3 }}>
             FL code-compliant estimate · AROYH + fl_roofing
           </div>
         </div>

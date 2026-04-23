@@ -58,6 +58,11 @@ const PENETRATION_KINDS: { value: PenetrationKind; icon: string; label: string }
 // ── Styles ──────────────────────────────────────────────────────
 
 const PANEL: React.CSSProperties = {
+  // Style values here mirror plumbing's Toolbar (src/ui/Toolbar.tsx)
+  // so the two workspaces share a single visual language — only the
+  // accent colour (orange vs cyan) differs. If you change padding,
+  // radius, background opacity, or font here, update the plumbing
+  // Toolbar to match.
   position: 'fixed',
   top: 56,
   left: 12,
@@ -65,50 +70,75 @@ const PANEL: React.CSSProperties = {
   width: 244,
   display: 'flex',
   flexDirection: 'column',
-  gap: 8,
-  padding: 10,
-  background: '#0a0a0f',
-  border: '1px solid #222',
+  gap: 3,
+  padding: 8,
+  background: 'rgba(10,10,15,0.95)',
+  border: '1px solid #333',
   // Workspace-accent on the canvas-facing edge. Roofing toolbar
   // sits left-of-canvas so the accent goes on the right edge,
   // mirroring the plumbing Toolbar on the other side of the mode.
   borderRight: `3px solid ${APP_MODE_ACCENTS.roofing}`,
-  borderRadius: 10,
+  borderRadius: 12,
   color: '#ddd',
-  fontFamily: 'system-ui, sans-serif',
-  fontSize: 12,
+  fontFamily: "'Segoe UI', system-ui, sans-serif",
+  fontSize: 11,
   boxShadow: '0 2px 14px rgba(0,0,0,0.5)',
   userSelect: 'none',
+  overflowY: 'auto',
+};
+
+const TITLE: React.CSSProperties = {
+  fontSize: 13,
+  fontWeight: 800,
+  color: APP_MODE_ACCENTS.roofing,
+  letterSpacing: 1,
+  textAlign: 'center',
+  padding: '4px 0 0',
+};
+
+const SUBTITLE: React.CSSProperties = {
+  fontSize: 9,
+  color: '#555',
+  textAlign: 'center',
+  letterSpacing: 2,
+  textTransform: 'uppercase',
 };
 
 const LABEL: React.CSSProperties = {
-  color: '#888',
-  fontSize: 10,
+  color: '#555',
+  fontSize: 9,
   textTransform: 'uppercase',
-  letterSpacing: '0.05em',
-  marginBottom: 3,
+  letterSpacing: 1,
+  padding: '4px 4px 2px',
 };
 
 const BTN: React.CSSProperties = {
-  background: '#181823',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+  background: 'transparent',
   border: '1px solid #333',
   color: '#ccc',
-  padding: '6px 10px',
-  borderRadius: 6,
+  padding: '7px 10px',
+  borderRadius: 8,
   cursor: 'pointer',
-  fontSize: 12,
-  // Added transform + box-shadow so the hook's press-scale + focus
-  // ring animate smoothly alongside the existing background/border
-  // hover shifts.
-  transition: 'background 120ms, border-color 120ms, color 120ms, transform 100ms ease, box-shadow 150ms ease',
+  fontSize: 11,
+  fontWeight: 600,
+  width: '100%',
+  // Transform (press-scale) + box-shadow (focus ring) animate via
+  // the InteractiveButton wrapper. Rest of the transitions kept on
+  // the same curves as plumbing's Toolbar.
+  transition: 'background 150ms ease, border-color 150ms ease, color 150ms ease, transform 100ms ease, box-shadow 150ms ease',
 };
 
 const BTN_ACTIVE: React.CSSProperties = {
   ...BTN,
-  background: '#ff980022',
-  borderColor: '#ff9800',
-  color: '#ff9800',
-  fontWeight: 600,
+  // Match plumbing's active-mode-button treatment: subtle white
+  // overlay on the neutral body + accent-coloured border. Keeps
+  // the visual weight consistent between the two toolbars.
+  background: 'rgba(255,255,255,0.06)',
+  borderColor: APP_MODE_ACCENTS.roofing,
+  color: APP_MODE_ACCENTS.roofing,
 };
 
 const BTN_DANGER: React.CSSProperties = {
@@ -136,8 +166,8 @@ const ROW: React.CSSProperties = {
 
 const DIVIDER: React.CSSProperties = {
   height: 1,
-  background: '#1a1a24',
-  margin: '2px 0',
+  background: '#222',
+  margin: '4px 0',
 };
 
 // ── Component ───────────────────────────────────────────────────
@@ -173,6 +203,14 @@ export function RoofingToolbar() {
 
   return (
     <div style={PANEL}>
+      {/* Title + subtitle — mirrors plumbing Toolbar's header block
+          so both modes lead with the same chrome element. Accent
+          colour picks up the workspace (orange here, cyan there). */}
+      <div style={TITLE}>ELBOW GREASE</div>
+      <div style={SUBTITLE}>Roofing CAD</div>
+
+      <div style={DIVIDER} />
+
       {/* Tool row */}
       <div style={ROW}>
         <InteractiveButton
