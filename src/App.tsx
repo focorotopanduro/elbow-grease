@@ -1748,16 +1748,21 @@ export function App() {
       <ActiveFloorAutoInfer />
       <FloorShortcutsBinder />
 
-      {/* Phase 2.B: Fixture parameter window (detail mode only). */}
-      <FixtureParamWindow />
+      {/* Phase 2.B: Fixture parameter window (detail mode only).
+          Fixtures are plumbing-only — gate so a lingering selection
+          from a prior plumbing session doesn't surface the panel
+          over the roofing workspace. */}
+      {appMode === 'plumbing' && <FixtureParamWindow />}
 
       {/* Phase 14.F: compact fixture inspector (mini mode — default).
           Renders only when a fixture is selected AND inspector mode is
-          'mini'. Expand button switches to the detail window above. */}
-      <FixtureMiniCard />
+          'mini'. Expand button switches to the detail window above.
+          Same plumbing-gate as above. */}
+      {appMode === 'plumbing' && <FixtureMiniCard />}
 
-      {/* Phase 2.C: Fixture visual editor (split top + 3D) */}
-      <FixtureVisualEditor />
+      {/* Phase 2.C: Fixture visual editor (split top + 3D).
+          Same plumbing-gate. */}
+      {appMode === 'plumbing' && <FixtureVisualEditor />}
 
       {/* Navigation status — shows why orbit is on/off */}
       <NavStatusChip />

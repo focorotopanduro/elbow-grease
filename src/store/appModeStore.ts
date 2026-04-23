@@ -85,6 +85,29 @@ export const APP_MODE_ACCENTS: Record<AppMode, string> = {
   roofing: '#ff9800',  // orange — maps to "warm / exterior / roof"
 };
 
+/**
+ * Accent for "shared chrome" — panels that appear in BOTH workspaces
+ * but aren't part of the trade-specific toolchain (camera HUD, floor
+ * selector, view-mode toggle, visibility controls).
+ *
+ * Plumbing mode uses cyan (matches `APP_MODE_ACCENTS.plumbing`) —
+ * shared chrome is indistinguishable from primary chrome, by design.
+ * Roofing mode uses AMBER instead of orange so the eye reads a
+ * hierarchy:
+ *   ORANGE = roofing-specific (toolbar, inspector, stripe)
+ *   AMBER  = meta-panels (camera, floors, view mode) visible in
+ *            roofing mode but not carrying roofing domain meaning.
+ *
+ * Amber (#ffd54f, Material Design amber 300) is warm — pairs
+ * visually with the roofing orange — but distinct enough that a
+ * glance at the amber panel immediately registers "utility chrome"
+ * rather than "another roofing tool".
+ */
+export const SHARED_CHROME_ACCENTS: Record<AppMode, string> = {
+  plumbing: '#00e5ff', // cyan — same as primary (plumbing is monochrome)
+  roofing: '#ffd54f',  // amber — distinct from the orange primary
+};
+
 export const __testables = {
   STORAGE_KEY,
   MODE_CYCLE,

@@ -23,6 +23,7 @@
 
 import { useMemo } from 'react';
 import { useFloorStore } from '@store/floorStore';
+import { useAppModeStore } from '@store/appModeStore';
 import { usePipeStore } from '@store/pipeStore';
 import { aggregatePipesPerFloor } from '@core/floor/FloorResolver';
 
@@ -55,6 +56,7 @@ export function FloorSelectorRail() {
   const setActiveFloor = useFloorStore((s) => s.setActiveFloor);
   const toggleFloorHidden = useFloorStore((s) => s.toggleFloorHidden);
   const pipes = usePipeStore((s) => s.pipes);
+  const appMode = useAppModeStore((s) => s.mode);
 
   // Sort highest-elevation first (matches physical building orientation)
   const ordered = useMemo(
@@ -80,14 +82,20 @@ export function FloorSelectorRail() {
     }
   };
 
+  // Workspace-aware anchor: right-side column in plumbing mode.
+  // In roofing mode, RoofingInspector owns the right column so we
+  // shift the rail to the left, below IsoCameraHUD + FloorVisibility-
+  // Controls (also mode-shifted). All three now stack in the
+  // left-mid region past the RoofingToolbar (which ends at left: 256).
+  const anchorStyle: React.CSSProperties = appMode === 'roofing'
+    ? { top: 260, left: 272 }
+    : { top: 260, right: 12 };
+
   return (
     <div
       style={{
         position: 'fixed',
-        // Top 260 clears FloorVisibilityControls (top 12 + ~240 tall
-        // when the ghost-opacity slider is expanded).
-        top: 260,
-        right: 12,
+        ...anchorStyle,
         width: RAIL_WIDTH,
         zIndex: 40,
         pointerEvents: 'auto',

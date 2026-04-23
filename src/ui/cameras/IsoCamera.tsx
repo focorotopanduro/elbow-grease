@@ -32,6 +32,7 @@ import { useEffect, useRef, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { create } from 'zustand';
+import { useAppModeStore, SHARED_CHROME_ACCENTS } from '@store/appModeStore';
 
 // ── View modes ──────────────────────────────────────────────────
 
@@ -220,6 +221,11 @@ const VIEW_PRESETS: { mode: CameraViewMode; label: string; icon: string; key: st
 export function IsoCameraHUD() {
   const mode = useIsoCameraStore((s) => s.mode);
   const setMode = useIsoCameraStore((s) => s.setMode);
+  // Shared-chrome accent — cyan in plumbing (matches primary), amber
+  // in roofing (distinct from the orange primary so the camera HUD
+  // doesn't look like yet another roofing tool).
+  const appMode = useAppModeStore((s) => s.mode);
+  const chromeAccent = SHARED_CHROME_ACCENTS[appMode];
 
   // Keyboard: numpad/number keys jump to a view.
   // 0 = perspective, 9 = iso_true, 7 = top, 8 = front, 6 = side.
@@ -240,27 +246,43 @@ export function IsoCameraHUD() {
 
   const active = VIEW_PRESETS.find((p) => p.mode === mode);
 
+  // In roofing mode, shift the HUD out of the left column
+  // (RoofingToolbar occupies left: 12 → 256) and anchor it just
+  // past the toolbar at the top. Plumbing mode keeps the existing
+  // position below LayerPanel.
+  const hudPositionStyle: React.CSSProperties = appMode === 'roofing'
+    ? { position: 'fixed', top: 56, left: 272 }
+    : { position: 'absolute', top: 380, left: 192 };
+
   return (
-    <div style={styles.hud}>
+    <div style={{ ...styles.hud, ...hudPositionStyle }}>
       <div style={styles.hudLabel}>CAMERA</div>
-      {VIEW_PRESETS.map((p) => (
-        <button
-          key={p.mode}
-          onClick={() => setMode(p.mode)}
-          style={{
-            ...styles.hudBtn,
-            borderColor: mode === p.mode ? '#00e5ff' : '#333',
-            color: mode === p.mode ? '#00e5ff' : '#888',
-            background: mode === p.mode ? 'rgba(0,229,255,0.08)' : 'transparent',
-            boxShadow: mode === p.mode ? '0 0 8px rgba(0,229,255,0.35)' : 'none',
-          }}
-          title={`${p.label} (${p.key})`}
-        >
-          <span>{p.icon}</span>
-          <span style={{ flex: 1, textAlign: 'left' }}>{p.label}</span>
-          <kbd style={styles.kbd}>{p.key}</kbd>
-        </button>
-      ))}
+      {VIEW_PRESETS.map((p) => {
+        const isActive = mode === p.mode;
+        // Pre-build rgba() variants of the chrome accent so the
+        // glow/background tints read correctly regardless of which
+        // mode we're in (cyan vs amber hex bases).
+        const accentRgba = hexToRgba(chromeAccent, 0.08);
+        const accentGlow = hexToRgba(chromeAccent, 0.35);
+        return (
+          <button
+            key={p.mode}
+            onClick={() => setMode(p.mode)}
+            style={{
+              ...styles.hudBtn,
+              borderColor: isActive ? chromeAccent : '#333',
+              color: isActive ? chromeAccent : '#888',
+              background: isActive ? accentRgba : 'transparent',
+              boxShadow: isActive ? `0 0 8px ${accentGlow}` : 'none',
+            }}
+            title={`${p.label} (${p.key})`}
+          >
+            <span>{p.icon}</span>
+            <span style={{ flex: 1, textAlign: 'left' }}>{p.label}</span>
+            <kbd style={styles.kbd}>{p.key}</kbd>
+          </button>
+        );
+      })}
       <div style={styles.hudMeta}>
         ◉ {active?.label ?? '—'}
       </div>
@@ -268,22 +290,27 @@ export function IsoCameraHUD() {
   );
 }
 
+/** Tiny hex → rgba helper. Accepts `#RRGGBB` or `#RGB`. Used by the
+ *  camera HUD to keep glow/tint colours in sync with the current
+ *  SHARED_CHROME_ACCENT without hardcoding per-mode rgba strings. */
+function hexToRgba(hex: string, alpha: number): string {
+  const raw = hex.replace(/^#/, '');
+  const long = raw.length === 3
+    ? raw[0]! + raw[0]! + raw[1]! + raw[1]! + raw[2]! + raw[2]!
+    : raw;
+  const r = parseInt(long.slice(0, 2), 16);
+  const g = parseInt(long.slice(2, 4), 16);
+  const b = parseInt(long.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 // ── Styles ──────────────────────────────────────────────────────
 
 const styles: Record<string, React.CSSProperties> = {
   hud: {
-    // Moved off the right edge — that column now belongs to
-    // FloorVisibilityControls + FloorSelectorRail + PhaseBOMPanel.
-    // Parked below LayerPanel in the left-mid region.
-    //
-    // Bug-fix pass: was `top: 200`, but LayerPanel extends from
-    // top:16 down through ~y=360 (5 system toggles + divider + 3
-    // component toggles + footer), so the camera HUD was covering
-    // the lower half of LayerPanel and hiding the Fittings /
-    // Fixtures / Dimensions / total-count rows. Bumped to 380 so
-    // the Camera HUD sits cleanly below LayerPanel with a small
-    // visual gap.
-    position: 'absolute', top: 380, left: 192,
+    // Position is applied per-mode at the component render site
+    // (see `hudPositionStyle` above). Plumbing: below LayerPanel
+    // in the left-mid region. Roofing: top-left past RoofingToolbar.
     display: 'flex', flexDirection: 'column', gap: 3,
     padding: 8, borderRadius: 8, border: '1px solid #333',
     background: 'rgba(10,10,15,0.92)',

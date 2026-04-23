@@ -13,15 +13,59 @@
  *   ALL   — every floor rendered at full brightness
  *   GHOST — active floor full, others dimmed + desaturated
  *   SOLO  — only active floor rendered; others completely hidden
+ *
+ * ─── Workspace-aware styling ─────────────────────────────────
+ *
+ * In plumbing mode: right-anchored (right: 12) — sits above the
+ * FloorSelectorRail in the right column. Glass-morphism pairs with
+ * the cyan-forward plumbing chrome.
+ *
+ * In roofing mode: left-anchored (left: 272, past the RoofingToolbar)
+ * — the right column belongs to the RoofingInspector (420px wide,
+ * right: 12). Active-state accent shifts from cyan to AMBER
+ * (`SHARED_CHROME_ACCENTS.roofing`) so the view-mode panel reads as
+ * "utility chrome", visually distinct from the orange roofing
+ * primary accent.
  */
 
 import { useFloorStore, type FloorVisibilityMode } from '@store/floorStore';
+import { useAppModeStore, SHARED_CHROME_ACCENTS } from '@store/appModeStore';
 
 const MODES: { id: FloorVisibilityMode; label: string; icon: string; tip: string }[] = [
   { id: 'all',         label: 'ALL',   icon: '▦', tip: 'All floors full brightness' },
   { id: 'ghost',       label: 'GHOST', icon: '◍', tip: 'Other floors dimmed' },
   { id: 'active_only', label: 'SOLO',  icon: '◉', tip: 'Only active floor' },
 ];
+
+/** Derive a second accent tint (lighter / more glowy) from the base
+ *  chrome accent. Simple hex → hsl lightness bump so we don't need a
+ *  second palette constant per mode. */
+function lightenHex(hex: string, amount = 0.18): string {
+  const raw = hex.replace(/^#/, '');
+  const long = raw.length === 3
+    ? raw[0]! + raw[0]! + raw[1]! + raw[1]! + raw[2]! + raw[2]!
+    : raw;
+  const r = parseInt(long.slice(0, 2), 16);
+  const g = parseInt(long.slice(2, 4), 16);
+  const b = parseInt(long.slice(4, 6), 16);
+  const lr = Math.min(255, Math.round(r + (255 - r) * amount));
+  const lg = Math.min(255, Math.round(g + (255 - g) * amount));
+  const lb = Math.min(255, Math.round(b + (255 - b) * amount));
+  return `rgb(${lr},${lg},${lb})`;
+}
+
+/** Hex → rgba. Same helper shape as IsoCameraHUD's — kept local so
+ *  each component owns its own color adapter. */
+function hexToRgba(hex: string, alpha: number): string {
+  const raw = hex.replace(/^#/, '');
+  const long = raw.length === 3
+    ? raw[0]! + raw[0]! + raw[1]! + raw[1]! + raw[2]! + raw[2]!
+    : raw;
+  const r = parseInt(long.slice(0, 2), 16);
+  const g = parseInt(long.slice(2, 4), 16);
+  const b = parseInt(long.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
 
 export function FloorVisibilityControls() {
   const mode = useFloorStore((s) => s.visibilityMode);
@@ -34,18 +78,27 @@ export function FloorVisibilityControls() {
   const toggleConstrain = useFloorStore((s) => s.toggleConstrainDraw);
   const hiddenCount = useFloorStore((s) => s.hiddenFloorIds.size);
 
+  const appMode = useAppModeStore((s) => s.mode);
+  const chromeAccent = SHARED_CHROME_ACCENTS[appMode];
+  const chromeAccentLight = lightenHex(chromeAccent, 0.25);
+
   const clearHidden = () => {
     const st = useFloorStore.getState();
     const ids = [...st.hiddenFloorIds];
     ids.forEach((id) => st.toggleFloorHidden(id));
   };
 
+  // Workspace-aware anchor: right side in plumbing, left side in
+  // roofing (where the RoofingInspector owns the right column).
+  const anchorStyle: React.CSSProperties = appMode === 'roofing'
+    ? { left: 272, top: 12 }
+    : { right: 12, top: 12 };
+
   return (
     <div
       style={{
         position: 'fixed',
-        top: 12,
-        right: 12,
+        ...anchorStyle,
         width: 188,
         zIndex: 41,
         pointerEvents: 'auto',
@@ -56,7 +109,7 @@ export function FloorVisibilityControls() {
       <div
         style={{
           background: 'linear-gradient(135deg, rgba(6,12,20,0.95) 0%, rgba(14,22,34,0.9) 100%)',
-          border: '1px solid rgba(120, 180, 220, 0.28)',
+          border: `1px solid ${hexToRgba(chromeAccent, 0.28)}`,
           borderRadius: 8,
           padding: 10,
           backdropFilter: 'blur(6px)',
@@ -68,7 +121,7 @@ export function FloorVisibilityControls() {
             fontSize: 10,
             letterSpacing: 2,
             textTransform: 'uppercase',
-            color: '#6a8fa8',
+            color: hexToRgba(chromeAccent, 0.65),
             marginBottom: 8,
             fontFamily: 'Consolas, monospace',
           }}
@@ -94,17 +147,20 @@ export function FloorVisibilityControls() {
                 title={m.tip}
                 style={{
                   background: isActive
-                    ? 'linear-gradient(135deg, #1e88e5 0%, #00bcd4 100%)'
+                    ? `linear-gradient(135deg, ${chromeAccent} 0%, ${chromeAccentLight} 100%)`
                     : 'rgba(30, 45, 60, 0.6)',
-                  border: `1px solid ${isActive ? '#4fc3f7' : 'rgba(120,180,220,0.25)'}`,
+                  border: `1px solid ${isActive ? chromeAccentLight : hexToRgba(chromeAccent, 0.25)}`,
                   borderRadius: 5,
                   padding: '6px 0',
-                  color: isActive ? '#fff' : '#8aa0b1',
+                  // Active tab uses dark text on bright accent (both cyan
+                  // and amber pass WCAG AAA against #0a0a0f). Inactive
+                  // stays muted.
+                  color: isActive ? '#0a0a0f' : '#8aa0b1',
                   fontSize: 10,
                   fontWeight: 600,
                   letterSpacing: 1,
                   cursor: 'pointer',
-                  boxShadow: isActive ? '0 0 10px rgba(79,195,247,0.6)' : 'none',
+                  boxShadow: isActive ? `0 0 10px ${hexToRgba(chromeAccentLight, 0.6)}` : 'none',
                   transition: 'all 120ms ease',
                 }}
               >
@@ -129,7 +185,7 @@ export function FloorVisibilityControls() {
               }}
             >
               <span>GHOST OPACITY</span>
-              <span style={{ color: '#4fc3f7' }}>{Math.round(ghostOpacity * 100)}%</span>
+              <span style={{ color: chromeAccentLight }}>{Math.round(ghostOpacity * 100)}%</span>
             </div>
             <input
               type="range"
@@ -138,14 +194,26 @@ export function FloorVisibilityControls() {
               step={0.02}
               value={ghostOpacity}
               onChange={(e) => setGhostOpacity(parseFloat(e.target.value))}
-              style={{ width: '100%', accentColor: '#4fc3f7' }}
+              style={{ width: '100%', accentColor: chromeAccent }}
             />
           </div>
         )}
 
         {/* Checkboxes */}
-        <ToggleRow label="Floor planes" checked={showPlanes} onChange={togglePlanes} />
-        <ToggleRow label="Constrain draw" checked={constrainDraw} onChange={toggleConstrain} />
+        <ToggleRow
+          label="Floor planes"
+          checked={showPlanes}
+          onChange={togglePlanes}
+          accent={chromeAccent}
+          accentLight={chromeAccentLight}
+        />
+        <ToggleRow
+          label="Constrain draw"
+          checked={constrainDraw}
+          onChange={toggleConstrain}
+          accent={chromeAccent}
+          accentLight={chromeAccentLight}
+        />
 
         {hiddenCount > 0 && (
           <button
@@ -177,10 +245,14 @@ function ToggleRow({
   label,
   checked,
   onChange,
+  accent,
+  accentLight,
 }: {
   label: string;
   checked: boolean;
   onChange: () => void;
+  accent: string;
+  accentLight: string;
 }) {
   return (
     <div
@@ -201,11 +273,11 @@ function ToggleRow({
           width: 28,
           height: 14,
           borderRadius: 7,
-          background: checked ? '#1e88e5' : 'rgba(60, 75, 90, 0.6)',
-          border: `1px solid ${checked ? '#4fc3f7' : 'rgba(120,180,220,0.3)'}`,
+          background: checked ? accent : 'rgba(60, 75, 90, 0.6)',
+          border: `1px solid ${checked ? accentLight : hexToRgba(accent, 0.3)}`,
           position: 'relative',
           transition: 'background 120ms ease',
-          boxShadow: checked ? '0 0 6px rgba(79,195,247,0.6)' : 'none',
+          boxShadow: checked ? `0 0 6px ${hexToRgba(accentLight, 0.6)}` : 'none',
         }}
       >
         <span
