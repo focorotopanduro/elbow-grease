@@ -5,9 +5,13 @@ import path from 'path';
 export default defineConfig({
   plugins: [react()],
   // Production source maps are cheap (~2s Vite overhead) and turn
-  // the otherwise-unreadable minified crash stack into real
-  // file:line references. Worth it during iteration. Flip to
-  // `false` if build size becomes a deploy concern.
+  // minified crash stacks into readable file:line references when
+  // inspected via DevTools. Leave on. Minification stays enabled
+  // (default) — we only temporarily turned it off to diagnose the
+  // React #185 infinite-loop crash that traced to
+  // `selectSectionsArray` without `useShallow`. If a future crash
+  // needs unminified component names in `Error.stack`, briefly set
+  // `minify: false` here, rebuild, reproduce, then revert.
   build: {
     sourcemap: true,
   },

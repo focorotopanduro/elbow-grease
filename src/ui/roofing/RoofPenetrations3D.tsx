@@ -21,6 +21,7 @@
  */
 
 import { useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useRoofStore, selectPenetrationsArray } from '@store/roofStore';
 import type { RoofPenetration, PenetrationKind } from '@engine/roofing/RoofGraph';
 
@@ -113,7 +114,11 @@ function RoofPenetration3D({ pen }: RoofPenetration3DProps) {
 // ── Layer ────────────────────────────────────────────────────────
 
 export function RoofPenetrations3D() {
-  const penetrations = useRoofStore(selectPenetrationsArray);
+  // `useShallow` — see RoofSectionsLayer.tsx for the full why.
+  // Short version: `selectPenetrationsArray` builds a fresh array
+  // per call, which Zustand's default `Object.is` treats as changed
+  // on every store mutation. Shallow-equal array contents instead.
+  const penetrations = useRoofStore(useShallow(selectPenetrationsArray));
 
   return (
     <group>

@@ -17,6 +17,7 @@
  * When no sections exist yet, shows a friendly onboarding hint.
  */
 
+import { useShallow } from 'zustand/react/shallow';
 import { useRoofStore, selectSectionsArray } from '@store/roofStore';
 import {
   type RoofSection,
@@ -70,7 +71,13 @@ const TYPE_LABELS: Record<RoofSection['roofType'], string> = {
 };
 
 export function SectionsPanel() {
-  const sections = useRoofStore(selectSectionsArray);
+  // `selectSectionsArray` returns a FRESH array on every call —
+  // Zustand's default `Object.is` equality would see it as "changed"
+  // on every render and trigger React 18's useSyncExternalStore
+  // tearing check → infinite re-render loop (React error #185).
+  // `useShallow` compares array contents element-by-element, so
+  // same-sections-in-same-order returns the cached reference.
+  const sections = useRoofStore(useShallow(selectSectionsArray));
   const selectedId = useRoofStore((s) => s.selectedSectionId);
   const selectSection = useRoofStore((s) => s.selectSection);
   const removeSection = useRoofStore((s) => s.removeSection);

@@ -18,15 +18,19 @@
  *   in App.tsx, so this file doesn't need its own mode check.
  */
 
+import { useShallow } from 'zustand/react/shallow';
 import { useRoofStore, selectSectionsArray } from '@store/roofStore';
 import { RoofSection3D } from './RoofSection3D';
 
 export function RoofSectionsLayer() {
-  // Re-render whenever the ordered list of section IDs changes OR
-  // whenever any individual section is mutated — Zustand shallow-
-  // compares by default, and section objects are replaced (not
-  // mutated) by updateSection, so reference-equality is reliable.
-  const sections = useRoofStore(selectSectionsArray);
+  // The prior comment claimed Zustand shallow-compares by default —
+  // it doesn't. Default equality is `Object.is`. `selectSectionsArray`
+  // returns a fresh array per call, so without `useShallow` every
+  // unrelated store mutation re-renders this <group> + ALL its
+  // `RoofSection3D` children. `useShallow` compares array contents
+  // element-by-element so we only re-render when the section LIST
+  // genuinely changes.
+  const sections = useRoofStore(useShallow(selectSectionsArray));
   const selectSection = useRoofStore((s) => s.selectSection);
 
   return (

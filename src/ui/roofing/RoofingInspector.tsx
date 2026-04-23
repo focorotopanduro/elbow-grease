@@ -48,6 +48,7 @@ import { pricesFromCatalog } from '@engine/roofing/materialCatalog';
 // Phase 14.R.4 — canvas-drawn sections. Selecting a section in the
 // panel syncs its dims into `roofingProjectStore` so the live
 // estimator below reflects "this section's quote".
+import { useShallow } from 'zustand/react/shallow';
 import { useRoofStore, selectSectionsArray, selectPenetrationsArray } from '@store/roofStore';
 import { SectionsPanel } from './SectionsPanel';
 // Phase 14.R.6 — whole-house aggregation across all drawn sections.
@@ -416,12 +417,20 @@ export function RoofingInspector() {
   // subscribe to the drawn-section list so the aggregate BOM updates
   // when the user draws/deletes/edits a section.
   const scope = useRoofingScopeStore((s) => s.scope);
-  const sections = useRoofStore(selectSectionsArray);
+  // `useShallow` is critical here: both `selectSectionsArray` and
+  // `selectPenetrationsArray` build a fresh array on every call,
+  // and Zustand's default `Object.is` equality would then re-render
+  // this component on every unrelated store mutation — worse,
+  // React 18's useSyncExternalStore tearing check interprets the
+  // new-array-every-render as a torn snapshot and loops infinitely
+  // (the React #185 crash that bit us when flipping plumbing ↔
+  // roofing via Shift+M).
+  const sections = useRoofStore(useShallow(selectSectionsArray));
   // Phase 14.R.27 — spatial penetration markers. When any markers
   // exist for a kind, they OVERRIDE the manual form count for that
   // kind; otherwise the manual count is still used. See
   // `resolvePenetrationCounts` for the exact rule.
-  const penetrations = useRoofStore(selectPenetrationsArray);
+  const penetrations = useRoofStore(useShallow(selectPenetrationsArray));
   const removePenetration = useRoofStore((s) => s.removePenetration);
   const state = useRoofingProjectStore.getState();
   const aggregate = scope === 'all' && sections.length > 0;
