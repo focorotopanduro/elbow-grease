@@ -440,3 +440,68 @@ describe('ModeTabs — hover-glow affordance', () => {
     expect(transition).toContain('box-shadow 200ms');
   });
 });
+
+// ── Pressed-state micro-feedback ─────────────────────────────
+//
+// mousedown on a tab triggers a brief 4% scale-down as a tactile
+// "I got your click" signal. Releases on mouseup OR when the
+// pointer drags off the button (the gesture users learn to
+// abort a click).
+
+describe('ModeTabs — pressed-state micro-feedback', () => {
+  it('mousedown on a tab scales it down to 0.96', () => {
+    const { container } = render(<ModeTabs />);
+    const roofing = container.querySelector('[data-mode-tab="roofing"]') as HTMLButtonElement;
+
+    expect(roofing.style.transform).toBe('scale(1)');
+    fireEvent.mouseDown(roofing);
+    expect(roofing.style.transform).toBe('scale(0.96)');
+  });
+
+  it('mouseup releases the scale-down', () => {
+    const { container } = render(<ModeTabs />);
+    const roofing = container.querySelector('[data-mode-tab="roofing"]') as HTMLButtonElement;
+
+    fireEvent.mouseDown(roofing);
+    expect(roofing.style.transform).toBe('scale(0.96)');
+    fireEvent.mouseUp(roofing);
+    expect(roofing.style.transform).toBe('scale(1)');
+  });
+
+  it('dragging the pointer off a pressed tab releases the scale (click-abort gesture)', () => {
+    const { container } = render(<ModeTabs />);
+    const roofing = container.querySelector('[data-mode-tab="roofing"]') as HTMLButtonElement;
+
+    fireEvent.mouseDown(roofing);
+    expect(roofing.style.transform).toBe('scale(0.96)');
+
+    // User drags off the button without releasing.
+    fireEvent.mouseLeave(roofing);
+    expect(roofing.style.transform).toBe('scale(1)');
+  });
+
+  it('pressing the active tab still shows tactile feedback (even if the click is a no-op)', () => {
+    useAppModeStore.setState({ mode: 'plumbing' });
+    const { container } = render(<ModeTabs />);
+    const plumbing = container.querySelector('[data-mode-tab="plumbing"]') as HTMLButtonElement;
+
+    fireEvent.mouseDown(plumbing);
+    // The click itself is a no-op (already active) but the user
+    // should still see visual confirmation the press registered.
+    expect(plumbing.style.transform).toBe('scale(0.96)');
+  });
+
+  it('transform transition is included in the tab transition list (snappy 100ms)', () => {
+    installMatchMediaMock(false);
+    const { container } = render(<ModeTabs />);
+    const roofing = container.querySelector('[data-mode-tab="roofing"]') as HTMLButtonElement;
+    expect(roofing.style.transition).toContain('transform 100ms');
+  });
+
+  it('reduced motion disables the press transition', () => {
+    installMatchMediaMock(true);
+    const { container } = render(<ModeTabs />);
+    const roofing = container.querySelector('[data-mode-tab="roofing"]') as HTMLButtonElement;
+    expect(roofing.style.transition).toBe('none');
+  });
+});

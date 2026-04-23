@@ -68,10 +68,15 @@ export function ModeTabs() {
   const reducedMotion = useReducedMotion();
 
   // React state for visual-only local interaction. Kept out of
-  // appModeStore because it's purely ephemeral — hover and focus
-  // don't survive unmount and shouldn't touch global state.
+  // appModeStore because it's purely ephemeral — hover / focus /
+  // press don't survive unmount and shouldn't touch global state.
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [focusedIdx, setFocusedIdx] = useState<number | null>(null);
+  // Pressed state drives the tactile scale-down feedback. Set on
+  // mousedown, cleared on mouseup OR when the mouse leaves the
+  // button mid-press (a common "committed to abort the click"
+  // gesture — users learn to drag off a button to cancel).
+  const [pressedIdx, setPressedIdx] = useState<number | null>(null);
 
   // Defensive clamp: if `mode` somehow isn't in MODES (rare but
   // possible with a stale / corrupted localStorage value), keep
@@ -88,10 +93,12 @@ export function ModeTabs() {
     : 'transform 280ms cubic-bezier(0.4, 0, 0.2, 1), background 280ms ease, box-shadow 280ms ease';
   // Transition text colour AND the hover glow/background on the
   // same 200ms curve. Keeps the affordance feeling like a single
-  // coordinated move rather than a staggered fade.
+  // coordinated move rather than a staggered fade. The pressure
+  // feedback rides on a faster 100ms curve so the press feels
+  // immediately tactile — the pill's 280ms slide then takes over.
   const tabTextTransition = reducedMotion
     ? 'none'
-    : 'color 200ms ease, background 200ms ease, box-shadow 200ms ease';
+    : 'color 200ms ease, background 200ms ease, box-shadow 200ms ease, transform 100ms ease';
   const containerGlowTransition = reducedMotion ? 'none' : 'box-shadow 280ms ease';
 
   /** Pointer / keyboard: move focus to `idx` and activate that
@@ -199,6 +206,7 @@ export function ModeTabs() {
           const active = resolvedMode === m;
           const hovered = hoveredIdx === idx;
           const focused = focusedIdx === idx;
+          const pressed = pressedIdx === idx;
           const color = active ? '#0a0a0f' : hovered ? '#ccc' : '#777';
 
           // Hover affordance on the INACTIVE tab: the tab picks up
@@ -227,7 +235,19 @@ export function ModeTabs() {
               }}
               onKeyDown={(e) => onKeyDown(e, idx)}
               onMouseEnter={() => setHoveredIdx(idx)}
-              onMouseLeave={() => setHoveredIdx((h) => (h === idx ? null : h))}
+              onMouseLeave={() => {
+                setHoveredIdx((h) => (h === idx ? null : h));
+                // If the user drags off during a press, release
+                // the pressure state so the button snaps back
+                // to rest instead of staying squished.
+                setPressedIdx((p) => (p === idx ? null : p));
+              }}
+              onMouseDown={() => setPressedIdx(idx)}
+              onMouseUp={() => setPressedIdx(null)}
+              // `onPointerCancel` + touch are intentionally not
+              // handled explicitly — the button release on touch
+              // fires `mouseup` via synthetic dispatch, and
+              // `mouseleave` catches any weird drag-off edge.
               onFocus={() => setFocusedIdx(idx)}
               onBlur={() => setFocusedIdx((f) => (f === idx ? null : f))}
               title={`${APP_MODE_LABELS[m]} workspace — Shift+M to toggle, ← / → to navigate`}
@@ -247,6 +267,10 @@ export function ModeTabs() {
                 fontWeight: active ? 700 : 500,
                 color,
                 boxShadow,
+                // Tactile scale-down on press. 4% smaller reads
+                // as a deliberate "click landed" tap without
+                // looking buggy. Snaps back on release.
+                transform: pressed ? 'scale(0.96)' : 'scale(1)',
                 cursor: 'pointer',
                 letterSpacing: active ? 0.3 : 0,
                 // `font-weight` removed from the transition list —
