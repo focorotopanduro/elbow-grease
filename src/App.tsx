@@ -1939,23 +1939,35 @@ export function App() {
       {appMode === 'plumbing' && <PhaseBOMPanel />}
       {appMode === 'plumbing' && <PhaseShortcutsBinder />}
 
-      {/* Phase 2.D: Customer management */}
-      <CustomerBadge />
-      <CustomerShortcutsBinder />
-      <FixtureTemplateEditor />
+      {/* Phase 2.D: Customer management — plumbing-scoped because
+          the CustomerBadge surfaces phase progression (UG/RI/TR)
+          that's a plumbing concept + the CustomerManager dialog
+          edits plumbing fixture templates. Roofing can grow its
+          own peer when customer-roofing flows land. */}
+      {appMode === 'plumbing' && <CustomerBadge />}
+      {appMode === 'plumbing' && <CustomerShortcutsBinder />}
+      {appMode === 'plumbing' && <FixtureTemplateEditor />}
 
-      {/* Phase 2.G: Walls / Ruler / Scale / Backdrop */}
-      <MeasureToolbar />
-      <ScaleCalibratorDialog />
-      <MeasureShortcutsBinder />
+      {/* Phase 2.G: Walls / Ruler / Scale / Backdrop. Mode-gated to
+          plumbing — the "Wall" tool here draws plumbing walls
+          (2×4 / 2×6 framing for DWV routing), which conflicts with
+          the roofing workspace's section-drawing. Ruler / Scale /
+          Backdrop sub-tools live inside this toolbar; if the user
+          wants them in roofing, we'll build a RoofingMeasureToolbar
+          peer. Also gates ScaleCalibratorDialog (plumbing scale)
+          and MeasureShortcutsBinder (plumbing keys). */}
+      {appMode === 'plumbing' && <MeasureToolbar />}
+      {appMode === 'plumbing' && <ScaleCalibratorDialog />}
+      {appMode === 'plumbing' && <MeasureShortcutsBinder />}
 
-      {/* Phase 1: Camera view HUD */}
+      {/* Phase 1: Camera view HUD. Shared across both workspaces —
+          the 3D camera IS the shell. */}
       <IsoCameraHUD />
 
       {/* Phase 14.AD.27 — ortho-drag mode badge (bottom-right).
-          Visible only when camera is in an orthographic view. Click
-          toggles the mode, same as Shift+O. */}
-      <OrthoDragModeBadge />
+          Plumbing-only: this toggles plumbingDrawStore's
+          orthoClickDragMode, which is a pipe-drawing setting. */}
+      {appMode === 'plumbing' && <OrthoDragModeBadge />}
 
       {/* Phase 1: Radial menus — plumbing-only (drawing / fixture / customer-edit wheels) */}
       {appMode === 'plumbing' && (
