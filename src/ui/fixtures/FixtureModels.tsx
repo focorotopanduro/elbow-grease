@@ -35,7 +35,7 @@ import { useMultiSelectStore } from '@store/multiSelectStore';
 // FixturePlacementPreview's catcher plane instead of being swallowed
 // here.
 import { useCustomerStore } from '@store/customerStore';
-import { usePhaseFilter } from '@store/phaseStore';
+import { usePhaseFilter } from '@store/plumbingPhaseStore';
 import { shouldPhaseRender, PHASE_META } from '@core/phases/PhaseTypes';
 import { classifyFixture } from '@core/phases/PhaseClassifier';
 import { getFixtureGeometry } from '@core/fixtures/ConnectionPoints';

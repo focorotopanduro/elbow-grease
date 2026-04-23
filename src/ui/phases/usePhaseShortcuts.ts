@@ -16,7 +16,7 @@
  */
 
 import { useEffect } from 'react';
-import { usePhaseStore } from '@store/phaseStore';
+import { usePlumbingPhaseStore } from '@store/plumbingPhaseStore';
 import { PHASE_ORDER } from '@core/phases/PhaseTypes';
 
 function isEditable(t: EventTarget | null): boolean {
@@ -33,7 +33,7 @@ export function usePhaseShortcuts() {
       if (isEditable(e.target)) return;
       if (e.ctrlKey || e.metaKey) return;
 
-      const st = usePhaseStore.getState();
+      const st = usePlumbingPhaseStore.getState();
 
       // Digit 1-3 → phase jump (no modifiers)
       if (!e.altKey && !e.shiftKey) {

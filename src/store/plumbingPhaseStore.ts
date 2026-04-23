@@ -1,5 +1,14 @@
 /**
- * PhaseStore — construction phase filter and per-item overrides.
+ * plumbingPhaseStore — plumbing construction phase filter and
+ * per-item overrides.
+ *
+ * Renamed from `phaseStore` in Phase 6b of the hybrid-architecture
+ * refactor (ARCHITECTURE.md §7.8). The "phases" modelled here are
+ * rough-in / top-out / trim-out — strictly plumbing construction
+ * stages. Roofing has different phases (tear-off / dry-in /
+ * shingle / finish) and will get its own `roofingPhaseStore` when
+ * needed (§4.7 — "After renaming to plumbingPhaseStore, the
+ * selector no-ops when appMode === 'roofing'").
  *
  * Tracks:
  *   - activePhase          Which phase the user is currently focused on
@@ -43,7 +52,7 @@ interface PhaseState {
   toggleHalo: () => void;
 }
 
-export const usePhaseStore = create<PhaseState>((set, get) => ({
+export const usePlumbingPhaseStore = create<PhaseState>((set, get) => ({
   activePhase: 'rough_in',
   visibilityMode: 'all',
   pipeOverrides: {},
@@ -115,11 +124,11 @@ export function usePhaseFilter(): {
   fixtureOverride: (id: string) => ConstructionPhase | undefined;
   tintByPhase: boolean;
 } {
-  const activePhase = usePhaseStore((s) => s.activePhase);
-  const mode = usePhaseStore((s) => s.visibilityMode);
-  const pipeOverrides = usePhaseStore((s) => s.pipeOverrides);
-  const fixtureOverrides = usePhaseStore((s) => s.fixtureOverrides);
-  const tintByPhase = usePhaseStore((s) => s.tintByPhase);
+  const activePhase = usePlumbingPhaseStore((s) => s.activePhase);
+  const mode = usePlumbingPhaseStore((s) => s.visibilityMode);
+  const pipeOverrides = usePlumbingPhaseStore((s) => s.pipeOverrides);
+  const fixtureOverrides = usePlumbingPhaseStore((s) => s.fixtureOverrides);
+  const tintByPhase = usePlumbingPhaseStore((s) => s.tintByPhase);
 
   return useMemo(
     () => ({

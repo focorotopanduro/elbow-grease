@@ -19,7 +19,7 @@ import * as THREE from 'three';
 import { usePipeStore } from '@store/pipeStore';
 import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 import { useFloorParams } from '@store/floorStore';
-import { usePhaseFilter } from '@store/phaseStore';
+import { usePhaseFilter } from '@store/plumbingPhaseStore';
 import { getPipeMaterial } from '../PipeMaterial';
 import { getOuterRadiusFt } from '@core/pipe/PipeSizeSpec';
 import type { PipeMaterial } from '../../../engine/graph/GraphEdge';

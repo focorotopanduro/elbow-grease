@@ -17,7 +17,7 @@ import * as THREE from 'three';
 import { usePipeStore } from '@store/pipeStore';
 import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 import { useFloorParams } from '@store/floorStore';
-import { usePhaseFilter } from '@store/phaseStore';
+import { usePhaseFilter } from '@store/plumbingPhaseStore';
 import { shouldPhaseRender } from '@core/phases/PhaseTypes';
 import { classifyPipe } from '@core/phases/PhaseClassifier';
 import {

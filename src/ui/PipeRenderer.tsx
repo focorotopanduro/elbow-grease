@@ -16,7 +16,7 @@ import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 import { useMultiSelectStore } from '@store/multiSelectStore';
 import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { useFloorParams, type FloorRenderParams } from '@store/floorStore';
-import { usePhaseFilter } from '@store/phaseStore';
+import { usePhaseFilter } from '@store/plumbingPhaseStore';
 import { shouldPhaseRender, PHASE_META } from '@core/phases/PhaseTypes';
 import { classifyPipe } from '@core/phases/PhaseClassifier';
 import { getOuterRadiusFt } from '@core/pipe/PipeSizeSpec';
