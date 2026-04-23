@@ -9,6 +9,7 @@
 
 import { usePlumbingDrawStore, type InteractionMode } from '@store/plumbingDrawStore';
 import { usePipeStore } from '@store/pipeStore';
+import { APP_MODE_ACCENTS } from '@store/appModeStore';
 
 // ── Mode buttons ────────────────────────────────────────────────
 
@@ -143,6 +144,10 @@ const styles: Record<string, React.CSSProperties> = {
     position: 'absolute', left: 16, top: 16, bottom: 16,
     display: 'flex', flexDirection: 'column', gap: 3,
     padding: 8, borderRadius: 12, border: '1px solid #333',
+    // Workspace-accent on the canvas-facing edge (right, since the
+    // toolbar sits left-of-canvas). Plumbing-only mount via App.tsx
+    // gate — hardcoded cyan is correct.
+    borderRight: `3px solid ${APP_MODE_ACCENTS.plumbing}`,
     background: 'rgba(10,10,15,0.95)', fontFamily: "'Segoe UI', system-ui, sans-serif",
     pointerEvents: 'auto', zIndex: 30, width: 160, overflowY: 'auto',
   },

@@ -18,6 +18,8 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 import { PipeInspector } from '../PipeInspector';
 import { LayerPanel } from '../LayerPanel';
+import { Toolbar } from '../Toolbar';
+import { RoofingToolbar } from '../roofing/RoofingToolbar';
 import { APP_MODE_ACCENTS } from '@store/appModeStore';
 import { usePipeStore } from '@store/pipeStore';
 
@@ -70,5 +72,23 @@ describe('LayerPanel — plumbing accent border', () => {
     const panel = container.firstElementChild as HTMLElement | null;
     expect(panel).not.toBeNull();
     expect(panel!.style.borderRight).toBe(`3px solid ${hexToRgb(APP_MODE_ACCENTS.plumbing)}`);
+  });
+});
+
+describe('Toolbar — plumbing accent border', () => {
+  it('toolbar root has a 3px cyan right border (canvas-facing edge)', () => {
+    const { container } = render(<Toolbar />);
+    const toolbar = container.firstElementChild as HTMLElement | null;
+    expect(toolbar).not.toBeNull();
+    expect(toolbar!.style.borderRight).toBe(`3px solid ${hexToRgb(APP_MODE_ACCENTS.plumbing)}`);
+  });
+});
+
+describe('RoofingToolbar — roofing accent border', () => {
+  it('toolbar root has a 3px orange right border (canvas-facing edge)', () => {
+    const { container } = render(<RoofingToolbar />);
+    const toolbar = container.firstElementChild as HTMLElement | null;
+    expect(toolbar).not.toBeNull();
+    expect(toolbar!.style.borderRight).toBe(`3px solid ${hexToRgb(APP_MODE_ACCENTS.roofing)}`);
   });
 });

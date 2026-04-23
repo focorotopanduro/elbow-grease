@@ -19,6 +19,7 @@ import {
   useRoofingDrawStore,
 } from '@store/roofingDrawStore';
 import { useRoofStore } from '@store/roofStore';
+import { APP_MODE_ACCENTS } from '@store/appModeStore';
 import type { RoofType, SectionType, PenetrationKind } from '@engine/roofing/RoofGraph';
 
 const ROOF_TYPES: { value: RoofType; label: string; icon: string }[] = [
@@ -60,6 +61,10 @@ const PANEL: React.CSSProperties = {
   padding: 10,
   background: '#0a0a0f',
   border: '1px solid #222',
+  // Workspace-accent on the canvas-facing edge. Roofing toolbar
+  // sits left-of-canvas so the accent goes on the right edge,
+  // mirroring the plumbing Toolbar on the other side of the mode.
+  borderRight: `3px solid ${APP_MODE_ACCENTS.roofing}`,
   borderRadius: 10,
   color: '#ddd',
   fontFamily: 'system-ui, sans-serif',
