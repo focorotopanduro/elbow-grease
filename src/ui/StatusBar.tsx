@@ -1,9 +1,21 @@
 /**
- * StatusBar — bottom-of-screen bar showing current mode, shortcuts, and draw state.
+ * StatusBar — bottom-of-screen bar for the plumbing workspace.
+ * Shows current draw mode, plane, diameter, hint text, and pipe
+ * count.
+ *
+ * Mounted only while `appMode === 'plumbing'` (Phase 9.1 gate).
+ * The roofing workspace has its own `RoofingStatusBar` peer.
+ *
+ * Carries a 2px cyan accent strip along the top so the user has
+ * an instant "this is plumbing" signal from peripheral vision,
+ * matching the orange strip on the roofing StatusBar.
  */
 
 import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { usePipeStore } from '@store/pipeStore';
+import { APP_MODE_ACCENTS } from '@store/appModeStore';
+
+const ACCENT = APP_MODE_ACCENTS.plumbing;
 
 const MODE_LABELS = {
   navigate: { text: 'NAVIGATE', color: '#888', hint: 'Left-drag = orbit | Scroll = zoom | D = draw mode' },
@@ -74,7 +86,9 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 8,
     padding: '0 16px 0 180px', // left padding clears the toolbar
     background: 'rgba(10,10,15,0.95)',
-    borderTop: '1px solid #222',
+    // Workspace-accent strip: cyan in plumbing mode, peer to the
+    // orange on `RoofingStatusBar`. Instant mode legibility.
+    borderTop: `2px solid ${ACCENT}`,
     fontFamily: "'Segoe UI', system-ui, sans-serif",
     pointerEvents: 'none',
     zIndex: 25,
