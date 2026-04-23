@@ -178,6 +178,30 @@ describe('CommandBus — log + subscriptions', () => {
 
 describe('CommandBus — performance', () => {
   it('dispatch latency p95 < 0.2ms for pipe.add on small scenes', () => {
+    // Phase 9 — JIT warmup before measurement. Without this the
+    // first ~20 iterations pay cold-path costs (V8 inline-cache
+    // misses, handler-lookup Map shape feedback, snapshot clone
+    // cost the first time structuredClone warms up for this
+    // handler). Those tail-heavy samples tripped p95 above the
+    // 1ms headroom sporadically when the test ran alongside the
+    // rest of the suite under machine load. Warmup runs aren't
+    // measured; the CommandBus log is cleared after so the
+    // measurement loop starts at the same log state as before.
+    const warmupPayloads = Array.from({ length: 50 }, (_, i) => ({
+      id: `warmup-${i}`,
+      points: [[i, 0, 0], [i + 1, 0, 0]] as [number, number, number][],
+      diameter: 2,
+      material: 'pvc_sch40',
+    }));
+    for (const p of warmupPayloads) {
+      commandBus.dispatch({ type: 'pipe.add', payload: p });
+    }
+    usePipeStore.setState({
+      pipes: {}, pipeOrder: [],
+      selectedId: null, undoStack: [], redoStack: [], pivotSession: null,
+    });
+    commandBus.clearLog();
+
     const payloads = Array.from({ length: 500 }, (_, i) => ({
       id: `perf-${i}`,
       points: [[i, 0, 0], [i + 1, 0, 0]] as [number, number, number][],
