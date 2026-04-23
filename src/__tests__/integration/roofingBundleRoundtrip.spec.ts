@@ -18,7 +18,7 @@
  *      correctly dropped when autosave passes `omitPdfImageData`.
  *
  *   3. Transient-by-design stores (`roofingCalibrationStore`,
- *      `roofingSectionDragStore`) are NOT serialized. The
+ *      `roofingDragStore`) are NOT serialized. The
  *      calibration DRAFT sequence and mid-drag anchors are
  *      deliberately out of scope; their persistent output
  *      (`roofStore.pdf.scale`, `sections[id].x/y`) is what
@@ -44,7 +44,7 @@ import {
   __testables as projectTestables,
 } from '@store/roofingProjectStore';
 import { useRoofingCalibrationStore } from '@store/roofingCalibrationStore';
-import { useRoofingSectionDragStore } from '@store/roofingSectionDragStore';
+import { useRoofingDragStore } from '@store/roofingDragStore';
 import {
   useRoofingEstimateScopeStore,
   __testables as scopeTestables,
@@ -87,7 +87,7 @@ function resetAll() {
     secondPoint: null,
   });
 
-  useRoofingSectionDragStore.setState({
+  useRoofingDragStore.setState({
     mode: 'idle',
     sectionId: null,
     pointerStart: null,
@@ -318,9 +318,9 @@ describe('roofing bundle roundtrip — transient stores are out of scope', () =>
     expect(calibAfter.firstPoint).toEqual(calibBefore.firstPoint);
   });
 
-  it('roofingSectionDragStore in-progress session is NOT serialized', () => {
+  it('roofingDragStore in-progress session is NOT serialized', () => {
     // Simulate a user mid-drag.
-    useRoofingSectionDragStore.setState({
+    useRoofingDragStore.setState({
       mode: 'dragging',
       sectionId: 'SEC-TEST',
       pointerStart: [10, 10],
@@ -332,9 +332,9 @@ describe('roofing bundle roundtrip — transient stores are out of scope', () =>
     const roofSlice = bundle.data.roof;
     expect(roofSlice && 'sectionDrag' in roofSlice).toBe(false);
 
-    const dragBefore = useRoofingSectionDragStore.getState();
+    const dragBefore = useRoofingDragStore.getState();
     applyBundle(bundle);
-    const dragAfter = useRoofingSectionDragStore.getState();
+    const dragAfter = useRoofingDragStore.getState();
     expect(dragAfter).toEqual(dragBefore);
   });
 });

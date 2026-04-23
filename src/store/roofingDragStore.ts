@@ -1,5 +1,12 @@
 /**
- * roofingSectionDragStore — Phase 14.R.8.
+ * roofingDragStore — Phase 14.R.8.
+ *
+ * Renamed from `roofingSectionDragStore` in Phase 6a of the
+ * hybrid-architecture refactor (ARCHITECTURE.md §7.7): the
+ * "Section" qualifier is redundant once the store's domain
+ * prefix is already `roofing`. Vertex drags and rotation
+ * drags have their own dedicated stores; the umbrella concept
+ * is just "drag in the roofing workspace".
  *
  * Transient drag-session state for the "drag-to-move section" tool
  * in the roofing workspace. Mirrors the lifecycle shape of
@@ -44,7 +51,7 @@ export interface SectionDragState {
   endDrag: () => void;
 }
 
-export const useRoofingSectionDragStore = create<SectionDragState>((set) => ({
+export const useRoofingDragStore = create<SectionDragState>((set) => ({
   mode: 'idle',
   sectionId: null,
   pointerStart: null,

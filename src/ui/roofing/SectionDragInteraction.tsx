@@ -3,7 +3,7 @@
  *
  * Scene-level catcher that drives drag-to-move for roof sections.
  * Only mounts — and only intercepts pointer events — when the
- * `roofingSectionDragStore` is in `'dragging'` mode, which flips on
+ * `roofingDragStore` is in `'dragging'` mode, which flips on
  * from a `pointerdown` on a section mesh (handled in
  * `RoofSection3D`). Keeps the catcher inert for the 99.9% of
  * frames where no drag is in progress, so OrbitControls + the
@@ -23,10 +23,10 @@ import { useEffect } from 'react';
 import * as THREE from 'three';
 import { useThree, type ThreeEvent } from '@react-three/fiber';
 import {
-  useRoofingSectionDragStore,
+  useRoofingDragStore,
   dragDelta,
   type GroundPoint,
-} from '@store/roofingSectionDragStore';
+} from '@store/roofingDragStore';
 import { useRoofStore } from '@store/roofStore';
 
 const GRID_SNAP_FT = 0.5;
@@ -37,11 +37,11 @@ function pointerToGround(e: ThreeEvent<PointerEvent>): GroundPoint {
 }
 
 export function SectionDragInteraction() {
-  const mode = useRoofingSectionDragStore((s) => s.mode);
-  const sectionId = useRoofingSectionDragStore((s) => s.sectionId);
-  const pointerStart = useRoofingSectionDragStore((s) => s.pointerStart);
-  const sectionStart = useRoofingSectionDragStore((s) => s.sectionStart);
-  const endDrag = useRoofingSectionDragStore((s) => s.endDrag);
+  const mode = useRoofingDragStore((s) => s.mode);
+  const sectionId = useRoofingDragStore((s) => s.sectionId);
+  const pointerStart = useRoofingDragStore((s) => s.pointerStart);
+  const sectionStart = useRoofingDragStore((s) => s.sectionStart);
+  const endDrag = useRoofingDragStore((s) => s.endDrag);
 
   const gl = useThree((s) => s.gl);
 
@@ -63,7 +63,7 @@ export function SectionDragInteraction() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
-      const st = useRoofingSectionDragStore.getState();
+      const st = useRoofingDragStore.getState();
       if (st.mode !== 'dragging') return;
       // Snap back.
       if (st.sectionId && st.sectionStart) {

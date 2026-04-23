@@ -28,7 +28,7 @@ import {
   type GroundPoint,
 } from '@store/roofingVertexDragStore';
 import { useRoofStore } from '@store/roofStore';
-import { dragDelta } from '@store/roofingSectionDragStore';
+import { dragDelta } from '@store/roofingDragStore';
 
 const GRID_SNAP_FT = 0.5;
 

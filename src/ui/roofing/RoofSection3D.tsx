@@ -44,7 +44,7 @@ import { useRoofStore } from '@store/roofStore';
 // Phase 14.R.8 — drag-to-move. Pointer-down on a section begins the
 // drag session; SectionDragInteraction picks up pointer-move/up via
 // a sibling ground-plane catcher.
-import { useRoofingSectionDragStore } from '@store/roofingSectionDragStore';
+import { useRoofingDragStore } from '@store/roofingDragStore';
 import { useRoofingDrawStore } from '@store/roofingDrawStore';
 import { useRoofingCalibrationStore } from '@store/roofingCalibrationStore';
 
@@ -224,7 +224,7 @@ export function RoofSection3D({ section, onClick }: RoofSection3DProps) {
   // only emits onClick on clean clicks.
   const drawMode = useRoofingDrawStore((s) => s.mode);
   const calibMode = useRoofingCalibrationStore((s) => s.mode);
-  const beginDrag = useRoofingSectionDragStore((s) => s.beginDrag);
+  const beginDrag = useRoofingDragStore((s) => s.beginDrag);
   const dragEnabled =
     !section.locked &&
     drawMode === 'idle' &&

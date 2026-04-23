@@ -1,5 +1,5 @@
 /**
- * roofingSectionDragStore — Phase 14.R.8 tests.
+ * roofingDragStore — Phase 14.R.8 tests.
  *
  * Covers:
  *   • idle ↔ dragging transitions
@@ -9,13 +9,13 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
-  useRoofingSectionDragStore,
+  useRoofingDragStore,
   dragDelta,
   type GroundPoint,
-} from '../roofingSectionDragStore';
+} from '../roofingDragStore';
 
 beforeEach(() => {
-  useRoofingSectionDragStore.setState({
+  useRoofingDragStore.setState({
     mode: 'idle',
     sectionId: null,
     pointerStart: null,
@@ -25,7 +25,7 @@ beforeEach(() => {
 
 describe('mode transitions', () => {
   it('defaults to idle with null anchors', () => {
-    const s = useRoofingSectionDragStore.getState();
+    const s = useRoofingDragStore.getState();
     expect(s.mode).toBe('idle');
     expect(s.sectionId).toBeNull();
     expect(s.pointerStart).toBeNull();
@@ -33,12 +33,12 @@ describe('mode transitions', () => {
   });
 
   it('beginDrag captures sectionId + both anchors', () => {
-    useRoofingSectionDragStore.getState().beginDrag(
+    useRoofingDragStore.getState().beginDrag(
       'SEC-001',
       [5, 7],
       [10, 20],
     );
-    const s = useRoofingSectionDragStore.getState();
+    const s = useRoofingDragStore.getState();
     expect(s.mode).toBe('dragging');
     expect(s.sectionId).toBe('SEC-001');
     expect(s.pointerStart).toEqual([5, 7]);
@@ -46,9 +46,9 @@ describe('mode transitions', () => {
   });
 
   it('endDrag returns to idle + clears anchors', () => {
-    useRoofingSectionDragStore.getState().beginDrag('SEC-001', [1, 1], [0, 0]);
-    useRoofingSectionDragStore.getState().endDrag();
-    const s = useRoofingSectionDragStore.getState();
+    useRoofingDragStore.getState().beginDrag('SEC-001', [1, 1], [0, 0]);
+    useRoofingDragStore.getState().endDrag();
+    const s = useRoofingDragStore.getState();
     expect(s.mode).toBe('idle');
     expect(s.sectionId).toBeNull();
     expect(s.pointerStart).toBeNull();
@@ -56,9 +56,9 @@ describe('mode transitions', () => {
   });
 
   it('beginDrag overwrites stale anchors from a previous drag', () => {
-    useRoofingSectionDragStore.getState().beginDrag('A', [0, 0], [0, 0]);
-    useRoofingSectionDragStore.getState().beginDrag('B', [50, 60], [100, 200]);
-    const s = useRoofingSectionDragStore.getState();
+    useRoofingDragStore.getState().beginDrag('A', [0, 0], [0, 0]);
+    useRoofingDragStore.getState().beginDrag('B', [50, 60], [100, 200]);
+    const s = useRoofingDragStore.getState();
     expect(s.sectionId).toBe('B');
     expect(s.pointerStart).toEqual([50, 60]);
     expect(s.sectionStart).toEqual([100, 200]);

@@ -29,7 +29,7 @@ import { useThree, type ThreeEvent } from '@react-three/fiber';
 import { useRoofStore } from '@store/roofStore';
 import { useRoofingDrawStore } from '@store/roofingDrawStore';
 import { useRoofingCalibrationStore } from '@store/roofingCalibrationStore';
-import { useRoofingSectionDragStore } from '@store/roofingSectionDragStore';
+import { useRoofingDragStore } from '@store/roofingDragStore';
 import { useRoofingVertexDragStore } from '@store/roofingVertexDragStore';
 import {
   useRoofingRotationDragStore,
@@ -59,7 +59,7 @@ export function RotationGizmo() {
   );
   const drawMode = useRoofingDrawStore((s) => s.mode);
   const calibMode = useRoofingCalibrationStore((s) => s.mode);
-  const sectionDragMode = useRoofingSectionDragStore((s) => s.mode);
+  const sectionDragMode = useRoofingDragStore((s) => s.mode);
   const vertexDragMode = useRoofingVertexDragStore((s) => s.mode);
   const rotateMode = useRoofingRotationDragStore((s) => s.mode);
   const beginRotate = useRoofingRotationDragStore((s) => s.beginRotate);
