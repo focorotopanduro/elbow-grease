@@ -25,6 +25,7 @@
  */
 
 import { useEffect, useMemo } from 'react';
+import { APP_MODE_ACCENTS } from '@store/appModeStore';
 import {
   useRoofingProjectStore,
   selectProject,
@@ -507,6 +508,12 @@ export function RoofingInspector() {
         width: 420,
         background: 'rgba(10, 10, 15, 0.96)',
         border: '1px solid #222',
+        // Workspace-accent left border — orange for roofing. The
+        // panel only mounts in roofing mode so the hardcoded
+        // accent is always correct. Frames the edge that faces
+        // the 3D canvas, matching the bottom `RoofingStatusBar`
+        // strip and the top `ModeAccentStripe`.
+        borderLeft: `3px solid ${APP_MODE_ACCENTS.roofing}`,
         borderRadius: 10,
         zIndex: 20,
         display: 'flex',

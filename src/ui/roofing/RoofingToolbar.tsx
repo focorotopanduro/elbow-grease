@@ -13,12 +13,21 @@
  *   Type [hip|gable|shed|flat]                    — roof type
  *   Slope [number]  Overhang [number]  Elev [number] — geometry defaults
  *   [Undo]  [Redo]  [Clear All]                    — graph actions
+ *
+ * ─── Interaction state: useInteractiveButton hook ──────────────
+ *
+ * Every button (tool row, roof-type grid, penetration picker,
+ * undo/redo, clear) goes through `@ui/shared/InteractiveButton`,
+ * which adds press-scale + focus ring. Same pattern as the plumbing
+ * Toolbar — consistent tactile feedback across both workspaces.
  */
 
 import {
   useRoofingDrawStore,
 } from '@store/roofingDrawStore';
 import { useRoofStore } from '@store/roofStore';
+import { APP_MODE_ACCENTS } from '@store/appModeStore';
+import { InteractiveButton } from '@ui/shared/InteractiveButton';
 import type { RoofType, SectionType, PenetrationKind } from '@engine/roofing/RoofGraph';
 
 const ROOF_TYPES: { value: RoofType; label: string; icon: string }[] = [
@@ -60,6 +69,10 @@ const PANEL: React.CSSProperties = {
   padding: 10,
   background: '#0a0a0f',
   border: '1px solid #222',
+  // Workspace-accent on the canvas-facing edge. Roofing toolbar
+  // sits left-of-canvas so the accent goes on the right edge,
+  // mirroring the plumbing Toolbar on the other side of the mode.
+  borderRight: `3px solid ${APP_MODE_ACCENTS.roofing}`,
   borderRadius: 10,
   color: '#ddd',
   fontFamily: 'system-ui, sans-serif',
@@ -84,7 +97,10 @@ const BTN: React.CSSProperties = {
   borderRadius: 6,
   cursor: 'pointer',
   fontSize: 12,
-  transition: 'background 120ms, border-color 120ms, color 120ms',
+  // Added transform + box-shadow so the hook's press-scale + focus
+  // ring animate smoothly alongside the existing background/border
+  // hover shifts.
+  transition: 'background 120ms, border-color 120ms, color 120ms, transform 100ms ease, box-shadow 150ms ease',
 };
 
 const BTN_ACTIVE: React.CSSProperties = {
@@ -159,28 +175,28 @@ export function RoofingToolbar() {
     <div style={PANEL}>
       {/* Tool row */}
       <div style={ROW}>
-        <button
+        <InteractiveButton
           style={drawingRect ? BTN_ACTIVE : BTN}
           onClick={() => drawingRect ? cancelDraft() : beginDrawRect()}
           title="Click-click to draw a roof section rectangle"
         >
           {drawingRect ? '⏹ Cancel' : '▭ Draw Rect'}
-        </button>
-        <button
+        </InteractiveButton>
+        <InteractiveButton
           style={drawingPoly ? BTN_ACTIVE : BTN}
           onClick={() => drawingPoly ? cancelDraft() : beginDrawPolygon()}
           title="Click each vertex; Enter or click vertex 1 to close. Creates a FLAT roof over any polygon."
         >
           {drawingPoly ? '⏹ Cancel' : '⬠ Polygon'}
-        </button>
-        <button
+        </InteractiveButton>
+        <InteractiveButton
           style={BTN}
           onClick={() => cancelDraft()}
           title="Return to selection mode"
           disabled={!drawing}
         >
           ✧
-        </button>
+        </InteractiveButton>
       </div>
 
       <div style={DIVIDER} />
@@ -190,14 +206,14 @@ export function RoofingToolbar() {
         <div style={LABEL}>Roof type</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
           {ROOF_TYPES.map((rt) => (
-            <button
+            <InteractiveButton
               key={rt.value}
               style={roofType === rt.value ? BTN_ACTIVE : BTN}
               onClick={() => setDefaultRoofType(rt.value)}
               title={`Set default roof type to ${rt.label.toLowerCase()}`}
             >
               <span style={{ marginRight: 4 }}>{rt.icon}</span>{rt.label}
-            </button>
+            </InteractiveButton>
           ))}
         </div>
       </div>
@@ -263,7 +279,7 @@ export function RoofingToolbar() {
           {PENETRATION_KINDS.map((pk) => {
             const active = placingPenetration && penetrationKind === pk.value;
             return (
-              <button
+              <InteractiveButton
                 key={pk.value}
                 style={active ? BTN_ACTIVE : BTN}
                 onClick={() => active ? cancelDraft() : beginPlacePenetration(pk.value)}
@@ -271,7 +287,7 @@ export function RoofingToolbar() {
               >
                 <span style={{ marginRight: 3 }}>{pk.icon}</span>
                 {pk.label.split(' ')[0]}
-              </button>
+              </InteractiveButton>
             );
           })}
         </div>
@@ -281,14 +297,14 @@ export function RoofingToolbar() {
 
       {/* Graph actions */}
       <div style={ROW}>
-        <button style={BTN} onClick={() => undo()} title="Undo last change">
+        <InteractiveButton style={BTN} onClick={() => undo()} title="Undo last change">
           ↶ Undo
-        </button>
-        <button style={BTN} onClick={() => redo()} title="Redo">
+        </InteractiveButton>
+        <InteractiveButton style={BTN} onClick={() => redo()} title="Redo">
           ↷ Redo
-        </button>
+        </InteractiveButton>
       </div>
-      <button
+      <InteractiveButton
         style={BTN_DANGER}
         onClick={() => {
           if (sectionCount === 0) return;
@@ -300,7 +316,7 @@ export function RoofingToolbar() {
         title="Remove every roof section from the scene"
       >
         🗑 Clear All ({sectionCount})
-      </button>
+      </InteractiveButton>
 
       {/* Hint text */}
       <div style={{ color: '#666', fontSize: 10, lineHeight: 1.4, marginTop: 4 }}>

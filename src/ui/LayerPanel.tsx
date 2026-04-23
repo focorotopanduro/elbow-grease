@@ -6,6 +6,23 @@
  * Double-click to solo a system (hide all others).
  *
  * Also has toggles for fittings, fixtures, and dimensions.
+ *
+ * ─── Interaction state: useInteractiveButton hook ──────────────
+ *
+ * Each SystemButton / ComponentButton owns its own hover / pressed /
+ * focused state via `useInteractiveButton`. The visual language we
+ * compose here is intentionally quieter than ModeTabs:
+ *
+ *   • Press-scale (0.96) — tactile "I got the click" feedback
+ *     consistent with the ModeTabs pattern.
+ *   • White focus ring — keyboard users see where they are.
+ *   • NO hover halo — this panel has 5+ system-colored buttons
+ *     (waste red, vent gray, cold cyan, hot orange, storm purple,
+ *     plus neutral component toggles). Painting an accent-halo in
+ *     each button's OWN color on hover would turn a mouse sweep
+ *     across the panel into a rainbow — noisy rather than clarifying.
+ *     The hover signal here is the existing opacity bump on the
+ *     swatch + text, which is already sufficient.
  */
 
 import { useMemo } from 'react';
@@ -16,6 +33,8 @@ import {
   type LayerState,
 } from '@store/plumbingLayerStore';
 import { usePipeStore } from '@store/pipeStore';
+import { APP_MODE_ACCENTS } from '@store/appModeStore';
+import { InteractiveButton } from '@ui/shared/InteractiveButton';
 import type { SystemType } from '../engine/graph/GraphNode';
 
 // ── System types to render ──────────────────────────────────────
@@ -55,7 +74,7 @@ function SystemButton({
   const label = SYSTEM_LABELS[system];
 
   return (
-    <button
+    <InteractiveButton
       style={{
         ...styles.systemBtn,
         borderColor: visible ? color : '#333',
@@ -73,7 +92,7 @@ function SystemButton({
       {pipeCount > 0 && (
         <span style={styles.count}>{pipeCount}</span>
       )}
-    </button>
+    </InteractiveButton>
   );
 }
 
@@ -89,7 +108,7 @@ function ComponentButton({
   onToggle: () => void;
 }) {
   return (
-    <button
+    <InteractiveButton
       style={{
         ...styles.compBtn,
         borderColor: visible ? '#555' : '#222',
@@ -100,7 +119,7 @@ function ComponentButton({
     >
       <span style={styles.compLabel}>{toggle.label}</span>
       <span style={styles.shortcut}>{toggle.shortcut}</span>
-    </button>
+    </InteractiveButton>
   );
 }
 
@@ -194,6 +213,10 @@ const styles: Record<string, React.CSSProperties> = {
     padding: 10,
     borderRadius: 10,
     border: '1px solid #333',
+    // Workspace-accent border on the canvas-facing edge (right,
+    // since the panel sits left-of-canvas). Plumbing-only mount
+    // by App.tsx gate — hardcoded cyan is correct.
+    borderRight: `3px solid ${APP_MODE_ACCENTS.plumbing}`,
     background: 'rgba(10,10,15,0.92)',
     fontFamily: "'Segoe UI', system-ui, sans-serif",
     pointerEvents: 'auto',
@@ -237,7 +260,11 @@ const styles: Record<string, React.CSSProperties> = {
     border: '1px solid',
     background: 'rgba(255,255,255,0.03)',
     cursor: 'pointer',
-    transition: 'opacity 0.15s, border-color 0.15s',
+    // Added transform (press-scale) + box-shadow (focus ring) to
+    // the transition list so the ModeTabs-style interaction feedback
+    // reads as intentional rather than jumpy. Transform rides on a
+    // faster curve (100ms) to match the tactile beat.
+    transition: 'opacity 0.15s, border-color 0.15s, transform 100ms ease, box-shadow 150ms ease',
   },
   swatch: {
     width: 8,
@@ -276,7 +303,7 @@ const styles: Record<string, React.CSSProperties> = {
     border: '1px solid',
     background: 'none',
     cursor: 'pointer',
-    transition: 'opacity 0.15s',
+    transition: 'opacity 0.15s, transform 100ms ease, box-shadow 150ms ease',
   },
   compLabel: {
     fontSize: 9,

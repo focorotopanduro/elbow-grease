@@ -56,6 +56,12 @@ import { NavStatusChip } from '@ui/NavStatusChip';
 // Phase 2a — extracted window-level keyboard dispatcher with the
 // ARCHITECTURE.md §4.1 plumbing-mode guard.
 import { KeyboardHandler } from '@ui/KeyboardHandler';
+// UI polish — mode accent stripe at the very top of the viewport
+// + a workspace-specific status bar peer for the roofing mode.
+// Gives users running both trades in the same session an instant
+// "which trade is armed" signal without having to read text.
+import { ModeAccentStripe } from '@ui/ModeAccentStripe';
+import { RoofingStatusBar } from '@ui/roofing/RoofingStatusBar';
 import { UpdateManager } from '@ui/UpdateManager';
 import { ErrorBoundary } from '@ui/ErrorBoundary';
 import { HelpOverlay } from '@ui/HelpOverlay';
@@ -1676,6 +1682,12 @@ export function App() {
         </Canvas>
       </ErrorBoundary>
 
+      {/* Always-visible 3px accent stripe at the very top of the
+          viewport. Persistent peripheral-vision cue of which
+          workspace is active, so users running mixed plumbing +
+          roofing jobs never mistake which tool set is armed. */}
+      <ModeAccentStripe />
+
       {/* Phase 14.R.3 — top-center workspace tab bar. Always visible
           so the user can switch between Plumbing and Roofing at any
           time. Shift+M is the keyboard equivalent. */}
@@ -1705,12 +1717,12 @@ export function App() {
           RoofingInspector can own the right side of the screen. The
           canvas + camera + keyboard-shortcuts stay live either way. */}
       {appMode === 'plumbing' && <Toolbar />}
-      {/* Phase 9 (ARCHITECTURE.md §6) — StatusBar reads
-          plumbingDrawStore + pipeStore exclusively; in roofing
-          mode it was rendering ghost plumbing state ("NAVIGATE",
-          "0 pipes"). Gated to plumbing mode until a roofing
-          status summary gets built. */}
+      {/* Phase 9.1 mode-gated the plumbing StatusBar; its roofing
+          peer lands below. The two carry different accent colors
+          on the top border, giving a persistent "which workspace
+          am I in" cue even for users who never touch the toolbar. */}
       {appMode === 'plumbing' && <StatusBar />}
+      {appMode === 'roofing' && <RoofingStatusBar />}
       <FeedbackOverlay />
       <PerformanceMonitor />
       {appMode === 'plumbing' && <LayerPanel />}
