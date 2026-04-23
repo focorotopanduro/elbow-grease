@@ -26,6 +26,7 @@ import { RadialMenu, type WheelConfig } from '../RadialMenu';
 import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { useMeasureStore } from '@store/measureStore';
 import { useWallStore, type WallType } from '@store/wallStore';
+import { useAppModeStore, APP_MODE_ACCENTS } from '@store/appModeStore';
 import type { PipeMaterial } from '../../../engine/graph/GraphEdge';
 
 // ── Subtype definitions ────────────────────────────────────────
@@ -85,7 +86,18 @@ const GRID_STEPS_FT = [1 / 12, 3 / 12, 6 / 12, 1, 2]; // 1", 3", 6", 1ft, 2ft
 
 // ── Build wheel config ──────────────────────────────────────────
 
-export function getDrawingWheelConfig(): WheelConfig {
+/**
+ * Build the drawing-wheel config. The `accentColor` is injected
+ * (rather than hardcoded) so the wheel picks up the ACTIVE
+ * workspace's accent — cyan in plumbing, orange if the wheel
+ * ever opens in roofing. Matches the chrome-frame pattern the
+ * status strip + inspector / toolbar borders established.
+ *
+ * The `#00e5ff` plumbing accent is ONE source of truth in
+ * `APP_MODE_ACCENTS.plumbing` — wheel's colour drift-safe
+ * against future palette changes.
+ */
+export function getDrawingWheelConfig(accentColor: string): WheelConfig {
   const ixn = usePlumbingDrawStore.getState();
   const measureStore = useMeasureStore.getState();
   const wallStore = useWallStore.getState();
@@ -117,7 +129,7 @@ export function getDrawingWheelConfig(): WheelConfig {
   return {
     id: 'drawing',
     title: 'DRAWING',
-    accentColor: '#00e5ff',
+    accentColor,
     outerRadiusPx: 220,
     innerRadiusPx: 70,
     tapToSelect: true,
@@ -215,6 +227,14 @@ export function getDrawingWheelConfig(): WheelConfig {
 // ── React component wrapper ─────────────────────────────────────
 
 export function DrawingWheel() {
-  const config = useMemo(() => getDrawingWheelConfig(), []);
+  // Subscribe to the active workspace so the wheel's accent
+  // tracks mode. Today the wheel only opens in plumbing mode
+  // (Ctrl+Space is plumbing-gated — see ShortcutRegistry §4.1),
+  // so `mode` is effectively always 'plumbing' here. But reading
+  // reactively means a future roofing-side wheel integration
+  // gets the orange accent for free with zero wheel changes.
+  const mode = useAppModeStore((s) => s.mode);
+  const accent = APP_MODE_ACCENTS[mode];
+  const config = useMemo(() => getDrawingWheelConfig(accent), [accent]);
   return <RadialMenu config={config} />;
 }
