@@ -52,6 +52,12 @@ import {
   type PipeMaterialStr,
 } from './SharedDagBuffer';
 import { getFlag, useFeatureFlagStore } from '@store/featureFlagStore';
+// Phase 2c (ARCHITECTURE.md §4.5) — appMode read at the top of the
+// PIPE_COMPLETE / pipe:removed / fixture handlers to early-return
+// when the user is in the roofing workspace. The bridge is
+// plumbing-only; PIPE_COMPLETE must never wake the worker on a
+// roof-section commit that happens to reuse the same event name.
+import { useAppModeStore } from '@store/appModeStore';
 import { logger } from '@core/logger/Logger';
 // Phase 10.D — round-trip latency → PerfStats.
 // Phase 14.AC.4 — batch size → PerfStats.
@@ -391,6 +397,14 @@ export class SimulationBridge {
     // of commits (paste, riser drop, auto-route) now cost one
     // postMessage total instead of N per pipe.
     eventBus.on<PipeCompletePayload>(EV.PIPE_COMPLETE, (payload) => {
+      // Phase 2c (ARCHITECTURE.md §4.5) — SimulationBridge is
+      // plumbing-only. When the user is in the roofing workspace,
+      // ignore the event entirely: no mutations queued, no worker
+      // wake, no fixture-node lookups. Cheap insurance against any
+      // future event leakage (e.g. a roof takeoff flow accidentally
+      // emitting PIPE_COMPLETE during a polygon commit).
+      if (useAppModeStore.getState().mode !== 'plumbing') return;
+
       // Phase 14.AC.7 — when the fixture-graph flag is on, check
       // whether the pipe's endpoints sit on a known fixture and
       // splice the fixture's node ID into the edge. This is the

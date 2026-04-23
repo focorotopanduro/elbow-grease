@@ -21,6 +21,8 @@ import { eventBus } from '@core/EventBus';
 import { simBus, SIM_MSG, type SimMessage, type SimMessageType } from '../../graph/MessageBus';
 import { EV, type PipeCompletePayload } from '@core/events';
 import { SimulationBridge } from '../SimulationBridge';
+// Phase 2c (ARCHITECTURE.md §4.5) — exercise the mode guard.
+import { useAppModeStore as useAppModeStoreForTest } from '@store/appModeStore';
 
 describe('SimulationBridge — Phase 14.AC.3 batching', () => {
   let bridge: SimulationBridge;
@@ -191,5 +193,86 @@ describe('SimulationBridge — Phase 14.AC.3 batching', () => {
     expect(bridge.lastBatchSent).not.toBeNull();
     expect(bridge.lastBatchSent!.nodesToAdd).toHaveLength(3);
     expect(bridge.lastBatchSent!.edgesToAdd).toHaveLength(2);
+  });
+});
+
+// ── Phase 2c — ARCHITECTURE.md §4.5 mode guard ────────────────
+
+describe('SimulationBridge — plumbing-only guard (ARCHITECTURE.md §4.5)', () => {
+  // The roofing workspace never wants the plumbing worker to wake.
+  // These tests exercise the early-return at the top of the
+  // PIPE_COMPLETE handler by flipping appModeStore and confirming
+  // no simBus traffic lands.
+
+  let bridge: SimulationBridge;
+  let seen: { type: SimMessageType }[];
+  let unsubs: Array<() => void>;
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    seen = [];
+    unsubs = [];
+    eventBus.clear();
+    simBus.clear();
+    bridge = new SimulationBridge();
+  });
+
+  afterEach(() => {
+    for (const u of unsubs) u();
+    bridge.destroy();
+    vi.useRealTimers();
+    eventBus.clear();
+    simBus.clear();
+    // Restore plumbing as the default so downstream tests aren't
+    // affected by a leaked roofing mode.
+    useAppModeStoreForTest.setState({ mode: 'plumbing' });
+  });
+
+  function spy(type: SimMessageType) {
+    const u = simBus.on(type, (m: SimMessage) => { seen.push({ type: m.type }); });
+    unsubs.push(u);
+  }
+
+  function emitCommit(id: string, pts: number) {
+    const payload: PipeCompletePayload = {
+      id,
+      points: Array.from({ length: pts }, (_, i) => [i, 0, 0] as [number, number, number]),
+      diameter: 2,
+      material: 'pvc_sch40',
+    };
+    eventBus.emit(EV.PIPE_COMPLETE, payload);
+  }
+
+  it('PIPE_COMPLETE in roofing mode does NOT post to the worker (no BATCH_MUTATE / SOLVE_REQUEST)', () => {
+    spy(SIM_MSG.BATCH_MUTATE);
+    spy(SIM_MSG.SOLVE_REQUEST);
+    spy(SIM_MSG.ADD_NODE);
+    spy(SIM_MSG.ADD_EDGE);
+
+    useAppModeStoreForTest.setState({ mode: 'roofing' });
+
+    emitCommit('rp1', 3);
+    vi.runAllTimers();
+
+    expect(seen).toHaveLength(0);
+    // Also verify the bridge didn't record an internal batch.
+    expect(bridge.lastBatchSent).toBeNull();
+  });
+
+  it('switching back to plumbing re-enables the handler', () => {
+    spy(SIM_MSG.BATCH_MUTATE);
+
+    // First: verify roofing mode silences it.
+    useAppModeStoreForTest.setState({ mode: 'roofing' });
+    emitCommit('rp1', 3);
+    vi.runAllTimers();
+    expect(seen).toHaveLength(0);
+
+    // Then flip back and confirm the next commit flows through.
+    useAppModeStoreForTest.setState({ mode: 'plumbing' });
+    emitCommit('pp1', 3);
+    vi.runAllTimers();
+    expect(seen).toHaveLength(1);
+    expect(seen[0]!.type).toBe(SIM_MSG.BATCH_MUTATE);
   });
 });
