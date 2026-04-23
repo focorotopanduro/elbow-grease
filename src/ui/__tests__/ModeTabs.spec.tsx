@@ -109,8 +109,17 @@ describe('ModeTabs — interaction', () => {
     const { container } = render(<ModeTabs />);
     const [plumbing, roofing] = container.querySelectorAll('[role="tab"]');
 
-    (plumbing as HTMLElement).focus();
-    fireEvent.keyDown(plumbing!, { key: 'ArrowRight' });
+    // Focus state is now owned by each <ModeTab> subcomponent (it
+    // uses useInteractiveButton). Wrap the imperative .focus() +
+    // keyDown in act() so React can flush the child's onFocus/onBlur
+    // state updates cleanly — otherwise jsdom fires them outside the
+    // testing-library act boundary and React warns.
+    act(() => {
+      (plumbing as HTMLElement).focus();
+    });
+    act(() => {
+      fireEvent.keyDown(plumbing!, { key: 'ArrowRight' });
+    });
 
     expect(useAppModeStore.getState().mode).toBe('roofing');
     expect(document.activeElement).toBe(roofing);
@@ -121,8 +130,12 @@ describe('ModeTabs — interaction', () => {
     const { container } = render(<ModeTabs />);
     const [plumbing, roofing] = container.querySelectorAll('[role="tab"]');
 
-    (roofing as HTMLElement).focus();
-    fireEvent.keyDown(roofing!, { key: 'ArrowLeft' });
+    act(() => {
+      (roofing as HTMLElement).focus();
+    });
+    act(() => {
+      fireEvent.keyDown(roofing!, { key: 'ArrowLeft' });
+    });
 
     expect(useAppModeStore.getState().mode).toBe('plumbing');
     expect(document.activeElement).toBe(plumbing);
@@ -132,8 +145,12 @@ describe('ModeTabs — interaction', () => {
     useAppModeStore.setState({ mode: 'roofing' });
     const { container } = render(<ModeTabs />);
     const roofing = container.querySelectorAll('[role="tab"]')[1] as HTMLButtonElement;
-    roofing.focus();
-    fireEvent.keyDown(roofing, { key: 'ArrowRight' });
+    act(() => {
+      roofing.focus();
+    });
+    act(() => {
+      fireEvent.keyDown(roofing, { key: 'ArrowRight' });
+    });
 
     // Wraps to plumbing (idx 0).
     expect(useAppModeStore.getState().mode).toBe('plumbing');
@@ -143,12 +160,18 @@ describe('ModeTabs — interaction', () => {
     useAppModeStore.setState({ mode: 'plumbing' });
     const { container } = render(<ModeTabs />);
     const plumbing = container.querySelectorAll('[role="tab"]')[0] as HTMLButtonElement;
-    plumbing.focus();
+    act(() => {
+      plumbing.focus();
+    });
 
-    fireEvent.keyDown(plumbing, { key: 'End' });
+    act(() => {
+      fireEvent.keyDown(plumbing, { key: 'End' });
+    });
     expect(useAppModeStore.getState().mode).toBe('roofing');
 
-    fireEvent.keyDown(plumbing, { key: 'Home' });
+    act(() => {
+      fireEvent.keyDown(plumbing, { key: 'Home' });
+    });
     expect(useAppModeStore.getState().mode).toBe('plumbing');
   });
 });
@@ -305,7 +328,9 @@ describe('ModeTabs — edge cases (debug pass)', () => {
     // library's fireEvent.click is the direct equivalent; we
     // verify the wiring by firing a real click (matching what a
     // keypress produces).
-    roofing.focus();
+    act(() => {
+      roofing.focus();
+    });
     fireEvent.click(roofing);
     expect(useAppModeStore.getState().mode).toBe('roofing');
   });

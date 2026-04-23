@@ -5,11 +5,31 @@
  *   Pipe diameter selector
  *   Pipe quality toggle (3D / Fast)
  *   Status hints
+ *
+ * ─── Interaction state: useInteractiveButton hook ──────────────
+ *
+ * Each toolbar button composes press-scale (0.96 on mousedown) +
+ * focus ring via `useInteractiveButton`. The pattern matches what
+ * ModeTabs worked out — mouseleave mid-press releases the press
+ * (drag-off-to-abort gesture). The hook handles the state; the
+ * `<InteractiveButton>` wrapper below handles the visual composition.
+ *
+ * Hover halos are intentionally absent on mode / utility buttons
+ * because each has its own saturated accent color (green, cyan,
+ * amber, purple, orange) — painting a same-colored halo on hover
+ * would double up and noise rather than clarify. The existing
+ * background / border shifts already flag hover. We just add the
+ * tactile press beat and a visible focus ring.
+ *
+ * The button wrapper comes from `@ui/shared/InteractiveButton`
+ * which layers the hook's state onto a native <button>. Same
+ * wrapper is used in LayerPanel + RoofingToolbar for consistency.
  */
 
 import { usePlumbingDrawStore, type InteractionMode } from '@store/plumbingDrawStore';
 import { usePipeStore } from '@store/pipeStore';
 import { APP_MODE_ACCENTS } from '@store/appModeStore';
+import { InteractiveButton } from '@ui/shared/InteractiveButton';
 
 // ── Mode buttons ────────────────────────────────────────────────
 
@@ -20,6 +40,8 @@ const MODES: { key: InteractionMode; label: string; icon: string; shortcut: stri
 ];
 
 const DIAMETERS = [0.5, 0.75, 1, 1.5, 2, 3, 4, 6];
+
+// ── Component ───────────────────────────────────────────────────
 
 export function Toolbar() {
   const mode = usePlumbingDrawStore((s) => s.mode);
@@ -48,13 +70,13 @@ export function Toolbar() {
       {MODES.map((m) => {
         const active = mode === m.key;
         return (
-          <button key={m.key}
+          <InteractiveButton key={m.key}
             style={{ ...styles.btn, borderColor: active ? m.color : '#333', background: active ? 'rgba(255,255,255,0.06)' : 'transparent' }}
             onClick={() => setMode(m.key)} title={`${m.label} (${m.shortcut})`}>
             <span style={styles.icon}>{m.icon}</span>
             <span style={{ ...styles.label, color: active ? m.color : '#666' }}>{m.label}</span>
             <kbd style={styles.kbd}>{m.shortcut}</kbd>
-          </button>
+          </InteractiveButton>
         );
       })}
 
@@ -64,7 +86,7 @@ export function Toolbar() {
           <div style={styles.divider} />
 
           {/* H/V plane toggle */}
-          <button style={{ ...styles.btn, borderColor: drawPlane === 'vertical' ? '#ff7043' : '#333',
+          <InteractiveButton style={{ ...styles.btn, borderColor: drawPlane === 'vertical' ? '#ff7043' : '#333',
             background: drawPlane === 'vertical' ? 'rgba(255,112,67,0.1)' : 'transparent' }}
             onClick={togglePlane} title="Toggle draw plane (V/H)">
             <span style={styles.icon}>{drawPlane === 'horizontal' ? '➡️' : '⬆️'}</span>
@@ -72,19 +94,19 @@ export function Toolbar() {
               {drawPlane === 'horizontal' ? 'Horizontal' : 'Vertical'}
             </span>
             <kbd style={styles.kbd}>{drawPlane === 'horizontal' ? 'H' : 'V'}</kbd>
-          </button>
+          </InteractiveButton>
 
           {/* Diameter selector */}
           <div style={styles.sectionLabel}>Diameter</div>
           <div style={styles.diamRow}>
             {DIAMETERS.map((d) => (
-              <button key={d}
+              <InteractiveButton key={d}
                 style={{ ...styles.diamBtn, borderColor: diameter === d ? '#00e5ff' : '#333',
                   color: diameter === d ? '#00e5ff' : '#666',
                   background: diameter === d ? 'rgba(0,229,255,0.1)' : 'transparent' }}
                 onClick={() => setDiameter(d)}>
                 {d}"
-              </button>
+              </InteractiveButton>
             ))}
           </div>
 
@@ -103,7 +125,7 @@ export function Toolbar() {
       <div style={styles.divider} />
 
       {/* Quality toggle */}
-      <button style={{ ...styles.btn, borderColor: quality === '3d' ? '#7c4dff' : '#333',
+      <InteractiveButton style={{ ...styles.btn, borderColor: quality === '3d' ? '#7c4dff' : '#333',
         background: quality === '3d' ? 'rgba(124,77,255,0.1)' : 'transparent' }}
         onClick={toggleQuality} title="Toggle pipe quality (Q)">
         <span style={styles.icon}>{quality === '3d' ? '🔵' : '⚡'}</span>
@@ -111,14 +133,14 @@ export function Toolbar() {
           {quality === '3d' ? '3D Pipes' : 'Fast Mode'}
         </span>
         <kbd style={styles.kbd}>Q</kbd>
-      </button>
+      </InteractiveButton>
 
       {/* Phase 14.AD.23 — ortho click-drag draw mode toggle. Active
           by default; disable for users who prefer the classic
           click-to-place-points flow. Only has an effect in top /
           front / side / bottom views; perspective + isometric
           still use the classic tool. */}
-      <button
+      <InteractiveButton
         style={{ ...styles.btn,
           borderColor: orthoClickDrag ? '#ff9800' : '#333',
           background: orthoClickDrag ? 'rgba(255,152,0,0.1)' : 'transparent' }}
@@ -129,7 +151,7 @@ export function Toolbar() {
           {orthoClickDrag ? 'Ortho Drag: ON' : 'Ortho Drag: off'}
         </span>
         <kbd style={styles.kbd}>⇧O</kbd>
-      </button>
+      </InteractiveButton>
 
       {/* Pipe count */}
       {pipeCount > 0 && (
@@ -163,7 +185,13 @@ const styles: Record<string, React.CSSProperties> = {
   btn: {
     display: 'flex', alignItems: 'center', gap: 6,
     padding: '7px 10px', borderRadius: 8, border: '1px solid',
-    cursor: 'pointer', transition: 'all 0.15s', width: '100%',
+    cursor: 'pointer',
+    // Bumped the transition list to include transform (press-scale)
+    // + box-shadow (focus ring). `all 0.15s` used to cover everything,
+    // but we want transform on a faster 100ms curve so the press
+    // beat feels immediate.
+    transition: 'background 150ms ease, border-color 150ms ease, color 150ms ease, transform 100ms ease, box-shadow 150ms ease',
+    width: '100%',
     background: 'transparent',
   },
   icon: { fontSize: 14, width: 20, textAlign: 'center' as const },
@@ -182,6 +210,7 @@ const styles: Record<string, React.CSSProperties> = {
   diamBtn: {
     fontSize: 10, fontWeight: 600, padding: '3px 7px', borderRadius: 4,
     border: '1px solid', cursor: 'pointer', background: 'transparent',
+    transition: 'background 150ms ease, border-color 150ms ease, color 150ms ease, transform 100ms ease, box-shadow 150ms ease',
   },
   hint: {
     fontSize: 11, color: '#00e5ff', padding: '4px 4px 0', textAlign: 'center' as const,

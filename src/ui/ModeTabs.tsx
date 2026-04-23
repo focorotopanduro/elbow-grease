@@ -29,24 +29,32 @@
  *
  * Shift+M still toggles from anywhere (handled in KeyboardHandler).
  *
+ * ─── Interaction state: useInteractiveButton hook ──────────────
+ *
+ * Per-tab hover / pressed / focused state is owned by
+ * `useInteractiveButton` (see `src/ui/shared/`). The hook returns the
+ * three booleans plus a `bindings` object that spreads onto the
+ * native `<button>`. That hook gets the tricky edge cases right:
+ *
+ *   • Mouseleave during a press releases BOTH hovered and pressed
+ *     (users drag off a button to abort a click).
+ *   • Binding identity is stable across renders — React doesn't
+ *     re-attach handlers on every parent re-render.
+ *
+ * Because hooks can't be called in a map, the tab body is extracted
+ * into a `<ModeTab>` subcomponent that calls the hook once per
+ * instance.
+ *
  * ─── Edge cases handled ──────────────────────────────────────
  *
- * Hover / focus state is tracked via React state (`hoveredIdx` /
- * `focusedIdx`) rather than direct DOM mutation, so rapid mode
- * flips, external store changes (Shift+M), and interleaved
- * hover/focus events can't leave the tab's style drifted out of
- * sync with its logical state.
+ * `activeIdx` is clamped to 0 when `mode` somehow isn't in `MODES`
+ * (e.g. corrupt localStorage value) — the pill stays visually
+ * on-screen instead of sliding off to the left.
  *
- * `activeIdx` is clamped to 0 when `mode` somehow isn't in
- * `MODES` (e.g. corrupt localStorage value) — the pill stays
- * visually on-screen instead of sliding off to the left.
- *
- * Clicking the already-active tab is a no-op instead of a
- * redundant `setMode` that would re-persist the same value to
- * localStorage.
+ * Clicking the already-active tab is a no-op instead of a redundant
+ * `setMode` that would re-persist the same value to localStorage.
  */
 
-import { useState } from 'react';
 import {
   useAppModeStore,
   APP_MODE_LABELS,
@@ -55,6 +63,7 @@ import {
   type AppMode,
 } from '@store/appModeStore';
 import { useReducedMotion } from '@core/a11y/useReducedMotion';
+import { useInteractiveButton } from '@ui/shared/useInteractiveButton';
 
 const MODES: AppMode[] = ['plumbing', 'roofing'];
 const TAB_WIDTH_PX = 150;
@@ -66,17 +75,6 @@ export function ModeTabs() {
   const mode = useAppModeStore((s) => s.mode);
   const setMode = useAppModeStore((s) => s.setMode);
   const reducedMotion = useReducedMotion();
-
-  // React state for visual-only local interaction. Kept out of
-  // appModeStore because it's purely ephemeral — hover / focus /
-  // press don't survive unmount and shouldn't touch global state.
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-  const [focusedIdx, setFocusedIdx] = useState<number | null>(null);
-  // Pressed state drives the tactile scale-down feedback. Set on
-  // mousedown, cleared on mouseup OR when the mouse leaves the
-  // button mid-press (a common "committed to abort the click"
-  // gesture — users learn to drag off a button to cancel).
-  const [pressedIdx, setPressedIdx] = useState<number | null>(null);
 
   // Defensive clamp: if `mode` somehow isn't in MODES (rare but
   // possible with a stale / corrupted localStorage value), keep
@@ -91,14 +89,6 @@ export function ModeTabs() {
   const pillTransition = reducedMotion
     ? 'none'
     : 'transform 280ms cubic-bezier(0.4, 0, 0.2, 1), background 280ms ease, box-shadow 280ms ease';
-  // Transition text colour AND the hover glow/background on the
-  // same 200ms curve. Keeps the affordance feeling like a single
-  // coordinated move rather than a staggered fade. The pressure
-  // feedback rides on a faster 100ms curve so the press feels
-  // immediately tactile — the pill's 280ms slide then takes over.
-  const tabTextTransition = reducedMotion
-    ? 'none'
-    : 'color 200ms ease, background 200ms ease, box-shadow 200ms ease, transform 100ms ease';
   const containerGlowTransition = reducedMotion ? 'none' : 'box-shadow 280ms ease';
 
   /** Pointer / keyboard: move focus to `idx` and activate that
@@ -202,92 +192,19 @@ export function ModeTabs() {
           }}
         />
 
-        {MODES.map((m, idx) => {
-          const active = resolvedMode === m;
-          const hovered = hoveredIdx === idx;
-          const focused = focusedIdx === idx;
-          const pressed = pressedIdx === idx;
-          const color = active ? '#0a0a0f' : hovered ? '#ccc' : '#777';
-
-          // Hover affordance on the INACTIVE tab: the tab picks up
-          // a faint halo in its OWN accent colour — a preview of
-          // the workspace the user is about to land in. When
-          // hovering the roofing tab from plumbing mode, the halo
-          // is orange (destination), not cyan (current). When
-          // active, no hover accent — the pill already owns that
-          // tab's visual space.
-          const hoverAccent = !active && hovered ? APP_MODE_ACCENTS[m] : null;
-          const tabBackground = hoverAccent ? `${hoverAccent}1A` : 'transparent';
-          const hoverShadow = hoverAccent ? `0 0 12px ${hoverAccent}55` : '';
-          const focusShadow = focused ? '0 0 0 2px rgba(255,255,255,0.7)' : '';
-          // Stack focus + hover if both apply — focused-and-hovered
-          // gets white focus ring AND accent glow.
-          const boxShadow = [focusShadow, hoverShadow].filter(Boolean).join(', ') || 'none';
-          return (
-            <button
-              key={m}
-              data-mode-tab={m}
-              role="tab"
-              aria-selected={active}
-              tabIndex={active ? 0 : -1}
-              onClick={() => {
-                if (m !== mode) setMode(m);
-              }}
-              onKeyDown={(e) => onKeyDown(e, idx)}
-              onMouseEnter={() => setHoveredIdx(idx)}
-              onMouseLeave={() => {
-                setHoveredIdx((h) => (h === idx ? null : h));
-                // If the user drags off during a press, release
-                // the pressure state so the button snaps back
-                // to rest instead of staying squished.
-                setPressedIdx((p) => (p === idx ? null : p));
-              }}
-              onMouseDown={() => setPressedIdx(idx)}
-              onMouseUp={() => setPressedIdx(null)}
-              // `onPointerCancel` + touch are intentionally not
-              // handled explicitly — the button release on touch
-              // fires `mouseup` via synthetic dispatch, and
-              // `mouseleave` catches any weird drag-off edge.
-              onFocus={() => setFocusedIdx(idx)}
-              onBlur={() => setFocusedIdx((f) => (f === idx ? null : f))}
-              title={`${APP_MODE_LABELS[m]} workspace — Shift+M to toggle, ← / → to navigate`}
-              style={{
-                position: 'relative',
-                zIndex: 1,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                width: TAB_WIDTH_PX,
-                height: TAB_HEIGHT_PX,
-                background: tabBackground,
-                border: 'none',
-                borderRadius: 8,
-                fontSize: 14,
-                fontWeight: active ? 700 : 500,
-                color,
-                boxShadow,
-                // Tactile scale-down on press. 4% smaller reads
-                // as a deliberate "click landed" tap without
-                // looking buggy. Snaps back on release.
-                transform: pressed ? 'scale(0.96)' : 'scale(1)',
-                cursor: 'pointer',
-                letterSpacing: active ? 0.3 : 0,
-                // `font-weight` removed from the transition list —
-                // CSS doesn't interpolate discrete font-weights, so
-                // listing it was a lie that didn't animate anything.
-                transition: tabTextTransition,
-                outline: 'none',
-                fontFamily: 'inherit',
-              }}
-            >
-              <span style={{ fontSize: 18, lineHeight: 1 }}>
-                {APP_MODE_ICONS[m]}
-              </span>
-              <span>{APP_MODE_LABELS[m]}</span>
-            </button>
-          );
-        })}
+        {MODES.map((m, idx) => (
+          <ModeTab
+            key={m}
+            mode={m}
+            active={resolvedMode === m}
+            idx={idx}
+            reducedMotion={reducedMotion}
+            onActivate={() => {
+              if (m !== mode) setMode(m);
+            }}
+            onKeyDown={(e) => onKeyDown(e, idx)}
+          />
+        ))}
       </div>
 
       {/* Hotkey hint. Small, low-contrast — learnable without being
@@ -304,6 +221,104 @@ export function ModeTabs() {
         <span style={{ marginLeft: 4 }}>to toggle</span>
       </div>
     </div>
+  );
+}
+
+// ── Single tab button ────────────────────────────────────────────
+
+interface ModeTabProps {
+  mode: AppMode;
+  active: boolean;
+  idx: number;
+  reducedMotion: boolean;
+  onActivate: () => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLButtonElement>) => void;
+}
+
+/**
+ * One tab button inside ModeTabs. Owns its own hover / pressed /
+ * focused state via `useInteractiveButton` and composes the visual
+ * language (hover halo, focus ring, press-scale) from those three
+ * flags.
+ *
+ * Extracting this into a subcomponent is required because
+ * `useInteractiveButton` is a hook, and hooks can't be called in a
+ * map. Each tab renders as its own component with its own hook call.
+ */
+function ModeTab({ mode: m, active, reducedMotion, onActivate, onKeyDown }: ModeTabProps) {
+  const { hovered, pressed, focused, bindings } = useInteractiveButton();
+
+  // Transition text colour AND the hover glow/background on the
+  // same 200ms curve. Keeps the affordance feeling like a single
+  // coordinated move rather than a staggered fade. The pressure
+  // feedback rides on a faster 100ms curve so the press feels
+  // immediately tactile — the pill's 280ms slide then takes over.
+  const tabTextTransition = reducedMotion
+    ? 'none'
+    : 'color 200ms ease, background 200ms ease, box-shadow 200ms ease, transform 100ms ease';
+
+  const color = active ? '#0a0a0f' : hovered ? '#ccc' : '#777';
+
+  // Hover affordance on the INACTIVE tab: the tab picks up
+  // a faint halo in its OWN accent colour — a preview of
+  // the workspace the user is about to land in. When
+  // hovering the roofing tab from plumbing mode, the halo
+  // is orange (destination), not cyan (current). When
+  // active, no hover accent — the pill already owns that
+  // tab's visual space.
+  const hoverAccent = !active && hovered ? APP_MODE_ACCENTS[m] : null;
+  const tabBackground = hoverAccent ? `${hoverAccent}1A` : 'transparent';
+  const hoverShadow = hoverAccent ? `0 0 12px ${hoverAccent}55` : '';
+  const focusShadow = focused ? '0 0 0 2px rgba(255,255,255,0.7)' : '';
+  // Stack focus + hover if both apply — focused-and-hovered
+  // gets white focus ring AND accent glow.
+  const boxShadow = [focusShadow, hoverShadow].filter(Boolean).join(', ') || 'none';
+
+  return (
+    <button
+      data-mode-tab={m}
+      role="tab"
+      aria-selected={active}
+      tabIndex={active ? 0 : -1}
+      onClick={onActivate}
+      onKeyDown={onKeyDown}
+      {...bindings}
+      title={`${APP_MODE_LABELS[m]} workspace — Shift+M to toggle, ← / → to navigate`}
+      style={{
+        position: 'relative',
+        zIndex: 1,
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        width: TAB_WIDTH_PX,
+        height: TAB_HEIGHT_PX,
+        background: tabBackground,
+        border: 'none',
+        borderRadius: 8,
+        fontSize: 14,
+        fontWeight: active ? 700 : 500,
+        color,
+        boxShadow,
+        // Tactile scale-down on press. 4% smaller reads
+        // as a deliberate "click landed" tap without
+        // looking buggy. Snaps back on release.
+        transform: pressed ? 'scale(0.96)' : 'scale(1)',
+        cursor: 'pointer',
+        letterSpacing: active ? 0.3 : 0,
+        // `font-weight` removed from the transition list —
+        // CSS doesn't interpolate discrete font-weights, so
+        // listing it was a lie that didn't animate anything.
+        transition: tabTextTransition,
+        outline: 'none',
+        fontFamily: 'inherit',
+      }}
+    >
+      <span style={{ fontSize: 18, lineHeight: 1 }}>
+        {APP_MODE_ICONS[m]}
+      </span>
+      <span>{APP_MODE_LABELS[m]}</span>
+    </button>
   );
 }
 
