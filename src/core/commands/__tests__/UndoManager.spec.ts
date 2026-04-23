@@ -19,6 +19,9 @@ import {
   installUndoHook, __resetUndoManagerForTests,
 } from '../UndoManager';
 import { usePipeStore } from '@store/pipeStore';
+// Phase 3 — per-mode undo partitioning requires controlling the
+// active workspace in tests.
+import { useAppModeStore } from '@store/appModeStore';
 import type { PipeAddPayload } from '../handlers/pipeHandlers';
 import type { Vec3 } from '@core/events';
 
@@ -207,5 +210,181 @@ describe('UndoManager — manifold.mergeNeighbors round-trip', () => {
     expect(Object.keys(useManifoldStore.getState().manifolds)).toHaveLength(2);
 
     useManifoldStore.setState({ manifolds: {}, order: [], selectedId: null });
+  });
+});
+
+// ── Phase 3 — per-mode undo semantics (ARCHITECTURE.md §4.3) ──
+//
+// The three scenarios below are the exact coverage the spec
+// mandates. They use SYNTHETIC handlers tagged with different
+// `mode` values rather than the real pipe/section/pricing
+// surfaces (roofing isn't on the CommandBus yet, and pricing
+// edits still go straight to the store). What's under test is
+// the UndoManager's partitioning logic: given mode-stamped log
+// entries, does it walk the right subset?
+
+describe('UndoManager — per-mode partitioning (ARCHITECTURE.md §4.3)', () => {
+  // Minimal per-domain "stores" — plain records the synthetic
+  // handlers mutate in place.
+  const pipes: Record<string, { id: string }> = {};
+  const sections: Record<string, { id: string }> = {};
+  const pricing: { rate: number } = { rate: 0 };
+
+  function registerPhase3TestHandlers() {
+    // Plumbing-scoped: add/remove a pipe.
+    commandBus.register<{ id: string }, void>({
+      type: 'test.pipe.add',
+      mode: 'plumbing',
+      snapshot: (p) => ({ prev: pipes[p.id] }),
+      apply: (p) => { pipes[p.id] = { id: p.id }; },
+      undo: (p, snap) => {
+        const s = snap as { prev: { id: string } | undefined };
+        if (s.prev === undefined) delete pipes[p.id];
+        else pipes[p.id] = s.prev;
+      },
+    });
+
+    // Roofing-scoped: add/remove a section.
+    commandBus.register<{ id: string }, void>({
+      type: 'test.section.add',
+      mode: 'roofing',
+      snapshot: (p) => ({ prev: sections[p.id] }),
+      apply: (p) => { sections[p.id] = { id: p.id }; },
+      undo: (p, snap) => {
+        const s = snap as { prev: { id: string } | undefined };
+        if (s.prev === undefined) delete sections[p.id];
+        else sections[p.id] = s.prev;
+      },
+    });
+
+    // Shared: pricing edit. Participates in BOTH workspaces'
+    // undo stacks regardless of which mode was active at
+    // dispatch.
+    commandBus.register<{ rate: number }, void>({
+      type: 'test.pricing.edit',
+      mode: 'shared',
+      snapshot: () => ({ prev: pricing.rate }),
+      apply: (p) => { pricing.rate = p.rate; },
+      undo: (_p, snap) => {
+        const s = snap as { prev: number };
+        pricing.rate = s.prev;
+      },
+    });
+  }
+
+  beforeEach(() => {
+    // beforeEach at file top resets commandBus + re-registers the
+    // real handlers + reinstalls the undo hook. Now register our
+    // synthetic ones on top + wipe the fake stores.
+    registerPhase3TestHandlers();
+    for (const k of Object.keys(pipes)) delete pipes[k];
+    for (const k of Object.keys(sections)) delete sections[k];
+    pricing.rate = 0;
+    useAppModeStore.setState({ mode: 'plumbing' });
+  });
+
+  it('scenario (a): draw pipe → switch to roofing → Ctrl+Z is a no-op', () => {
+    // Plumbing: dispatch a pipe.
+    commandBus.dispatch({ type: 'test.pipe.add', payload: { id: 'p1' } });
+    expect(pipes.p1).toBeDefined();
+
+    // Switch workspace.
+    useAppModeStore.setState({ mode: 'roofing' });
+
+    // Ctrl+Z in roofing must not touch the plumbing-scoped entry.
+    expect(canUndo()).toBe(false);
+    expect(undo()).toBeNull();
+    expect(pipes.p1).toBeDefined();
+  });
+
+  it('scenario (b): pipe → switch → section → Ctrl+Z removes section; Ctrl+Z no-op; switch back → Ctrl+Z removes pipe', () => {
+    // Plumbing: pipe.
+    commandBus.dispatch({ type: 'test.pipe.add', payload: { id: 'p1' } });
+
+    // Switch to roofing, section.
+    useAppModeStore.setState({ mode: 'roofing' });
+    commandBus.dispatch({ type: 'test.section.add', payload: { id: 's1' } });
+
+    expect(pipes.p1).toBeDefined();
+    expect(sections.s1).toBeDefined();
+
+    // In roofing: undo → section removed.
+    expect(canUndo()).toBe(true);
+    expect(undo()).toBe('test.section.add');
+    expect(sections.s1).toBeUndefined();
+    expect(pipes.p1).toBeDefined();
+
+    // Another Ctrl+Z in roofing has nothing eligible — the pipe
+    // is plumbing-scoped.
+    expect(canUndo()).toBe(false);
+    expect(undo()).toBeNull();
+
+    // Switch back to plumbing; pipe becomes the eligible target.
+    useAppModeStore.setState({ mode: 'plumbing' });
+    expect(canUndo()).toBe(true);
+    expect(undo()).toBe('test.pipe.add');
+    expect(pipes.p1).toBeUndefined();
+  });
+
+  it('scenario (c): edit pricing in plumbing → switch to roofing → Ctrl+Z reverts the pricing edit', () => {
+    // Plumbing: edit pricing.
+    commandBus.dispatch({ type: 'test.pricing.edit', payload: { rate: 120 } });
+    expect(pricing.rate).toBe(120);
+
+    // Switch workspace.
+    useAppModeStore.setState({ mode: 'roofing' });
+
+    // Shared entry must appear in BOTH stacks — undoable from
+    // either side.
+    expect(canUndo()).toBe(true);
+    expect(undo()).toBe('test.pricing.edit');
+    expect(pricing.rate).toBe(0);
+  });
+
+  it('shared command undone from one side is undone for the other too', () => {
+    // Dispatch a shared command, undo it in roofing, switch back
+    // and verify plumbing does NOT see it as undoable again.
+    commandBus.dispatch({ type: 'test.pricing.edit', payload: { rate: 200 } });
+
+    useAppModeStore.setState({ mode: 'roofing' });
+    expect(undo()).toBe('test.pricing.edit');
+
+    useAppModeStore.setState({ mode: 'plumbing' });
+    // canUndo may still be false — the shared command is in the
+    // undone set and there are no OTHER undoable plumbing entries.
+    expect(canUndo()).toBe(false);
+    // But redo works in plumbing (also shared).
+    expect(canRedo()).toBe(true);
+    expect(redo()).toBe('test.pricing.edit');
+    expect(pricing.rate).toBe(200);
+  });
+
+  it('redo dispatched from a different mode than undo still re-applies the shared command', () => {
+    commandBus.dispatch({ type: 'test.pricing.edit', payload: { rate: 50 } });
+
+    // Undo in plumbing.
+    useAppModeStore.setState({ mode: 'plumbing' });
+    undo();
+    expect(pricing.rate).toBe(0);
+
+    // Redo in roofing — still allowed because the entry is shared.
+    useAppModeStore.setState({ mode: 'roofing' });
+    expect(canRedo()).toBe(true);
+    expect(redo()).toBe('test.pricing.edit');
+    expect(pricing.rate).toBe(50);
+  });
+
+  it('a new user command clears the redo region across both modes', () => {
+    commandBus.dispatch({ type: 'test.pricing.edit', payload: { rate: 75 } });
+    undo();
+    expect(canRedo()).toBe(true);
+
+    // Any new user command, in any mode, truncates redo.
+    commandBus.dispatch({ type: 'test.pipe.add', payload: { id: 'p-new' } });
+    expect(canRedo()).toBe(false);
+
+    // Even switching to roofing doesn't bring the redo back.
+    useAppModeStore.setState({ mode: 'roofing' });
+    expect(canRedo()).toBe(false);
   });
 });

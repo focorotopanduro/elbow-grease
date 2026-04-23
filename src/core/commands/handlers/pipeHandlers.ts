@@ -77,6 +77,7 @@ export interface PipeInsertAnchorPayload {
  */
 export const pipeAddHandler: CommandHandler<PipeAddPayload, CommittedPipe> = {
   type: 'pipe.add',
+  mode: 'plumbing',
   preconditions: (p) => {
     if (!Array.isArray(p.points) || p.points.length < 2) {
       return 'pipe.add requires at least 2 points';
@@ -111,6 +112,7 @@ export const pipeAddHandler: CommandHandler<PipeAddPayload, CommittedPipe> = {
  */
 export const pipeRemoveHandler: CommandHandler<PipeRemovePayload, void> = {
   type: 'pipe.remove',
+  mode: 'plumbing',
   preconditions: (p) => {
     if (!usePipeStore.getState().pipes[p.id]) {
       return `pipe.remove: no pipe with id "${p.id}"`;
@@ -155,6 +157,7 @@ export const pipeRemoveHandler: CommandHandler<PipeRemovePayload, void> = {
  */
 export const pipeSelectHandler: CommandHandler<PipeSelectPayload, void> = {
   type: 'pipe.select',
+  mode: 'plumbing',
   preconditions: (p) => {
     if (p.id !== null && !usePipeStore.getState().pipes[p.id]) {
       return `pipe.select: no pipe with id "${p.id}"`;
@@ -175,6 +178,7 @@ export const pipeUpdateDiameterHandler: CommandHandler<
   void
 > = {
   type: 'pipe.updateDiameter',
+  mode: 'plumbing',
   preconditions: (p) => {
     if (!usePipeStore.getState().pipes[p.id]) {
       return `pipe.updateDiameter: no pipe with id "${p.id}"`;
@@ -205,6 +209,7 @@ export const pipeUpdateDiameterHandler: CommandHandler<
  */
 export const pipeBeginPivotHandler: CommandHandler<PipeBeginPivotPayload, void> = {
   type: 'pipe.beginPivot',
+  mode: 'plumbing',
   preconditions: (p) => {
     if (!usePipeStore.getState().pipes[p.pipeId]) {
       return `pipe.beginPivot: no pipe "${p.pipeId}"`;
@@ -221,6 +226,7 @@ export const pipeBeginPivotHandler: CommandHandler<PipeBeginPivotPayload, void> 
 
 export const pipeCommitPivotHandler: CommandHandler<PipeCommitPivotPayload, void> = {
   type: 'pipe.commitPivot',
+  mode: 'plumbing',
   preconditions: () => {
     if (!usePipeStore.getState().pivotSession) {
       return 'pipe.commitPivot: no pivot session active';
@@ -234,6 +240,7 @@ export const pipeCommitPivotHandler: CommandHandler<PipeCommitPivotPayload, void
 
 export const pipeCancelPivotHandler: CommandHandler<PipeCancelPivotPayload, void> = {
   type: 'pipe.cancelPivot',
+  mode: 'plumbing',
   preconditions: () => {
     if (!usePipeStore.getState().pivotSession) {
       return 'pipe.cancelPivot: no pivot session active';
@@ -254,6 +261,7 @@ export const pipeCancelPivotHandler: CommandHandler<PipeCancelPivotPayload, void
  */
 export const pipeInsertAnchorHandler: CommandHandler<PipeInsertAnchorPayload, void> = {
   type: 'pipe.insertAnchor',
+  mode: 'plumbing',
   preconditions: (p) => {
     const pipe = usePipeStore.getState().pipes[p.pipeId];
     if (!pipe) return `pipe.insertAnchor: no pipe "${p.pipeId}"`;

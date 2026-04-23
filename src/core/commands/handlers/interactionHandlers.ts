@@ -53,6 +53,7 @@ export interface InteractionSetDrawMaterialPayload {
 
 export const interactionSetModeHandler: CommandHandler<InteractionSetModePayload, void> = {
   type: 'interaction.setMode',
+  mode: 'plumbing',
   apply: (p) => {
     usePlumbingDrawStore.getState().setMode(p.mode);
   },
@@ -63,6 +64,7 @@ export const interactionAddDrawPointHandler: CommandHandler<
   void
 > = {
   type: 'interaction.addDrawPoint',
+  mode: 'plumbing',
   preconditions: (_p) => {
     if (usePlumbingDrawStore.getState().mode !== 'draw') {
       return 'interaction.addDrawPoint: not in draw mode';
@@ -79,6 +81,7 @@ export const interactionClearDrawHandler: CommandHandler<
   void
 > = {
   type: 'interaction.clearDraw',
+  mode: 'plumbing',
   apply: () => {
     usePlumbingDrawStore.getState().clearDraw();
   },
@@ -89,6 +92,7 @@ export const interactionFinishDrawHandler: CommandHandler<
   Vec3[] | null
 > = {
   type: 'interaction.finishDraw',
+  mode: 'plumbing',
   apply: () => {
     return usePlumbingDrawStore.getState().finishDraw();
   },
@@ -99,6 +103,7 @@ export const interactionSetDrawPlaneHandler: CommandHandler<
   void
 > = {
   type: 'interaction.setDrawPlane',
+  mode: 'plumbing',
   apply: (p) => {
     usePlumbingDrawStore.getState().setDrawPlane(p.plane);
   },
@@ -109,6 +114,7 @@ export const interactionSetDrawDiameterHandler: CommandHandler<
   void
 > = {
   type: 'interaction.setDrawDiameter',
+  mode: 'plumbing',
   preconditions: (p) => (p.diameter > 0 ? null : `diameter must be > 0 (got ${p.diameter})`),
   apply: (p) => {
     usePlumbingDrawStore.getState().setDrawDiameter(p.diameter);
@@ -120,6 +126,7 @@ export const interactionSetDrawMaterialHandler: CommandHandler<
   void
 > = {
   type: 'interaction.setDrawMaterial',
+  mode: 'plumbing',
   apply: (p) => {
     usePlumbingDrawStore.getState().setDrawMaterial(p.material);
   },

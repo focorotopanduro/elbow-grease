@@ -37,6 +37,23 @@ export type CommandOrigin =
   | 'undo'
   | 'redo';
 
+// ── Domain / mode scope ─────────────────────────────────────────
+
+import type { AppMode } from '@store/appModeStore';
+
+/**
+ * Phase 3 (ARCHITECTURE.md §4.3) — which workspace a command
+ * belongs to for undo-stack partitioning.
+ *
+ *   • `plumbing` / `roofing` — workspace-scoped. `Ctrl+Z` in the
+ *     OTHER workspace will not walk back over this entry.
+ *   • `shared` — participates in BOTH workspaces' undo stacks.
+ *     Examples: pricing edits, customer edits, file save/open,
+ *     contractor-profile edits. Undoing from either workspace
+ *     reverses the change for both.
+ */
+export type CommandMode = AppMode | 'shared';
+
 // ── The command ────────────────────────────────────────────────
 
 export interface Command<P = unknown> {
@@ -50,6 +67,14 @@ export interface Command<P = unknown> {
   readonly timestamp: number;
   /** Traces a user action through all its side effects. */
   readonly correlationId: string;
+  /**
+   * Phase 3 — workspace scope stamped at dispatch. Drives the
+   * UndoManager's per-mode partitioning. Either the handler
+   * declares it (`CommandHandler.mode`) or the bus falls back to
+   * `useAppModeStore.getState().mode` at dispatch time. See
+   * ARCHITECTURE.md §4.3.
+   */
+  readonly mode: CommandMode;
 }
 
 // ── Dispatch result ────────────────────────────────────────────
@@ -75,6 +100,19 @@ export type DispatchResult<R = unknown> = DispatchOk<R> | DispatchRejected;
 export interface CommandHandler<P = unknown, R = unknown> {
   /** Must match the Command.type this handler claims. */
   readonly type: string;
+
+  /**
+   * Phase 3 (ARCHITECTURE.md §4.3) — workspace scope for the
+   * commands this handler serves. When declared, the bus stamps
+   * every matching Command with this `mode`; when omitted, the
+   * bus falls back to the active `useAppModeStore.getState().mode`
+   * at dispatch time. Declare `shared` for commands that
+   * meaningfully apply to both workspaces (pricing, customer,
+   * contractor profile, file IO). Declare `plumbing` / `roofing`
+   * for domain-scoped commands to get compile-time clarity + a
+   * safety net against accidental cross-domain dispatch.
+   */
+  readonly mode?: CommandMode;
 
   /**
    * Return `null` to proceed; return a human-readable error string to

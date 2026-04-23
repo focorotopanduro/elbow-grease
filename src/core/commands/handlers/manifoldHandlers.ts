@@ -46,11 +46,13 @@ export interface ManifoldMergeNeighborsPayload {
 
 export const manifoldAddHandler: CommandHandler<ManifoldAddPayload, string> = {
   type: 'manifold.add',
+  mode: 'plumbing',
   apply: (p) => useManifoldStore.getState().addManifold(p),
 };
 
 export const manifoldRemoveHandler: CommandHandler<ManifoldRemovePayload, void> = {
   type: 'manifold.remove',
+  mode: 'plumbing',
   preconditions: (p) => {
     if (!useManifoldStore.getState().manifolds[p.id]) {
       return `manifold.remove: no manifold "${p.id}"`;
@@ -72,6 +74,7 @@ export const manifoldRemoveHandler: CommandHandler<ManifoldRemovePayload, void> 
 
 export const manifoldMoveHandler: CommandHandler<ManifoldMovePayload, void> = {
   type: 'manifold.move',
+  mode: 'plumbing',
   preconditions: (p) => {
     if (!useManifoldStore.getState().manifolds[p.id]) {
       return `manifold.move: no manifold "${p.id}"`;
@@ -91,6 +94,7 @@ export const manifoldMoveHandler: CommandHandler<ManifoldMovePayload, void> = {
 
 export const manifoldSelectHandler: CommandHandler<ManifoldSelectPayload, void> = {
   type: 'manifold.select',
+  mode: 'plumbing',
   apply: (p) => useManifoldStore.getState().selectManifold(p.id),
 };
 
@@ -106,6 +110,7 @@ export const manifoldMergeNeighborsHandler: CommandHandler<
   string | null
 > = {
   type: 'manifold.mergeNeighbors',
+  mode: 'plumbing',
   preconditions: (p) => {
     if (!useManifoldStore.getState().manifolds[p.id]) {
       return `manifold.mergeNeighbors: no manifold "${p.id}"`;

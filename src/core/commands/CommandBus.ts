@@ -19,10 +19,12 @@
 
 import { newCorrelationId } from './correlationId';
 import { logger } from '@core/logger/Logger';
+import { useAppModeStore } from '@store/appModeStore';
 import type {
   Command,
   CommandHandler,
   CommandLogEntry,
+  CommandMode,
   DispatchResult,
   HandlerContext,
 } from './types';
@@ -89,13 +91,14 @@ class CommandBus {
   dispatch<P = unknown, R = unknown>(
     input:
       | Command<P>
-      | (Omit<Command<P>, 'timestamp' | 'correlationId' | 'issuedBy'> & {
+      | (Omit<Command<P>, 'timestamp' | 'correlationId' | 'issuedBy' | 'mode'> & {
           issuedBy?: Command['issuedBy'];
           correlationId?: string;
+          mode?: CommandMode;
         }),
   ): DispatchResult<R> {
     if (this.depth >= this.MAX_DEPTH) {
-      const cmd = this.materialize(input);
+      const cmd = this.materialize(input, this.handlers.get(input.type));
       const rejected: DispatchResult<R> = {
         ok: false,
         reason: `CommandBus recursion limit (${this.MAX_DEPTH}) — probable infinite dispatch loop`,
@@ -105,8 +108,8 @@ class CommandBus {
       return rejected;
     }
 
-    const cmd = this.materialize(input);
-    const handler = this.handlers.get(cmd.type);
+    const handler = this.handlers.get(input.type);
+    const cmd = this.materialize(input, handler);
 
     if (!handler) {
       const rejected: DispatchResult<R> = {
@@ -219,19 +222,35 @@ class CommandBus {
 
   // ── internal ───────────────────────────────────────────────
 
-  private materialize<P>(input: {
-    type: string;
-    payload: P;
-    issuedBy?: Command['issuedBy'];
-    correlationId?: string;
-    timestamp?: number;
-  }): Command<P> {
+  private materialize<P>(
+    input: {
+      type: string;
+      payload: P;
+      issuedBy?: Command['issuedBy'];
+      correlationId?: string;
+      timestamp?: number;
+      mode?: CommandMode;
+    },
+    handler?: CommandHandler,
+  ): Command<P> {
+    // Phase 3 — resolve the workspace scope the Command will carry.
+    // Priority: explicit input (e.g. UndoManager preserving the
+    // original mode on an undo dispatch) → handler's declared mode
+    // → current appMode at dispatch time. The fallback covers any
+    // handler that forgets to declare, which is fine for plumbing
+    // commands dispatched while the user is in plumbing mode but
+    // would produce a wrong stamp for shared commands dispatched
+    // in a domain mode — so every shared handler MUST declare.
+    const mode: CommandMode = input.mode
+      ?? handler?.mode
+      ?? useAppModeStore.getState().mode;
     return {
       type: input.type,
       payload: input.payload,
       issuedBy: input.issuedBy ?? 'user',
       timestamp: input.timestamp ?? performance.now(),
       correlationId: input.correlationId ?? newCorrelationId(),
+      mode,
     };
   }
 

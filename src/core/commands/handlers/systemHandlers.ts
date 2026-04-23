@@ -12,6 +12,11 @@ export interface SystemBootPayload {
 
 export const systemBootHandler: CommandHandler<SystemBootPayload, void> = {
   type: 'system.boot',
+  // Phase 3 (ARCHITECTURE.md §4.3) — boot is workspace-agnostic
+  // infrastructure. Stamp 'shared' so it never falls into either
+  // workspace's undo stack (it's non-undoable anyway, but the
+  // classification keeps the taxonomy honest).
+  mode: 'shared',
   // Pure marker. No mutation, no snapshot, no undo.
   apply: () => undefined,
 };

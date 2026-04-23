@@ -51,6 +51,7 @@ export interface FixtureSetPositionPayload {
 
 export const fixturePlaceHandler: CommandHandler<FixturePlacePayload, string> = {
   type: 'fixture.place',
+  mode: 'plumbing',
   apply: (p) => {
     return useFixtureStore
       .getState()
@@ -63,6 +64,7 @@ export const fixturePlaceHandler: CommandHandler<FixturePlacePayload, string> = 
 
 export const fixtureRemoveHandler: CommandHandler<FixtureRemovePayload, void> = {
   type: 'fixture.remove',
+  mode: 'plumbing',
   preconditions: (p) => {
     if (!useFixtureStore.getState().fixtures[p.id]) {
       return `fixture.remove: no fixture "${p.id}"`;
@@ -82,6 +84,7 @@ export const fixtureRemoveHandler: CommandHandler<FixtureRemovePayload, void> = 
 
 export const fixtureSelectHandler: CommandHandler<FixtureSelectPayload, void> = {
   type: 'fixture.select',
+  mode: 'plumbing',
   preconditions: (p) => {
     if (p.id !== null && !useFixtureStore.getState().fixtures[p.id]) {
       return `fixture.select: no fixture "${p.id}"`;
@@ -95,6 +98,7 @@ export const fixtureSelectHandler: CommandHandler<FixtureSelectPayload, void> = 
 
 export const fixtureUpdateParamHandler: CommandHandler<FixtureUpdateParamPayload, void> = {
   type: 'fixture.updateParam',
+  mode: 'plumbing',
   preconditions: (p) => {
     if (!useFixtureStore.getState().fixtures[p.id]) {
       return `fixture.updateParam: no fixture "${p.id}"`;
@@ -118,6 +122,7 @@ export const fixtureBulkUpdateParamsHandler: CommandHandler<
   void
 > = {
   type: 'fixture.bulkUpdateParams',
+  mode: 'plumbing',
   preconditions: (p) => {
     if (!useFixtureStore.getState().fixtures[p.id]) {
       return `fixture.bulkUpdateParams: no fixture "${p.id}"`;
@@ -144,6 +149,7 @@ export const fixtureBulkUpdateParamsHandler: CommandHandler<
 
 export const fixtureSetPositionHandler: CommandHandler<FixtureSetPositionPayload, void> = {
   type: 'fixture.setPosition',
+  mode: 'plumbing',
   preconditions: (p) => {
     if (!useFixtureStore.getState().fixtures[p.id]) {
       return `fixture.setPosition: no fixture "${p.id}"`;
