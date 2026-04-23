@@ -127,27 +127,43 @@ interface IsoCameraControllerProps {
  * IsoCameraStore state. Mount it inside the Canvas.
  */
 export function IsoCameraController({
-  transitionDurationSec = 0.8,
+  transitionDurationSec = 0.4,
   target = [0, 0, 0],
   distance = 20,
 }: IsoCameraControllerProps) {
-  const { camera, gl } = useThree();
+  const { camera, gl, controls } = useThree();
   const mode = useIsoCameraStore((s) => s.mode);
   const prevMode = useIsoCameraStore((s) => s.prevMode);
   const transitionT = useIsoCameraStore((s) => s.transitionT);
   const frustumSize = useIsoCameraStore((s) => s.frustumSize);
   const stepTransition = useIsoCameraStore((s) => s.stepTransition);
+  const handoffDoneRef = useRef(true);
 
   // Ease-in-out cubic
   const ease = (t: number): number =>
     t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
   useFrame((_, dt) => {
-    // Only drive the camera WHILE the transition is playing. Once the
-    // transition completes, yield control to OrbitControls so the user
-    // can pan + zoom freely in Top/Front/Side views without us
-    // immediately snapping them back to center.
-    if (transitionT >= 1) return;
+    if (transitionT >= 1) {
+      // One-shot handoff: after the transition settles, nudge
+      // OrbitControls to adopt the new camera position as its
+      // baseline. Without this, OrbitControls' cached spherical
+      // would fight the new view the moment it re-enables (which
+      // is the "top/side/front broke" bug — orbit damping dragged
+      // the camera back to perspective).
+      if (!handoffDoneRef.current && controls) {
+        const c = controls as unknown as {
+          target?: THREE.Vector3;
+          update?: () => void;
+        };
+        if (c.target) c.target.set(target[0], target[1], target[2]);
+        c.update?.();
+        handoffDoneRef.current = true;
+      }
+      return;
+    }
+    // Starting / middle of a transition — owner of the camera.
+    handoffDoneRef.current = false;
 
     stepTransition(dt, transitionDurationSec);
     const t = ease(transitionT);
@@ -259,7 +275,15 @@ const styles: Record<string, React.CSSProperties> = {
     // Moved off the right edge — that column now belongs to
     // FloorVisibilityControls + FloorSelectorRail + PhaseBOMPanel.
     // Parked below LayerPanel in the left-mid region.
-    position: 'absolute', top: 200, left: 192,
+    //
+    // Bug-fix pass: was `top: 200`, but LayerPanel extends from
+    // top:16 down through ~y=360 (5 system toggles + divider + 3
+    // component toggles + footer), so the camera HUD was covering
+    // the lower half of LayerPanel and hiding the Fittings /
+    // Fixtures / Dimensions / total-count rows. Bumped to 380 so
+    // the Camera HUD sits cleanly below LayerPanel with a small
+    // visual gap.
+    position: 'absolute', top: 380, left: 192,
     display: 'flex', flexDirection: 'column', gap: 3,
     padding: 8, borderRadius: 8, border: '1px solid #333',
     background: 'rgba(10,10,15,0.92)',

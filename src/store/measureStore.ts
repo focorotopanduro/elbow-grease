@@ -36,7 +36,24 @@ export interface Measurement {
   pinned: boolean;
 }
 
-export type MeasureMode = 'off' | 'ruler' | 'scale';
+/**
+ * Phase 14.G — "calibrate" is an umbrella term for aligning a blueprint
+ * backdrop to the app's world. Three coordinates need to agree:
+ *
+ *   • Scale    — how many world feet per pixel of blueprint
+ *   • Level    — which way is "north" on the blueprint (rotation)
+ *   • Origin   — which point on the blueprint is world (0, 0, 0)
+ *
+ * Each is its own two-click (or one-click) tool. All three modify
+ * the active floor's backdrops so pipes/fixtures stay fixed relative
+ * to the world frame — the blueprint moves, not the drawing.
+ */
+export type MeasureMode =
+  | 'off'
+  | 'ruler'
+  | 'scale'
+  | 'calibrate_level'   // two clicks on a known-horizontal line
+  | 'calibrate_origin'; // one click on the blueprint's (0, 0, 0)
 
 interface MeasureState {
   mode: MeasureMode;
@@ -65,6 +82,15 @@ interface MeasureState {
   applyScaleFromRealFeet: (realFeet: number) => void;
   resetScale: () => void;
   cancelScale: () => void;
+
+  // Phase 14.G — Level (rotate-to-horizontal) and Origin (translate).
+  /** Apply rotation to all active-floor backdrops so p1→p2 becomes
+   *  horizontal. Rotation pivots around the midpoint so the clicked
+   *  segment stays on screen. */
+  applyLevelFromPair: (p1: Vec3, p2: Vec3) => void;
+  /** Apply translation to all active-floor backdrops so `worldPoint`
+   *  becomes (0, y, 0) in world coordinates. */
+  applyOriginShift: (worldPoint: Vec3) => void;
 }
 
 let seq = 0;
@@ -149,4 +175,21 @@ export const useMeasureStore = create<MeasureState>((set, get) => ({
   resetScale: () => set({ scaleFactor: 1 }),
 
   cancelScale: () => set({ pendingScalePair: null, mode: 'off' }),
+
+  applyLevelFromPair: (p1, p2) => {
+    // Defer to the backdrop store — it's the owner of the transform.
+    // Dynamic import avoids the cyclic backdrop↔measure dep at module
+    // load time (measureStore is imported everywhere including tests).
+    import('./backdropStore').then(({ rotateActiveFloorBackdropsToLevel }) => {
+      rotateActiveFloorBackdropsToLevel(p1, p2);
+    });
+    set({ mode: 'off', pendingStart: null, previewEnd: null });
+  },
+
+  applyOriginShift: (worldPoint) => {
+    import('./backdropStore').then(({ shiftActiveFloorBackdropsOrigin }) => {
+      shiftActiveFloorBackdropsOrigin(worldPoint);
+    });
+    set({ mode: 'off', pendingStart: null, previewEnd: null });
+  },
 }));

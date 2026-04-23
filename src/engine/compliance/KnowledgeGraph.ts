@@ -116,6 +116,16 @@ export class KnowledgeGraph {
     return this.bySubject.get(subject) ?? [];
   }
 
+  /**
+   * Return every triple in the graph.
+   * Used by the Phase 2 compliance-trace builder to filter the facts
+   * that contributed to a violation. Returns a COPY so callers can't
+   * mutate internal state by accident.
+   */
+  getAll(): Triple[] {
+    return [...this.triples];
+  }
+
   /** Get a single value: kg.value("bldg:pipe-1", "ipc:diameter") → 2 */
   value(subject: string, predicate: string): string | number | boolean | undefined {
     const matches = (this.bySubject.get(subject) ?? [])

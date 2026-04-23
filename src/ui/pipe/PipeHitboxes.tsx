@@ -28,6 +28,10 @@ import { usePipeStore, type CommittedPipe } from '@store/pipeStore';
 import { useInteractionStore } from '@store/interactionStore';
 import { useLayerStore } from '@store/layerStore';
 import { useFloorParams } from '@store/floorStore';
+import { useFeatureFlagStore } from '@store/featureFlagStore';
+import { beginExtend } from './ExtendSession';
+import { nearestSegmentOnPolyline } from '@core/pipe/polylineMath';
+import type { Vec3 } from '@core/events';
 
 // ── Edge disc radius (world units) ──────────────────────────────
 
@@ -84,13 +88,84 @@ function PipeHitbox({ pipe }: { pipe: CommittedPipe }) {
     return segs;
   }, [pipe.points, edgeRadius]);
 
+  // Phase 7.A: tee-from-middle-drag threshold.
+  // A pointer that moves beyond this many client-space pixels between
+  // pointerdown and pointerup counts as a DRAG — which creates a tee
+  // and starts extending a branch. Under the threshold = CLICK = select.
+  const DRAG_THRESHOLD_PX = 8;
+
   // ── Handlers ────────────────────────────────────────────────
+
+  // Pull the extend-drag flag once per render — the handler below
+  // closes over the latest value via store reads.
+  const extendDragEnabled = useFeatureFlagStore((s) => s.pipeExtendDrag);
 
   const onCenterDown = useCallback((e: ThreeEvent<PointerEvent>) => {
     if (e.button !== 0) return;
     e.stopPropagation();
-    selectPipe(pipe.id);
-  }, [pipe.id, selectPipe]);
+
+    // Phase 7.A path: if the extend-drag flag is on, defer the
+    // select/drag decision until we see whether the user moves. If the
+    // flag is off, fall through to the legacy instant-select behavior.
+    if (!extendDragEnabled) {
+      selectPipe(pipe.id);
+      return;
+    }
+
+    // Capture the pipe-local hit context we'll need if this turns
+    // into a drag. The R3F event carries `e.point` in world space;
+    // we find the nearest pipe segment + its `t` parameter now so
+    // the anchor is computed from the actual click point, not from
+    // wherever the cursor was when the drag threshold crossed.
+    const hitWorld: Vec3 = [e.point.x, e.point.y, e.point.z];
+    const nearest = nearestSegmentOnPolyline(pipe.points, hitWorld);
+    if (!nearest) {
+      // Degenerate pipe — fall back to select.
+      selectPipe(pipe.id);
+      return;
+    }
+
+    const startClientX = e.clientX;
+    const startClientY = e.clientY;
+    let dragged = false;
+
+    const onMove = (ev: PointerEvent) => {
+      if (dragged) return; // one-shot arm
+      const dx = ev.clientX - startClientX;
+      const dy = ev.clientY - startClientY;
+      if (dx * dx + dy * dy < DRAG_THRESHOLD_PX * DRAG_THRESHOLD_PX) return;
+      dragged = true;
+
+      // Snap the anchor to the grid — the user expects tees to land
+      // on grid points, matching the rest of the drawing flow.
+      const grid = useInteractionStore.getState().gridSnap || 0.5;
+      const snappedAnchor: Vec3 = [
+        Math.round(nearest.worldPoint[0] / grid) * grid,
+        nearest.worldPoint[1],
+        Math.round(nearest.worldPoint[2] / grid) * grid,
+      ];
+
+      beginExtend({
+        parentPipeId: pipe.id,
+        origin: 'tee',
+        anchor: snappedAnchor,
+        teeSegmentIdx: nearest.segmentIdx,
+      });
+    };
+
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      // Click (no drag) → select. Drag → ExtendSession's window listeners
+      // already handle commit/cancel; we stay out of its way.
+      if (!dragged) {
+        selectPipe(pipe.id);
+      }
+    };
+
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  }, [pipe.id, pipe.points, selectPipe, extendDragEnabled]);
 
   const onEdgeDown = useCallback((e: ThreeEvent<PointerEvent>, which: 'start' | 'end') => {
     if (e.button !== 0) return;

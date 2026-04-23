@@ -86,6 +86,10 @@ const SYSTEM_STYLES: Record<SystemType, { color: string; strokeWidth: number; da
   cold_supply: { color: '#1e40af', strokeWidth: 2.0, dashArray: 'none' },
   hot_supply:  { color: '#991b1b', strokeWidth: 2.0, dashArray: 'none' },
   storm:       { color: '#1f2937', strokeWidth: 2.5, dashArray: '2 3' }, // dotted
+  // Phase 14.AA.3 — condensate. Purple with mid-dash to separate
+  // from vent (8-4) and storm (2-3). ANSI doesn't specify a
+  // condensate convention so we pick one distinct from the others.
+  condensate:  { color: '#6b46c1', strokeWidth: 1.6, dashArray: '4 2' },
 };
 
 // ── Projection math ─────────────────────────────────────────────

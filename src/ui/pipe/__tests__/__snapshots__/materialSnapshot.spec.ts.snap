@@ -1,0 +1,821 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AD.18 material snapshots — PEX per system > PEX 1" cold_supply system color > fp 1`] = `
+{
+  "color": "#2a6fd6",
+  "depthWrite": true,
+  "emissive": "#2a6fd6",
+  "emissiveIntensity": 0.04,
+  "metalness": 0.1,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.4,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — PEX per system > PEX 1" cold_supply system color > hash 1`] = `"035d59d1f089a862"`;
+
+exports[`AD.18 material snapshots — PEX per system > PEX 1" condensate system color > fp 1`] = `
+{
+  "color": "#9575cd",
+  "depthWrite": true,
+  "emissive": "#9575cd",
+  "emissiveIntensity": 0.04,
+  "metalness": 0.1,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.4,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — PEX per system > PEX 1" condensate system color > hash 1`] = `"22bed65cd8ff9c1a"`;
+
+exports[`AD.18 material snapshots — PEX per system > PEX 1" hot_supply system color > fp 1`] = `
+{
+  "color": "#d13e3e",
+  "depthWrite": true,
+  "emissive": "#d13e3e",
+  "emissiveIntensity": 0.04,
+  "metalness": 0.1,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.4,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — PEX per system > PEX 1" hot_supply system color > hash 1`] = `"661c25048916b3a2"`;
+
+exports[`AD.18 material snapshots — PEX per system > PEX 1" storm system color > fp 1`] = `
+{
+  "color": "#5b6f84",
+  "depthWrite": true,
+  "emissive": "#5b6f84",
+  "emissiveIntensity": 0.04,
+  "metalness": 0.1,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.4,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — PEX per system > PEX 1" storm system color > hash 1`] = `"b54d1d8cf8fc7c76"`;
+
+exports[`AD.18 material snapshots — PEX per system > PEX 1" vent system color > fp 1`] = `
+{
+  "color": "#eeeeee",
+  "depthWrite": true,
+  "emissive": "#eeeeee",
+  "emissiveIntensity": 0.04,
+  "metalness": 0.1,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.4,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — PEX per system > PEX 1" vent system color > hash 1`] = `"1a614ec6dc394b96"`;
+
+exports[`AD.18 material snapshots — PEX per system > PEX 1" waste system color > fp 1`] = `
+{
+  "color": "#eeeeee",
+  "depthWrite": true,
+  "emissive": "#eeeeee",
+  "emissiveIntensity": 0.04,
+  "metalness": 0.1,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.4,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — PEX per system > PEX 1" waste system color > hash 1`] = `"1a614ec6dc394b96"`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" abs cold_supply main material > fp 1`] = `
+{
+  "color": "#986822",
+  "depthWrite": true,
+  "emissive": "#986822",
+  "emissiveIntensity": 0.04,
+  "metalness": 0.05,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.58,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" abs cold_supply main material > hash 1`] = `"86b56db79cf7dd27"`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" cast_iron cold_supply main material > fp 1`] = `
+{
+  "color": "#2a2c30",
+  "depthWrite": true,
+  "emissive": "#2a2c30",
+  "emissiveIntensity": 0.02,
+  "metalness": 0.6,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.72,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" cast_iron cold_supply main material > hash 1`] = `"072f839612a3659a"`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" copper_type_l cold_supply main material > fp 1`] = `
+{
+  "color": "#c25d1e",
+  "depthWrite": true,
+  "emissive": "#c25d1e",
+  "emissiveIntensity": 0.06,
+  "metalness": 0.92,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.15,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" copper_type_l cold_supply main material > hash 1`] = `"7da50bddce98f358"`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" copper_type_m cold_supply main material > fp 1`] = `
+{
+  "color": "#b05418",
+  "depthWrite": true,
+  "emissive": "#b05418",
+  "emissiveIntensity": 0.06,
+  "metalness": 0.88,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.18,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" copper_type_m cold_supply main material > hash 1`] = `"10bce89b76c43e46"`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" cpvc cold_supply main material > fp 1`] = `
+{
+  "color": "#f1ad49",
+  "depthWrite": true,
+  "emissive": "#f1ad49",
+  "emissiveIntensity": 0.05,
+  "metalness": 0.06,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.45,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" cpvc cold_supply main material > hash 1`] = `"e6e8bcbf2b55691b"`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" ductile_iron cold_supply main material > fp 1`] = `
+{
+  "color": "#33353a",
+  "depthWrite": true,
+  "emissive": "#33353a",
+  "emissiveIntensity": 0.02,
+  "metalness": 0.65,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.68,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" ductile_iron cold_supply main material > hash 1`] = `"630fa21ee39fba4e"`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" galvanized_steel cold_supply main material > fp 1`] = `
+{
+  "color": "#a8b0b8",
+  "depthWrite": true,
+  "emissive": "#a8b0b8",
+  "emissiveIntensity": 0.04,
+  "metalness": 0.8,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.25,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" galvanized_steel cold_supply main material > hash 1`] = `"b49538524eb9bee6"`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" pex cold_supply main material > fp 1`] = `
+{
+  "color": "#2a6fd6",
+  "depthWrite": true,
+  "emissive": "#2a6fd6",
+  "emissiveIntensity": 0.04,
+  "metalness": 0.1,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.4,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" pex cold_supply main material > hash 1`] = `"035d59d1f089a862"`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" pvc_sch40 cold_supply main material > fp 1`] = `
+{
+  "color": "#f8b95c",
+  "depthWrite": true,
+  "emissive": "#f8b95c",
+  "emissiveIntensity": 0.05,
+  "metalness": 0.05,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.48,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" pvc_sch40 cold_supply main material > hash 1`] = `"6bd2688fbf958bd7"`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" pvc_sch80 cold_supply main material > fp 1`] = `
+{
+  "color": "#c0893c",
+  "depthWrite": true,
+  "emissive": "#c0893c",
+  "emissiveIntensity": 0.05,
+  "metalness": 0.08,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.42,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — main pipe material per type > 2" pvc_sch80 cold_supply main material > hash 1`] = `"ace9c3fb94237c9e"`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 0.5" cold_supply — diameter tint > fp 1`] = `
+{
+  "color": "#7dcdee",
+  "depthWrite": true,
+  "emissive": "#7dcdee",
+  "emissiveIntensity": 0.05,
+  "metalness": 0.05,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.48,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 0.5" cold_supply — diameter tint > hash 1`] = `"fc327dd7321a0c9f"`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 0.75" cold_supply — diameter tint > fp 1`] = `
+{
+  "color": "#62c4ed",
+  "depthWrite": true,
+  "emissive": "#62c4ed",
+  "emissiveIntensity": 0.05,
+  "metalness": 0.05,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.48,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 0.75" cold_supply — diameter tint > hash 1`] = `"77feae77f33d78b3"`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 1" cold_supply — diameter tint > fp 1`] = `
+{
+  "color": "#62c4ed",
+  "depthWrite": true,
+  "emissive": "#62c4ed",
+  "emissiveIntensity": 0.05,
+  "metalness": 0.05,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.48,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 1" cold_supply — diameter tint > hash 1`] = `"77feae77f33d78b3"`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 1.5" cold_supply — diameter tint > fp 1`] = `
+{
+  "color": "#bd76c5",
+  "depthWrite": true,
+  "emissive": "#bd76c5",
+  "emissiveIntensity": 0.05,
+  "metalness": 0.05,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.48,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 1.5" cold_supply — diameter tint > hash 1`] = `"82d136ed04fc092b"`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 2" cold_supply — diameter tint > fp 1`] = `
+{
+  "color": "#f8b95c",
+  "depthWrite": true,
+  "emissive": "#f8b95c",
+  "emissiveIntensity": 0.05,
+  "metalness": 0.05,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.48,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 2" cold_supply — diameter tint > hash 1`] = `"6bd2688fbf958bd7"`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 3" cold_supply — diameter tint > fp 1`] = `
+{
+  "color": "#8dc78b",
+  "depthWrite": true,
+  "emissive": "#8dc78b",
+  "emissiveIntensity": 0.05,
+  "metalness": 0.05,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.48,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 3" cold_supply — diameter tint > hash 1`] = `"1037d8bf6a75239f"`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 4" cold_supply — diameter tint > fp 1`] = `
+{
+  "color": "#ed7f79",
+  "depthWrite": true,
+  "emissive": "#ed7f79",
+  "emissiveIntensity": 0.05,
+  "metalness": 0.05,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.48,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 4" cold_supply — diameter tint > hash 1`] = `"e7ef82c63d8fc9e3"`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 6" cold_supply — diameter tint > fp 1`] = `
+{
+  "color": "#a87b51",
+  "depthWrite": true,
+  "emissive": "#a87b51",
+  "emissiveIntensity": 0.05,
+  "metalness": 0.05,
+  "opacity": 1,
+  "polygonOffset": true,
+  "polygonOffsetFactor": -1,
+  "polygonOffsetUnits": -1,
+  "roughness": 0.48,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — plastic diameter tint ladder > pvc_sch40 6" cold_supply — diameter tint > hash 1`] = `"060a85811d6dfe3b"`;
+
+exports[`AD.18 material snapshots — preview (live draw) > preview material has stable cyan tint + emissive > fp 1`] = `
+{
+  "color": "#00e5ff",
+  "depthWrite": false,
+  "emissive": "#00e5ff",
+  "emissiveIntensity": 0.5,
+  "metalness": 0.2,
+  "opacity": 0.45,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.5,
+  "side": 0,
+  "toneMapped": false,
+  "transparent": true,
+}
+`;
+
+exports[`AD.18 material snapshots — preview (live draw) > preview material has stable cyan tint + emissive > hash 1`] = `"0a30ae6666cd34c3"`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" abs selected material (yellow emissive) > fp 1`] = `
+{
+  "color": "#986822",
+  "depthWrite": true,
+  "emissive": "#ffd54f",
+  "emissiveIntensity": 0.35,
+  "metalness": 0.2,
+  "opacity": 1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.48,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" abs selected material (yellow emissive) > hash 1`] = `"12f9fd64f5ab0f5e"`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" cast_iron selected material (yellow emissive) > fp 1`] = `
+{
+  "color": "#2a2c30",
+  "depthWrite": true,
+  "emissive": "#ffd54f",
+  "emissiveIntensity": 0.35,
+  "metalness": 0.75,
+  "opacity": 1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.62,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" cast_iron selected material (yellow emissive) > hash 1`] = `"155503f8dedf2070"`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" copper_type_l selected material (yellow emissive) > fp 1`] = `
+{
+  "color": "#c25d1e",
+  "depthWrite": true,
+  "emissive": "#ffd54f",
+  "emissiveIntensity": 0.35,
+  "metalness": 1,
+  "opacity": 1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.05,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" copper_type_l selected material (yellow emissive) > hash 1`] = `"bb162d0512fe2f19"`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" copper_type_m selected material (yellow emissive) > fp 1`] = `
+{
+  "color": "#b05418",
+  "depthWrite": true,
+  "emissive": "#ffd54f",
+  "emissiveIntensity": 0.35,
+  "metalness": 1,
+  "opacity": 1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.08,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" copper_type_m selected material (yellow emissive) > hash 1`] = `"f2cb2d5d720f1244"`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" cpvc selected material (yellow emissive) > fp 1`] = `
+{
+  "color": "#f1ad49",
+  "depthWrite": true,
+  "emissive": "#ffd54f",
+  "emissiveIntensity": 0.35,
+  "metalness": 0.21,
+  "opacity": 1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.35,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" cpvc selected material (yellow emissive) > hash 1`] = `"79b6313f09a4cd4b"`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" ductile_iron selected material (yellow emissive) > fp 1`] = `
+{
+  "color": "#33353a",
+  "depthWrite": true,
+  "emissive": "#ffd54f",
+  "emissiveIntensity": 0.35,
+  "metalness": 0.8,
+  "opacity": 1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.58,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" ductile_iron selected material (yellow emissive) > hash 1`] = `"065f74113603b7ca"`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" galvanized_steel selected material (yellow emissive) > fp 1`] = `
+{
+  "color": "#a8b0b8",
+  "depthWrite": true,
+  "emissive": "#ffd54f",
+  "emissiveIntensity": 0.35,
+  "metalness": 0.95,
+  "opacity": 1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.15,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" galvanized_steel selected material (yellow emissive) > hash 1`] = `"38e1be8fd37c0b68"`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" pex selected material (yellow emissive) > fp 1`] = `
+{
+  "color": "#2a6fd6",
+  "depthWrite": true,
+  "emissive": "#ffd54f",
+  "emissiveIntensity": 0.35,
+  "metalness": 0.25,
+  "opacity": 1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.3,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" pex selected material (yellow emissive) > hash 1`] = `"ef9857521c1ad2c4"`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" pvc_sch40 selected material (yellow emissive) > fp 1`] = `
+{
+  "color": "#f8b95c",
+  "depthWrite": true,
+  "emissive": "#ffd54f",
+  "emissiveIntensity": 0.35,
+  "metalness": 0.2,
+  "opacity": 1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.38,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" pvc_sch40 selected material (yellow emissive) > hash 1`] = `"a03a4a369e06d3ab"`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" pvc_sch80 selected material (yellow emissive) > fp 1`] = `
+{
+  "color": "#c0893c",
+  "depthWrite": true,
+  "emissive": "#ffd54f",
+  "emissiveIntensity": 0.35,
+  "metalness": 0.23,
+  "opacity": 1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.32,
+  "side": 0,
+  "toneMapped": true,
+  "transparent": false,
+}
+`;
+
+exports[`AD.18 material snapshots — selected (highlight) variant > 2" pvc_sch80 selected material (yellow emissive) > hash 1`] = `"882606568a685869"`;
+
+exports[`AD.18 material snapshots — wall-shell (diameter ring) > 0.5" wall-shell material > fp 1`] = `
+{
+  "color": "#4fc3f7",
+  "depthWrite": false,
+  "emissive": "#000000",
+  "emissiveIntensity": 1,
+  "metalness": 0.08,
+  "opacity": 0.1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.5,
+  "side": 1,
+  "toneMapped": true,
+  "transparent": true,
+}
+`;
+
+exports[`AD.18 material snapshots — wall-shell (diameter ring) > 0.5" wall-shell material > hash 1`] = `"f418244b393aa70e"`;
+
+exports[`AD.18 material snapshots — wall-shell (diameter ring) > 1" wall-shell material > fp 1`] = `
+{
+  "color": "#29b6f6",
+  "depthWrite": false,
+  "emissive": "#000000",
+  "emissiveIntensity": 1,
+  "metalness": 0.08,
+  "opacity": 0.1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.5,
+  "side": 1,
+  "toneMapped": true,
+  "transparent": true,
+}
+`;
+
+exports[`AD.18 material snapshots — wall-shell (diameter ring) > 1" wall-shell material > hash 1`] = `"fdcc209ea8d42478"`;
+
+exports[`AD.18 material snapshots — wall-shell (diameter ring) > 2" wall-shell material > fp 1`] = `
+{
+  "color": "#ffa726",
+  "depthWrite": false,
+  "emissive": "#000000",
+  "emissiveIntensity": 1,
+  "metalness": 0.08,
+  "opacity": 0.1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.5,
+  "side": 1,
+  "toneMapped": true,
+  "transparent": true,
+}
+`;
+
+exports[`AD.18 material snapshots — wall-shell (diameter ring) > 2" wall-shell material > hash 1`] = `"25f266fdff4eba73"`;
+
+exports[`AD.18 material snapshots — wall-shell (diameter ring) > 3" wall-shell material > fp 1`] = `
+{
+  "color": "#66bb6a",
+  "depthWrite": false,
+  "emissive": "#000000",
+  "emissiveIntensity": 1,
+  "metalness": 0.08,
+  "opacity": 0.1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.5,
+  "side": 1,
+  "toneMapped": true,
+  "transparent": true,
+}
+`;
+
+exports[`AD.18 material snapshots — wall-shell (diameter ring) > 3" wall-shell material > hash 1`] = `"0984173229d3b6f0"`;
+
+exports[`AD.18 material snapshots — wall-shell (diameter ring) > 4" wall-shell material > fp 1`] = `
+{
+  "color": "#ef5350",
+  "depthWrite": false,
+  "emissive": "#000000",
+  "emissiveIntensity": 1,
+  "metalness": 0.08,
+  "opacity": 0.1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.5,
+  "side": 1,
+  "toneMapped": true,
+  "transparent": true,
+}
+`;
+
+exports[`AD.18 material snapshots — wall-shell (diameter ring) > 4" wall-shell material > hash 1`] = `"5d168e659e348a31"`;
+
+exports[`AD.18 material snapshots — wall-shell (diameter ring) > 6" wall-shell material > fp 1`] = `
+{
+  "color": "#8d4e17",
+  "depthWrite": false,
+  "emissive": "#000000",
+  "emissiveIntensity": 1,
+  "metalness": 0.08,
+  "opacity": 0.1,
+  "polygonOffset": false,
+  "polygonOffsetFactor": 0,
+  "polygonOffsetUnits": 0,
+  "roughness": 0.5,
+  "side": 1,
+  "toneMapped": true,
+  "transparent": true,
+}
+`;
+
+exports[`AD.18 material snapshots — wall-shell (diameter ring) > 6" wall-shell material > hash 1`] = `"9fbaf6516c38d992"`;

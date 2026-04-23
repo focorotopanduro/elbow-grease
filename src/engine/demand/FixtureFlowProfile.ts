@@ -183,6 +183,96 @@ export const FLOW_PROFILES: Record<FixtureSubtype, FlowProfile> = {
     hunterWSFU: 0.25,
     waterSense: true,
   },
+  // Phase 14.Y — equipment + specialty flow profiles.
+  // Water heater inlet: cold fills the tank. Nominal residential
+  // demand under recovery: 3 GPM for 40-min cycle. Peak % much
+  // lower than end fixtures because the tank buffers.
+  water_heater: {
+    subtype: 'water_heater',
+    name: 'Water Heater (Tank)',
+    q: 3.0,
+    t: 180,      // 3-min recovery burst during peak
+    p: 180 / PEAK_INTERVAL_SEC,
+    temperture: 'cold',
+    hunterWSFU: 3,
+    waterSense: false,
+  },
+  // Tankless produces hot on demand — higher instantaneous draw,
+  // no storage buffering. Sizes inlet for peak simultaneous use.
+  tankless_water_heater: {
+    subtype: 'tankless_water_heater',
+    name: 'Tankless Water Heater',
+    q: 8.0,
+    t: 180,
+    p: 180 / PEAK_INTERVAL_SEC,
+    temperture: 'cold',
+    hunterWSFU: 8,
+    waterSense: false,
+  },
+  bidet: {
+    subtype: 'bidet',
+    name: 'Bidet',
+    q: 1.8,
+    t: 45,
+    p: 45 / PEAK_INTERVAL_SEC,
+    temperture: 'both',
+    hunterWSFU: 1.5,
+    waterSense: false,
+  },
+  laundry_tub: {
+    subtype: 'laundry_tub',
+    name: 'Laundry Tub',
+    q: 2.5,
+    t: 60,
+    p: 60 / PEAK_INTERVAL_SEC,
+    temperture: 'both',
+    hunterWSFU: 2.0,
+    waterSense: false,
+  },
+  utility_sink: {
+    subtype: 'utility_sink',
+    name: 'Utility / Slop Sink',
+    q: 3.0,
+    t: 90,
+    p: 90 / PEAK_INTERVAL_SEC,
+    temperture: 'both',
+    hunterWSFU: 2.0,
+    waterSense: false,
+  },
+  // Inline devices: no load of their own. Sized by the supply
+  // pipe they're installed on; report zero peak draw.
+  expansion_tank: {
+    subtype: 'expansion_tank',
+    name: 'Expansion Tank',
+    q: 0, t: 0, p: 0,
+    temperture: 'cold',
+    hunterWSFU: 0,
+    waterSense: false,
+  },
+  backflow_preventer: {
+    subtype: 'backflow_preventer',
+    name: 'Backflow Preventer',
+    q: 0, t: 0, p: 0,
+    temperture: 'cold',
+    hunterWSFU: 0,
+    waterSense: false,
+  },
+  pressure_reducing_valve: {
+    subtype: 'pressure_reducing_valve',
+    name: 'Pressure-Reducing Valve',
+    q: 0, t: 0, p: 0,
+    temperture: 'cold',
+    hunterWSFU: 0,
+    waterSense: false,
+  },
+  cleanout_access: {
+    subtype: 'cleanout_access',
+    name: 'Cleanout Access',
+    q: 0, t: 0, p: 0,
+    temperture: 'cold',
+    hunterWSFU: 0,
+    waterSense: false,
+  },
 };
 
 /** Get the flow profile for a fixture subtype. */

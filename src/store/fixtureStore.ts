@@ -128,11 +128,21 @@ export const useFixtureStore = create<FixtureState>((set, get) => ({
   },
 
   setPosition: (id, position) => {
+    let subtype: FixtureSubtype | null = null;
     set((s) => {
       const f = s.fixtures[id];
       if (!f) return s;
+      subtype = f.subtype;
       return { fixtures: { ...s.fixtures, [id]: { ...f, position } } };
     });
+    // Phase 14.AC.11 — emit so the SimulationBridge (when
+    // `fixtureGraph` is on) can refresh the worker DAG's fixture
+    // node elevation and keep downstream math aligned with UI
+    // position. Pre-14.AC.11 the store mutated silently and the
+    // worker graph drifted out of sync with every move.
+    if (subtype !== null) {
+      eventBus.emit(EV.FIXTURE_MOVED, { id, subtype, position });
+    }
   },
 
   selectFixture: (id) => {

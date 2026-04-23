@@ -20,7 +20,27 @@
 import { useRef, useState } from 'react';
 import { useWallStore, WALL_TYPE_META, type WallType } from '@store/wallStore';
 import { useMeasureStore } from '@store/measureStore';
-import { useBackdropStore, uploadBackdropFile } from '@store/backdropStore';
+import { useBackdropStore, uploadBackdropFile, uploadBackdropPdfPage } from '@store/backdropStore';
+import { useFloorStore } from '@store/floorStore';
+import { logger } from '@core/logger/Logger';
+// Phase 14.E — native PDF import. Lazy-loaded so the 300KB pdfjs
+// chunk doesn't bloat the main bundle; only loads on first PDF upload.
+import { loadPdfRenderer } from '@core/lazy/loaders';
+import { PdfPagePicker, type PdfPickChoice } from '@ui/backdrop/PdfPagePicker';
+import type { PdfMetadata } from '../../engine/pdf/PDFRenderer';
+
+const log = logger('MeasureToolbar');
+
+/**
+ * Phase 14.E — type-check for PDF uploads. Lives here rather than
+ * importing `isPdfFile` from the PDFRenderer module because that
+ * module is lazy-loaded; we need to decide *whether* to load it
+ * before we commit to the load.
+ */
+function isPdf(f: File): boolean {
+  const name = f.name?.toLowerCase() ?? '';
+  return f.type === 'application/pdf' || name.endsWith('.pdf');
+}
 
 export function MeasureToolbar() {
   const drawSession = useWallStore((s) => s.drawSession);
@@ -41,6 +61,11 @@ export function MeasureToolbar() {
   const backdrops = useBackdropStore((s) => s.backdrops);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showBackdropPanel, setShowBackdropPanel] = useState(false);
+  // Phase 14.E — PDF upload state. `pendingPdf` holds the file + its
+  // pdfjs metadata while the PdfPagePicker is open.
+  const [pendingPdf, setPendingPdf] = useState<
+    { file: File; metadata: PdfMetadata } | null
+  >(null);
 
   const wallActive = drawSession !== null;
   const currentType: WallType = drawSession?.type ?? 'interior';
@@ -62,9 +87,63 @@ export function MeasureToolbar() {
     const files = e.target.files;
     if (!files || files.length === 0) return;
     for (const f of Array.from(files)) {
-      try { await uploadBackdropFile(f); } catch (err) { console.error(err); }
+      try {
+        // Phase 14.E — PDF path: read metadata first, then either
+        // upload directly (single-page) or open the picker modal.
+        if (isPdf(f)) {
+          const mod = await loadPdfRenderer.get();
+          const metadata = await mod.readPdfMetadata(f);
+          if (metadata.numPages === 1) {
+            await uploadBackdropPdfPage(f, 1, { totalPages: 1 });
+          } else {
+            setPendingPdf({ file: f, metadata });
+            // Break: only one PDF-picker modal at a time. Any
+            // additional files in the drop are handled separately.
+            break;
+          }
+        } else {
+          await uploadBackdropFile(f);
+        }
+      } catch (err) {
+        log.error('backdrop upload failed', err);
+      }
     }
     if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handlePdfPickerChoice = async (choice: PdfPickChoice) => {
+    const pending = pendingPdf;
+    setPendingPdf(null);
+    if (!pending || choice.kind === 'cancel') return;
+
+    try {
+      if (choice.kind === 'single') {
+        // Switch active floor before upload so addBackdrop inherits it.
+        if (choice.floorId) useFloorStore.getState().setActiveFloor(choice.floorId);
+        await uploadBackdropPdfPage(
+          pending.file,
+          choice.pageNumber,
+          { totalPages: pending.metadata.numPages },
+        );
+      } else if (choice.kind === 'all-sequential') {
+        const floorsOrdered = Object.values(useFloorStore.getState().floors)
+          .sort((a, b) => a.order - b.order);
+        const startIdx = floorsOrdered.findIndex((f) => f.id === choice.startFloorId);
+        if (startIdx < 0) return;
+        for (let p = 1; p <= pending.metadata.numPages; p++) {
+          const floor = floorsOrdered[startIdx + p - 1];
+          if (!floor) break; // ran out of floors
+          useFloorStore.getState().setActiveFloor(floor.id);
+          await uploadBackdropPdfPage(
+            pending.file,
+            p,
+            { totalPages: pending.metadata.numPages },
+          );
+        }
+      }
+    } catch (err) {
+      log.error('pdf upload failed', err);
+    }
   };
 
   return (
@@ -137,14 +216,54 @@ export function MeasureToolbar() {
 
         <Divider />
 
-        {/* Scale */}
+        {/* Phase 14.G — CALIBRATE group: scale + level + origin.
+            Each tool aligns one axis of the blueprint's reference frame
+            to the app's world frame. Grouped visually under a shared
+            header so users see them as parts of the same workflow. */}
+        <div
+          title={
+            'Calibrate aligns the blueprint to the app world in three steps:\n' +
+            '  Scale  — how many world feet per pixel\n' +
+            '  Level  — which way is horizontal (rotate so a known-\n' +
+            '           horizontal wall lines up with +X)\n' +
+            '  Origin — which point on the blueprint is world (0, 0, 0)\n\n' +
+            'Do all three once per blueprint for the most accurate fit.'
+          }
+          style={{
+            fontSize: 8,
+            fontWeight: 800,
+            color: '#ef5350',
+            letterSpacing: 2,
+            padding: '5px 4px',
+            alignSelf: 'center',
+            cursor: 'help',
+          }}
+        >
+          CALIBRATE
+        </div>
         <ToolChip
           active={measureMode === 'scale'}
           onClick={toggleScale}
-          title="Calibrate scale — click two points, enter real distance [K]"
+          title="Scale — click two points, enter real distance [K]"
           color="#ef5350"
         >
           ⚖ Scale
+        </ToolChip>
+        <ToolChip
+          active={measureMode === 'calibrate_level'}
+          onClick={() => setMeasureMode(measureMode === 'calibrate_level' ? 'off' : 'calibrate_level')}
+          title="Level — click two points along a known-horizontal line; backdrop rotates so that line is horizontal"
+          color="#ef5350"
+        >
+          ◎ Level
+        </ToolChip>
+        <ToolChip
+          active={measureMode === 'calibrate_origin'}
+          onClick={() => setMeasureMode(measureMode === 'calibrate_origin' ? 'off' : 'calibrate_origin')}
+          title="Origin — click the blueprint point that should be world (0, 0, 0); backdrop shifts so that point aligns with origin"
+          color="#ef5350"
+        >
+          ⊕ Origin
         </ToolChip>
         {Math.abs(scaleFactor - 1) > 0.001 && (
           <div
@@ -179,14 +298,14 @@ export function MeasureToolbar() {
         <button
           onClick={() => fileInputRef.current?.click()}
           style={smallBtnStyle('#ffd54f')}
-          title="Upload PNG/JPG backdrop"
+          title="Upload PDF blueprint or PNG/JPG backdrop"
         >
           ＋
         </button>
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/*,application/pdf,.pdf"
           multiple
           onChange={onFileChange}
           style={{ display: 'none' }}
@@ -199,6 +318,16 @@ export function MeasureToolbar() {
       </div>
 
       {showBackdropPanel && <BackdropManagePanel onClose={() => setShowBackdropPanel(false)} />}
+
+      {/* Phase 14.E — PDF page picker. Shown only when a multi-page PDF
+          is mid-upload; single-page PDFs bypass the picker entirely. */}
+      {pendingPdf && (
+        <PdfPagePicker
+          filename={pendingPdf.file.name}
+          metadata={pendingPdf.metadata}
+          onChoose={handlePdfPickerChoice}
+        />
+      )}
 
       {/* Wall opacity floater when wall is visible */}
       {showWalls && Object.keys(useWallStore.getState().walls).length > 0 && (

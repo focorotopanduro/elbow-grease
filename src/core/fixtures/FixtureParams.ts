@@ -630,6 +630,37 @@ const DRINKING_FOUNTAIN: SubtypeSchema = {
 
 // ── Master registry ────────────────────────────────────────────
 
+// Phase 14.Y — minimal schemas for equipment + specialty fixtures.
+// These don't expose user-editable fields yet (beyond placement)
+// because their parametric behavior lands in 14.Y.2; for now we
+// just need the schema to exist so PARAM_SCHEMA is exhaustive over
+// the FixtureSubtype union.
+const MINIMAL_PLACEMENT_ONLY: SubtypeSchema = {
+  defaults: { rotationDeg: 0, wallMounted: false },
+  sections: [COMMON_PLACEMENT],
+};
+
+const WATER_HEATER: SubtypeSchema = {
+  defaults: {
+    rotationDeg: 0, wallMounted: false,
+    capacityGal: 50,
+    energy: 'gas',   // 'gas' | 'electric'
+    expansionTank: true,
+  },
+  sections: [
+    COMMON_PLACEMENT,
+    {
+      title: 'Heater',
+      fields: [
+        { kind: 'number', key: 'capacityGal', label: 'Capacity', unit: 'gal', min: 20, max: 100, step: 10 },
+        { kind: 'select', key: 'energy', label: 'Energy',
+          options: [{ id: 'gas', label: 'Gas' }, { id: 'electric', label: 'Electric' }] },
+        { kind: 'toggle', key: 'expansionTank', label: 'Expansion tank' },
+      ],
+    },
+  ],
+};
+
 export const PARAM_SCHEMA: Record<FixtureSubtype, SubtypeSchema> = {
   water_closet:      WATER_CLOSET,
   lavatory:          LAVATORY,
@@ -644,6 +675,16 @@ export const PARAM_SCHEMA: Record<FixtureSubtype, SubtypeSchema> = {
   urinal:            URINAL,
   mop_sink:          MOP_SINK,
   drinking_fountain: DRINKING_FOUNTAIN,
+  // Phase 14.Y equipment + specialty
+  water_heater:            WATER_HEATER,
+  tankless_water_heater:   MINIMAL_PLACEMENT_ONLY,
+  bidet:                   MINIMAL_PLACEMENT_ONLY,
+  laundry_tub:             MINIMAL_PLACEMENT_ONLY,
+  utility_sink:            MINIMAL_PLACEMENT_ONLY,
+  expansion_tank:          MINIMAL_PLACEMENT_ONLY,
+  backflow_preventer:      MINIMAL_PLACEMENT_ONLY,
+  pressure_reducing_valve: MINIMAL_PLACEMENT_ONLY,
+  cleanout_access:         MINIMAL_PLACEMENT_ONLY,
 };
 
 // ── Helpers ────────────────────────────────────────────────────

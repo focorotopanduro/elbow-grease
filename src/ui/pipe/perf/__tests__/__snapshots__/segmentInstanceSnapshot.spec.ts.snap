@@ -1,0 +1,476 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 0.5" pvc_sch40 straight, retracted both ends > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    0.5,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 0.5" pvc_sch40 straight, retracted both ends > hash 1`] = `"6eee9446c5f15abc"`;
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 0.75" pvc_sch40 straight, retracted both ends > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    0.75,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 0.75" pvc_sch40 straight, retracted both ends > hash 1`] = `"066ef514409609e6"`;
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 1" pvc_sch40 straight, retracted both ends > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    1,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 1" pvc_sch40 straight, retracted both ends > hash 1`] = `"8a8224f5319d78c0"`;
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 1.5" pvc_sch40 straight, retracted both ends > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    1.5,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 1.5" pvc_sch40 straight, retracted both ends > hash 1`] = `"d40f8d10c23cc594"`;
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 2" pvc_sch40 straight, retracted both ends > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 2" pvc_sch40 straight, retracted both ends > hash 1`] = `"9279a2dd858269d8"`;
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 3" pvc_sch40 straight, retracted both ends > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    3,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 3" pvc_sch40 straight, retracted both ends > hash 1`] = `"036614d33c5848d4"`;
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 4" pvc_sch40 straight, retracted both ends > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    4,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 4" pvc_sch40 straight, retracted both ends > hash 1`] = `"ce70fa6bcd65b4b4"`;
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 6" pvc_sch40 straight, retracted both ends > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    6,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — diameter scale > 6" pvc_sch40 straight, retracted both ends > hash 1`] = `"2325a8e759bdd7d0"`;
+
+exports[`AD.17 fast-mode snapshots — floor ghosting carries through > ghosted floor → segments inherit opacity + colorOverride > fp 1`] = `
+{
+  "anyGhosted": true,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 1,
+  "spanX": 10,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 10,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — floor ghosting carries through > ghosted floor → segments inherit opacity + colorOverride > hash 1`] = `"635f1dc20e1249bf"`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight abs with both-end retract > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "abs",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight abs with both-end retract > hash 1`] = `"6e5499586d6f760e"`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight cast_iron with both-end retract > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "cast_iron",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight cast_iron with both-end retract > hash 1`] = `"3afc24dc7f35069e"`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight copper_type_l with both-end retract > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "copper_type_l",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight copper_type_l with both-end retract > hash 1`] = `"d9a6c3a68680b38a"`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight copper_type_m with both-end retract > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "copper_type_m",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight copper_type_m with both-end retract > hash 1`] = `"75cd9fb58326263a"`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight cpvc with both-end retract > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "cpvc",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight cpvc with both-end retract > hash 1`] = `"1c2a99bba922d134"`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight ductile_iron with both-end retract > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "ductile_iron",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight ductile_iron with both-end retract > hash 1`] = `"3b069cfb339198a6"`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight galvanized_steel with both-end retract > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "galvanized_steel",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight galvanized_steel with both-end retract > hash 1`] = `"f7d53687bb16bb52"`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight pvc_sch40 with both-end retract > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight pvc_sch40 with both-end retract > hash 1`] = `"cb04068847e03b8a"`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight pvc_sch80 with both-end retract > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "pvc_sch80",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > 2" straight pvc_sch80 with both-end retract > hash 1`] = `"6bdb3f5e3e9d7fca"`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > PEX is flexible: retraction hints are IGNORED even at both ends > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    1,
+  ],
+  "materials": [
+    "pex",
+  ],
+  "segmentCount": 1,
+  "spanX": 10,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 10,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — material buckets > PEX is flexible: retraction hints are IGNORED even at both ends > hash 1`] = `"416ea7f020c8674b"`;
+
+exports[`AD.17 fast-mode snapshots — multi-segment rigid pipes > 3-point L-bend 90° pvc_sch40 2": interior vertex always retracted > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 2,
+  "spanX": 10,
+  "spanY": 0,
+  "spanZ": 10,
+  "totalLengthFt": 19.15625,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — multi-segment rigid pipes > 3-point L-bend 90° pvc_sch40 2": interior vertex always retracted > hash 1`] = `"e3ce335864fc930f"`;
+
+exports[`AD.17 fast-mode snapshots — multi-segment rigid pipes > 3-point vertical drop pvc_sch40 3": interior vertex retracted at deeper socket > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    3,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 2,
+  "spanX": 10,
+  "spanY": 5,
+  "spanZ": 0,
+  "totalLengthFt": 13.75,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — multi-segment rigid pipes > 3-point vertical drop pvc_sch40 3": interior vertex retracted at deeper socket > hash 1`] = `"25fee3b6b4df51df"`;
+
+exports[`AD.17 fast-mode snapshots — multi-segment rigid pipes > 4-point U-bend pvc_sch40 2": three interior vertices all retracted > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 3,
+  "spanX": 10,
+  "spanY": 0,
+  "spanZ": 10,
+  "totalLengthFt": 28.3125,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — multi-segment rigid pipes > 4-point U-bend pvc_sch40 2": three interior vertices all retracted > hash 1`] = `"8d408dedd061de15"`;
+
+exports[`AD.17 fast-mode snapshots — straight rigid pipes > 2" PVC Sch 40 straight, no hints: identity pipe geometry > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 1,
+  "spanX": 10,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 10,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — straight rigid pipes > 2" PVC Sch 40 straight, no hints: identity pipe geometry > hash 1`] = `"321693077b790c5d"`;
+
+exports[`AD.17 fast-mode snapshots — straight rigid pipes > 2" PVC Sch 40 straight, only start hint → only head retracted > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.578,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.578,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — straight rigid pipes > 2" PVC Sch 40 straight, only start hint → only head retracted > hash 1`] = `"12320eb8f5c2227d"`;
+
+exports[`AD.17 fast-mode snapshots — straight rigid pipes > 2" PVC Sch 40 straight, start+end hints → both endpoints retracted > fp 1`] = `
+{
+  "anyGhosted": false,
+  "diameters": [
+    2,
+  ],
+  "materials": [
+    "pvc_sch40",
+  ],
+  "segmentCount": 1,
+  "spanX": 9.156,
+  "spanY": 0,
+  "spanZ": 0,
+  "totalLengthFt": 9.156,
+}
+`;
+
+exports[`AD.17 fast-mode snapshots — straight rigid pipes > 2" PVC Sch 40 straight, start+end hints → both endpoints retracted > hash 1`] = `"57f2dc3043215480"`;

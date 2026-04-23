@@ -14,6 +14,12 @@ pub fn run() {
     // frontend (see `src/ui/UpdateManager.tsx`) so it can drive the UI.
     .plugin(tauri_plugin_updater::Builder::new().build())
     .plugin(tauri_plugin_process::init())
+    // Phase 2: ComplianceDebugger opens IPC code deep-links externally.
+    .plugin(tauri_plugin_shell::init())
+    // Phase 4: project-bundle persistence (atomic rename, fsync, dir IO).
+    .plugin(tauri_plugin_fs::init())
+    // Phase 11.D: native open/save dialogs for .elbow bundles.
+    .plugin(tauri_plugin_dialog::init())
     .setup(|app| {
       if cfg!(debug_assertions) {
         app.handle().plugin(

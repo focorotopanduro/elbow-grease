@@ -32,6 +32,10 @@ export const EV = {
   FIXTURE_REMOVED:        'fixture:removed',
   FIXTURE_SELECTED:       'fixture:selected',
   FIXTURE_PARAMS_CHANGED: 'fixture:params:changed',
+  // Phase 14.AC.11 — position changes. Bridge listens so the
+  // worker graph's fixture node elevation (and future: spatial
+  // downstream recomputes) reflects moves rather than going stale.
+  FIXTURE_MOVED:          'fixture:moved',
 
   // FSM state
   STATE_TRANSITION: 'fsm:transition',

@@ -16,17 +16,29 @@
 
 // ── Pipe materials and roughness ────────────────────────────────
 
-export type PipeMaterial =
-  | 'pvc_sch40'
-  | 'pvc_sch80'
-  | 'abs'
-  | 'cast_iron'
-  | 'copper_type_l'
-  | 'copper_type_m'
-  | 'cpvc'
-  | 'pex'
-  | 'galvanized_steel'
-  | 'ductile_iron';
+/**
+ * All pipe materials the solver + BOM + fitting catalog understand.
+ * Phase 13.B: declared as a runtime-iterable const array so tests
+ * (and any future coverage-check code) can enumerate members without
+ * shipping a hardcoded list that could drift from the type.
+ *
+ * The `PipeMaterial` type is derived from this array — adding a new
+ * member here is the single change required to extend the set.
+ */
+export const PIPE_MATERIALS = [
+  'pvc_sch40',
+  'pvc_sch80',
+  'abs',
+  'cast_iron',
+  'copper_type_l',
+  'copper_type_m',
+  'cpvc',
+  'pex',
+  'galvanized_steel',
+  'ductile_iron',
+] as const;
+
+export type PipeMaterial = typeof PIPE_MATERIALS[number];
 
 /**
  * Absolute roughness ε in feet (Darcy-Weisbach).
@@ -79,34 +91,54 @@ export const COST_PER_FT: Record<PipeMaterial, Record<number, number>> = {
 
 // ── Fitting types ───────────────────────────────────────────────
 
-export type FittingType =
+/**
+ * Runtime-iterable list of every fitting type in the type system.
+ * Phase 13.B: Same treatment as PIPE_MATERIALS — the `FittingType`
+ * union is derived from this array so tests can enumerate members
+ * without a parallel hardcoded list.
+ */
+export const FITTING_TYPES = [
   // Rigid-pipe bend fittings (legal angles only — 1/16, 1/8, 1/4)
-  | 'bend_22_5'        // 1/16 bend
-  | 'bend_45'          // 1/8 bend
-  | 'bend_90'          // 1/4 bend (short sweep)
-  | 'bend_90_ls'       // 1/4 bend (long sweep — DWV preferred for horizontal→vertical)
+  'bend_22_5',        // 1/16 bend
+  'bend_45',          // 1/8 bend
+  'bend_90',          // 1/4 bend (short sweep)
+  'bend_90_ls',       // 1/4 bend (long sweep — DWV preferred for horizontal→vertical)
   // Legacy aliases kept for backward-compat with solver code
-  | 'elbow_90'
-  | 'elbow_45'
+  'elbow_90',
+  'elbow_45',
+  // Phase 14.V — Uponor / PEX-A 90° elbow (ProPEX style).
+  // Visually distinct from rigid bend_90 (expansion-ring collars)
+  // and priced separately in BOM. Emitted by generatePexBendFittings
+  // on deliberate right-angle draws in PEX material.
+  'pex_elbow_90',
   // Branching
-  | 'tee'              // standard tee (supply)
-  | 'sanitary_tee'     // DWV sanitary tee (perpendicular branch)
-  | 'wye'              // 45° wye (DWV)
-  | 'combo_wye_eighth' // combination wye + 1/8 bend (DWV)
-  | 'cross'            // 4-way (rare)
+  'tee',              // standard tee (supply)
+  'sanitary_tee',     // DWV sanitary tee (perpendicular branch)
+  'wye',              // 45° wye (DWV)
+  'combo_wye_eighth', // combination wye + 1/8 bend (DWV)
+  'cross',            // 4-way (rare)
   // Straight joints
-  | 'coupling'
-  | 'reducer'
-  | 'cap'
+  'coupling',
+  'reducer',
+  // Phase 14.AD.12 — bushing: hub-on-small-side + spigot-on-
+  // large-side adapter that slips INTO an existing fitting's
+  // socket (vs a reducer, which is two hubs between two pipe
+  // ends). Common for adapting a 2" tee outlet down to a 1.5"
+  // pipe without needing a separate reducer coupling.
+  'bushing',
+  'cap',
   // DWV-specific
-  | 'cleanout_adapter'
-  | 'p_trap'
-  | 'closet_flange'
+  'cleanout_adapter',
+  'p_trap',
+  'closet_flange',
   // Manifolds (PEX home-run supply)
-  | 'manifold_2'
-  | 'manifold_4'
-  | 'manifold_6'
-  | 'manifold_8';
+  'manifold_2',
+  'manifold_4',
+  'manifold_6',
+  'manifold_8',
+] as const;
+
+export type FittingType = typeof FITTING_TYPES[number];
 
 /**
  * Equivalent length in feet for friction loss calculations.
@@ -119,6 +151,10 @@ export const FITTING_EQ_LENGTH: Record<FittingType, Record<number, number>> = {
   bend_90_ls:       { 0.5: 1.2, 0.75: 1.6, 1: 2,   1.5: 3,   2: 3.8, 3: 5.5, 4: 7.5 },
   elbow_90:         { 0.5: 1.5, 0.75: 2,   1: 2.5, 1.5: 4,   2: 5,   3: 7,   4: 10 },
   elbow_45:         { 0.5: 0.8, 0.75: 1,   1: 1.3, 1.5: 2,   2: 2.5, 3: 3.5, 4: 5 },
+  // ProPEX 90° elbow — PEX supply sizes only. Slightly higher K-factor
+  // than a rigid 90° because the expansion fitting has a step-down
+  // bore at each end. Uponor tech data approximation.
+  pex_elbow_90:     { 0.5: 1.7, 0.75: 2.3, 1: 2.9, 1.5: 4.5, 2: 5.8 },
   tee:              { 0.5: 3,   0.75: 4,   1: 5,   1.5: 7,   2: 10,  3: 14,  4: 18 },
   sanitary_tee:     { 1.5: 5,   2: 7,      3: 10,  4: 14 },
   wye:              { 1.5: 3,   2: 4,      3: 6,   4: 8 },
@@ -126,6 +162,10 @@ export const FITTING_EQ_LENGTH: Record<FittingType, Record<number, number>> = {
   cross:            { 0.5: 5,   0.75: 7,   1: 9,   1.5: 12,  2: 16 },
   coupling:         { 0.5: 0,   0.75: 0,   1: 0,   1.5: 0,   2: 0,   3: 0,   4: 0 },
   reducer:          { 0.5: 1,   0.75: 1,   1: 1.5, 1.5: 2,   2: 2.5, 3: 3.5, 4: 5 },
+  // Phase 14.AD.12 — bushing has very similar friction loss to a
+  // reducer (same ID transition); slightly lower because there's
+  // no second hub creating an internal step on the small side.
+  bushing:          { 0.5: 0.8, 0.75: 0.8, 1: 1.2, 1.5: 1.6, 2: 2,   3: 2.8, 4: 4 },
   cap:              { 0.5: 0,   0.75: 0,   1: 0,   1.5: 0,   2: 0,   3: 0,   4: 0 },
   cleanout_adapter: { 1.5: 1,   2: 1.5,    3: 2,   4: 3 },
   p_trap:           { 1.25: 3,  1.5: 4,    2: 5,   3: 7 },

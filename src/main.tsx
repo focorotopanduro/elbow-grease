@@ -16,9 +16,12 @@ class RuntimeErrorBoundary extends Component<
 
   componentDidCatch(err: Error, info: { componentStack?: string | null }) {
     this.setState({ err, info: info.componentStack ?? null });
-    // Also dump to console for completeness
-    console.error('App crashed:', err);
-    console.error('Component stack:', info.componentStack);
+    // Top-level entry-point boundary: the Logger subsystem may not
+    // have booted yet (the crash could be at first mount). Stay on
+    // raw console here — this is the last line of defense below all
+    // our other layers.
+    // eslint-disable-next-line no-console -- intentional: pre-logger-boot path
+    console.error('App crashed at entry:', err, info.componentStack);
   }
 
   render() {

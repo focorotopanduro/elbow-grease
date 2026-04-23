@@ -26,8 +26,29 @@ import {
   type PCSPVariable,
   type PCSPConstraint,
   type PCSPSolution,
+  type ConstraintResult,
 } from './PCSPSolver';
 import type { CodeReference, RemediationAction, ViolationSeverity } from './IPCOntology';
+import type { ViolationTrace, TracedConstraint, TracedRuleCondition } from './ViolationTrace';
+
+/**
+ * Controls trace construction. Read once at solver entry.
+ *
+ * The worker has no direct access to the main thread's Zustand store —
+ * we set this from the bridge each solve via `setComplianceTraceEnabled`
+ * below. Solver code only needs to check `TRACE_ENABLED`.
+ */
+let TRACE_ENABLED = false;
+
+/** Called from the bridge (main thread) OR bootstrap code BEFORE solve. */
+export function setComplianceTraceEnabled(on: boolean): void {
+  TRACE_ENABLED = on;
+}
+
+/** Test hook. */
+export function __getComplianceTraceEnabled(): boolean {
+  return TRACE_ENABLED;
+}
 
 // ── Standard pipe diameter domain ───────────────────────────────
 
@@ -46,6 +67,13 @@ export interface ComplianceViolation {
   entityId: string;
   entityType: 'node' | 'edge';
   remediations: RemediationAction[];
+  /**
+   * Phase 2 — inference chain. Populated only when TRACE_ENABLED
+   * (mirrors the `complianceTrace` feature flag). Undefined in
+   * production builds so the payload stays small and zero-copy costs
+   * are unchanged.
+   */
+  trace?: ViolationTrace;
 }
 
 export interface ComplianceReport {
@@ -419,22 +447,40 @@ export class ComplianceEngine {
 
         const severity: ViolationSeverity = c.hard ? 'error' : c.cost > 0.5 ? 'warning' : 'info';
 
+        const entityId = variable?.entityId ?? '';
+        const entityType: 'node' | 'edge' =
+          variable?.entityId.startsWith('edge') ? 'edge' : 'node';
+
+        const codeRefObj = {
+          code: 'IPC' as const,
+          edition: '2021',
+          chapter: parseInt(c.codeRef.split(' ')[1] ?? '0'),
+          section: c.codeRef.split(' ')[1] ?? '',
+          description: c.name,
+        };
+
+        // Phase 2: optional inference trace. Skipped entirely when
+        // TRACE_ENABLED is false so production builds pay zero.
+        const trace = TRACE_ENABLED && constraint
+          ? this.buildTrace({
+              entityId,
+              constraint,
+              result: c,
+              codeRef: codeRefObj,
+            })
+          : undefined;
+
         return {
           ruleId: c.constraintId,
           ruleName: c.name,
-          codeRef: {
-            code: 'IPC' as const,
-            edition: '2021',
-            chapter: parseInt(c.codeRef.split(' ')[1] ?? '0'),
-            section: c.codeRef.split(' ')[1] ?? '',
-            description: c.name,
-          },
+          codeRef: codeRefObj,
           severity,
           cost: c.cost,
           message: c.message,
-          entityId: variable?.entityId ?? '',
-          entityType: (variable?.entityId.startsWith('edge') ? 'edge' : 'node') as 'node' | 'edge',
+          entityId,
+          entityType,
           remediations,
+          trace,
         };
       });
 
@@ -475,6 +521,87 @@ export class ComplianceEngine {
     };
   }
 
+  // ── Phase 2: Trace builder ────────────────────────────────────
+
+  /**
+   * Build a serializable inference chain for a single failed constraint.
+   *
+   * Called per violation during buildReport when TRACE_ENABLED. The
+   * chain carries the data UI needs to answer "why did this fire?"
+   * WITHOUT holding references to closures (costFn) that can't cross
+   * the worker postMessage boundary.
+   */
+  private buildTrace(args: {
+    entityId: string;
+    constraint: PCSPConstraint;
+    result: ConstraintResult;
+    codeRef: CodeReference;
+  }): ViolationTrace {
+    const { entityId, constraint, result, codeRef } = args;
+
+    // Serializable constraint snapshot — strips costFn.
+    const failedConstraint: TracedConstraint = {
+      id: constraint.id,
+      name: constraint.name,
+      codeRef: constraint.codeRef,
+      variableIds: constraint.variableIds,
+      weight: constraint.weight,
+      hard: constraint.hard,
+      message: constraint.message,
+      cost: result.cost,
+      rawCost: result.cost / (constraint.weight || 1),
+    };
+
+    // Triples whose subject or connectivity references the violating
+    // entity. This shows "what facts in the KG led to this rule firing".
+    // Filter is conservative: show only the entity's own triples plus
+    // its outgoing/incoming connectsTo edges. Keeps the panel focused.
+    const entityUri = `bldg:${entityId}`;
+    const sourceTriples = this.kg
+      .getAll()
+      .filter(
+        (t) =>
+          t.subject === entityUri ||
+          (t.predicate === 'ipc:connectsTo' && t.object === entityUri),
+      );
+
+    // Applied conditions: the engine currently hardcodes constraint
+    // instantiation per constraint-family rather than scanning rule
+    // templates, so conditions reflect the constraint family. This is
+    // honest — there's no "rule" that produced trap-arm-distance
+    // beyond the engine's own code. When IPCRuleParser gains declarative
+    // rules, this list gets populated from the actual matched templates.
+    const appliedConditions: TracedRuleCondition[] = [
+      {
+        ruleId: constraint.id.split('-')[0] ?? 'unknown',
+        ruleName: constraint.name,
+        matched: true,
+        boundEntities: [entityId],
+      },
+    ];
+
+    return {
+      correlationId: undefined, // attached later by the bridge
+      appliedConditions,
+      failedConstraint,
+      sourceTriples,
+      sourceCode: {
+        code: 'IPC',
+        edition: codeRef.edition,
+        chapter: codeRef.chapter,
+        section: codeRef.section,
+        description: codeRef.description,
+        url: ipcSectionUrl(codeRef.section),
+      },
+      // PCSPSolver.solve() is the single phase we currently run; arc
+      // consistency is a separate call that may prune domains without
+      // producing violations. Mark accordingly.
+      phase: 'solve',
+      variableValues: result.variableValues,
+      solvedAt: performance.now(),
+    };
+  }
+
   // ── Apply to DAG ──────────────────────────────────────────────
 
   private applyToDAG(dag: PlumbingDAG, report: ComplianceReport): void {
@@ -511,6 +638,18 @@ export class ComplianceEngine {
 
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/**
+ * Build a deep link to a specific IPC section on UpCodes (best public
+ * IPC viewer). Returns undefined for sections the builder doesn't
+ * recognize; the UI hides the link gracefully.
+ */
+function ipcSectionUrl(section: string): string | undefined {
+  if (!section || !/^\d/.test(section)) return undefined;
+  const chapter = section.split('.')[0];
+  if (!chapter) return undefined;
+  return `https://up.codes/viewer/general/ipc-2021/chapter/${chapter}#${section}`;
 }
 
 /** Singleton. */

@@ -12,12 +12,16 @@
 import { useMemo, useRef, useEffect } from 'react';
 import * as THREE from 'three';
 import { useBackdropStore, type Backdrop } from '@store/backdropStore';
+import { useFloorStore } from '@store/floorStore';
 import { type ThreeEvent } from '@react-three/fiber';
 
 export function BackdropLayer() {
   const backdrops = useBackdropStore((s) => s.backdrops);
   const selectedId = useBackdropStore((s) => s.selectedId);
   const selectBackdrop = useBackdropStore((s) => s.selectBackdrop);
+  // Phase 14.E — track active floor so backdrops filter per-level.
+  const activeFloorId = useFloorStore((s) => s.activeFloorId);
+  const visibilityMode = useFloorStore((s) => s.visibilityMode);
 
   const list = Object.values(backdrops);
   if (list.length === 0) return null;
@@ -30,17 +34,42 @@ export function BackdropLayer() {
           backdrop={b}
           selected={b.id === selectedId}
           onSelect={() => selectBackdrop(b.id)}
+          activeFloorId={activeFloorId}
+          visibilityMode={visibilityMode}
         />
       ))}
     </group>
   );
 }
 
-function BackdropMesh({ backdrop, selected, onSelect }: { backdrop: Backdrop; selected: boolean; onSelect: () => void }) {
+function BackdropMesh({
+  backdrop, selected, onSelect, activeFloorId, visibilityMode,
+}: {
+  backdrop: Backdrop;
+  selected: boolean;
+  onSelect: () => void;
+  activeFloorId: string;
+  visibilityMode: 'all' | 'active_only' | 'ghost';
+}) {
   const texture = useBackdropTexture(backdrop.dataUrl);
   const meshRef = useRef<THREE.Mesh>(null!);
 
   if (backdrop.hidden) return null;
+
+  // Phase 14.E — per-floor filtering. A backdrop without a floorId
+  // (legacy / pre-14.E) is always visible. A backdrop with a floorId
+  // respects the floor store's visibility mode:
+  //   • 'all'         → every backdrop renders
+  //   • 'active_only' → only backdrops on the active floor render
+  //   • 'ghost'       → all render, but off-floor ones at reduced opacity
+  let effectiveOpacity = backdrop.opacity;
+  if (backdrop.floorId) {
+    const isActiveFloor = backdrop.floorId === activeFloorId;
+    if (visibilityMode === 'active_only' && !isActiveFloor) return null;
+    if (visibilityMode === 'ghost' && !isActiveFloor) {
+      effectiveOpacity = Math.min(backdrop.opacity * 0.25, 0.15);
+    }
+  }
 
   return (
     <group position={backdrop.position} rotation={[0, backdrop.rotationY, 0]}>
@@ -57,7 +86,7 @@ function BackdropMesh({ backdrop, selected, onSelect }: { backdrop: Backdrop; se
         <meshBasicMaterial
           map={texture}
           transparent
-          opacity={backdrop.opacity}
+          opacity={effectiveOpacity}
           depthWrite={false}
           side={THREE.DoubleSide}
           toneMapped={false}

@@ -31,6 +31,8 @@ export function Toolbar() {
   const toggleQuality = useInteractionStore((s) => s.togglePipeQuality);
   const diameter = useInteractionStore((s) => s.drawDiameter);
   const setDiameter = useInteractionStore((s) => s.setDrawDiameter);
+  const orthoClickDrag = useInteractionStore((s) => s.orthoClickDragMode);
+  const toggleOrthoClickDrag = useInteractionStore((s) => s.toggleOrthoClickDragMode);
   const pipeCount = usePipeStore((s) => Object.keys(s.pipes).length);
 
   return (
@@ -108,6 +110,24 @@ export function Toolbar() {
           {quality === '3d' ? '3D Pipes' : 'Fast Mode'}
         </span>
         <kbd style={styles.kbd}>Q</kbd>
+      </button>
+
+      {/* Phase 14.AD.23 — ortho click-drag draw mode toggle. Active
+          by default; disable for users who prefer the classic
+          click-to-place-points flow. Only has an effect in top /
+          front / side / bottom views; perspective + isometric
+          still use the classic tool. */}
+      <button
+        style={{ ...styles.btn,
+          borderColor: orthoClickDrag ? '#ff9800' : '#333',
+          background: orthoClickDrag ? 'rgba(255,152,0,0.1)' : 'transparent' }}
+        onClick={toggleOrthoClickDrag}
+        title="Toggle CAD-style click-drag drawing in ortho views (Shift+O)">
+        <span style={styles.icon}>{orthoClickDrag ? '✋' : '✏️'}</span>
+        <span style={{ ...styles.label, color: orthoClickDrag ? '#ff9800' : '#666' }}>
+          {orthoClickDrag ? 'Ortho Drag: ON' : 'Ortho Drag: off'}
+        </span>
+        <kbd style={styles.kbd}>⇧O</kbd>
       </button>
 
       {/* Pipe count */}

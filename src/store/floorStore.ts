@@ -94,8 +94,14 @@ export const useFloorStore = create<FloorState>((set, get) => ({
     return acc;
   }, {} as Record<string, Floor>),
   activeFloorId: 'floor_1',
-  visibilityMode: 'ghost',
-  ghostOpacity: 0.15,
+  // Default to 'all' — a fresh session should show every floor at full
+  // opacity. 'ghost' is a great working mode once you have layout on
+  // multiple floors, but kicking a new user into 15% opacity gives the
+  // impression the scene is broken / the background is gone.
+  visibilityMode: 'all',
+  // If the user opts into ghost mode, default to a readable 35% rather
+  // than the near-invisible 15% that was tripping people up.
+  ghostOpacity: 0.35,
   ghostColor: '#444',
   lastSwitchTs: 0,
   showFloorPlanes: true,

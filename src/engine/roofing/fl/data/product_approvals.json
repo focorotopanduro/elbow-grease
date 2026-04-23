@@ -1,0 +1,805 @@
+{
+  "catalog_refresh_metadata": {
+    "generated_date": "2026-04-21",
+    "next_refresh_due": "2026-05-21",
+    "state_search_url": "https://www.floridabuilding.org/pr/pr_app_srch.aspx",
+    "miami_dade_search_url": "https://www.miamidade.gov/building/pc-search_app.asp",
+    "notes": "FL approvals expire every 5 years and require re-certification. Revision (-R##) numbers increment with each recertification or technical amendment. The -R## suffix is the version pointer.\n"
+  },
+  "shingle_manufacturers": [
+    {
+      "id": 1,
+      "manufacturer": "GAF",
+      "parent": "GAF / LL Building Products",
+      "headquarters": "Parsippany, NJ",
+      "product_lines": [
+        {
+          "name": "Timberline HDZ",
+          "profile": "architectural",
+          "warranty_years": 50,
+          "wind_rating": "Class H (130+ mph)",
+          "fl_approval_prefix": "FL10124",
+          "noa_number": "NOA 21-0305.04"
+        },
+        {
+          "name": "Timberline AS II",
+          "profile": "architectural",
+          "warranty_years": 30,
+          "wind_rating": "Class H",
+          "fl_approval_prefix": "FL10124",
+          "noa_number": "NOA 19-1107.12"
+        },
+        {
+          "name": "Timberline UHD",
+          "profile": "architectural",
+          "warranty_years": 50,
+          "wind_rating": "Class H",
+          "fl_approval_prefix": "FL10124",
+          "noa_number": null
+        },
+        {
+          "name": "Grand Sequoia",
+          "profile": "architectural",
+          "warranty_years": 50,
+          "wind_rating": "Class H",
+          "fl_approval_prefix": "FL10124",
+          "noa_number": null
+        },
+        {
+          "name": "Royal Sovereign 3-tab",
+          "profile": "3-tab",
+          "warranty_years": 25,
+          "wind_rating": "Class D (90 mph)",
+          "fl_approval_prefix": "FL10124",
+          "noa_number": null
+        },
+        {
+          "name": "WeatherBlocker starter",
+          "profile": "starter",
+          "warranty_years": null,
+          "wind_rating": null,
+          "fl_approval_prefix": "FL10124",
+          "noa_number": null
+        },
+        {
+          "name": "TimberTex hip/ridge",
+          "profile": "hip_ridge",
+          "warranty_years": null,
+          "wind_rating": null,
+          "fl_approval_prefix": "FL10124",
+          "noa_number": null
+        }
+      ],
+      "master_fl_approval": "FL10124",
+      "master_noa": "NOA 21-0305.04 (Timberline HDZ HVHZ)",
+      "typical_refresh_cycle_years": 5
+    },
+    {
+      "id": 2,
+      "manufacturer": "Owens Corning",
+      "parent": "Owens Corning Roofing and Asphalt",
+      "headquarters": "Toledo, OH",
+      "product_lines": [
+        {
+          "name": "Duration Premium",
+          "profile": "architectural",
+          "warranty_years": 40,
+          "wind_rating": "Class H",
+          "fl_approval_prefix": "FL10674",
+          "noa_number": "NOA 20-0218.08"
+        },
+        {
+          "name": "Duration Storm (SureNail)",
+          "profile": "architectural",
+          "warranty_years": 40,
+          "wind_rating": "Class H",
+          "fl_approval_prefix": "FL10674",
+          "noa_number": "NOA 20-0218.08"
+        },
+        {
+          "name": "Oakridge",
+          "profile": "architectural",
+          "warranty_years": 30,
+          "wind_rating": "Class H",
+          "fl_approval_prefix": "FL10674",
+          "noa_number": null
+        },
+        {
+          "name": "Supreme 3-tab",
+          "profile": "3-tab",
+          "warranty_years": 25,
+          "wind_rating": "Class A (60 mph)",
+          "fl_approval_prefix": "FL10674",
+          "noa_number": null
+        },
+        {
+          "name": "Starter Strip Plus",
+          "profile": "starter",
+          "warranty_years": null,
+          "wind_rating": null,
+          "fl_approval_prefix": "FL10674",
+          "noa_number": null
+        },
+        {
+          "name": "ProEdge Hip and Ridge",
+          "profile": "hip_ridge",
+          "warranty_years": null,
+          "wind_rating": null,
+          "fl_approval_prefix": "FL10674",
+          "noa_number": null
+        }
+      ],
+      "master_fl_approval": "FL10674",
+      "master_noa": "NOA 20-0218.08",
+      "typical_refresh_cycle_years": 5
+    },
+    {
+      "id": 3,
+      "manufacturer": "CertainTeed",
+      "parent": "Saint-Gobain",
+      "headquarters": "Malvern, PA",
+      "product_lines": [
+        {
+          "name": "Landmark",
+          "profile": "architectural",
+          "warranty_years": 30,
+          "wind_rating": "Class H",
+          "fl_approval_prefix": "FL5444",
+          "noa_number": "NOA 18-1120.05"
+        },
+        {
+          "name": "Landmark PRO",
+          "profile": "architectural",
+          "warranty_years": 50,
+          "wind_rating": "Class H",
+          "fl_approval_prefix": "FL5444",
+          "noa_number": "NOA 18-1120.05"
+        },
+        {
+          "name": "Presidential Shake",
+          "profile": "luxury",
+          "warranty_years": 50,
+          "wind_rating": "Class H",
+          "fl_approval_prefix": "FL5444",
+          "noa_number": null
+        },
+        {
+          "name": "XT 25 3-tab",
+          "profile": "3-tab",
+          "warranty_years": 25,
+          "wind_rating": "Class A",
+          "fl_approval_prefix": "FL5444",
+          "noa_number": null
+        },
+        {
+          "name": "Swiftstart starter",
+          "profile": "starter",
+          "warranty_years": null,
+          "wind_rating": null,
+          "fl_approval_prefix": "FL5444",
+          "noa_number": null
+        },
+        {
+          "name": "Shadow Ridge hip/ridge",
+          "profile": "hip_ridge",
+          "warranty_years": null,
+          "wind_rating": null,
+          "fl_approval_prefix": "FL5444",
+          "noa_number": null
+        }
+      ],
+      "master_fl_approval": "FL5444",
+      "typical_refresh_cycle_years": 5
+    },
+    {
+      "id": 4,
+      "manufacturer": "Atlas Roofing",
+      "parent": "Atlas Roofing Corporation",
+      "headquarters": "Atlanta, GA",
+      "product_lines": [
+        {
+          "name": "StormMaster Shake",
+          "profile": "architectural",
+          "warranty_years": 50,
+          "wind_rating": "Class H (150 mph)",
+          "fl_approval_prefix": "FL12086",
+          "noa_number": null
+        },
+        {
+          "name": "Pinnacle Pristine",
+          "profile": "architectural",
+          "warranty_years": 50,
+          "wind_rating": "Class H",
+          "fl_approval_prefix": "FL12086",
+          "noa_number": null
+        },
+        {
+          "name": "ProLam",
+          "profile": "architectural",
+          "warranty_years": 30,
+          "wind_rating": "Class H",
+          "fl_approval_prefix": "FL12086",
+          "noa_number": null
+        },
+        {
+          "name": "Pro-Cut GlassMaster",
+          "profile": "3-tab",
+          "warranty_years": 25,
+          "wind_rating": "Class A",
+          "fl_approval_prefix": "FL12086",
+          "noa_number": null
+        }
+      ],
+      "master_fl_approval": "FL12086",
+      "typical_refresh_cycle_years": 5
+    },
+    {
+      "id": 5,
+      "manufacturer": "TAMKO",
+      "parent": "TAMKO Building Products",
+      "headquarters": "Joplin, MO",
+      "product_lines": [
+        {
+          "name": "Heritage Premium",
+          "profile": "architectural",
+          "warranty_years": 40,
+          "wind_rating": "Class H",
+          "fl_approval_prefix": "FL3434",
+          "noa_number": null
+        },
+        {
+          "name": "Heritage Proline",
+          "profile": "architectural",
+          "warranty_years": 30,
+          "wind_rating": "Class H",
+          "fl_approval_prefix": "FL3434",
+          "noa_number": null
+        },
+        {
+          "name": "Heritage Vintage",
+          "profile": "architectural",
+          "warranty_years": 30,
+          "wind_rating": "Class H",
+          "fl_approval_prefix": "FL3434",
+          "noa_number": null
+        },
+        {
+          "name": "Elite Glass-Seal 3-tab",
+          "profile": "3-tab",
+          "warranty_years": 25,
+          "wind_rating": "Class A",
+          "fl_approval_prefix": "FL3434",
+          "noa_number": null
+        }
+      ],
+      "master_fl_approval": "FL3434",
+      "typical_refresh_cycle_years": 5
+    }
+  ],
+  "tile_manufacturers": [
+    {
+      "id": 10,
+      "manufacturer": "Eagle Roofing Products",
+      "parent": "Burlingame Industries",
+      "headquarters": "Rialto, CA",
+      "profiles_offered": [
+        "flat",
+        "s_tile",
+        "low_profile"
+      ],
+      "product_lines": [
+        {
+          "name": "Ponderosa",
+          "profile": "flat",
+          "material": "concrete",
+          "warranty_years": 50,
+          "fl_approval_prefix": "FL5187",
+          "noa_number": "NOA 22-0412.01"
+        },
+        {
+          "name": "Capistrano",
+          "profile": "s_tile",
+          "material": "concrete",
+          "warranty_years": 50,
+          "fl_approval_prefix": "FL5187",
+          "noa_number": "NOA 22-0412.01"
+        },
+        {
+          "name": "Bel Air",
+          "profile": "low_profile",
+          "material": "concrete",
+          "warranty_years": 50,
+          "fl_approval_prefix": "FL5187",
+          "noa_number": "NOA 22-0412.01"
+        },
+        {
+          "name": "Malibu",
+          "profile": "flat",
+          "material": "concrete",
+          "warranty_years": 50,
+          "fl_approval_prefix": "FL5187",
+          "noa_number": null
+        }
+      ],
+      "master_fl_approval": "FL5187",
+      "master_noa": "NOA 22-0412.01"
+    },
+    {
+      "id": 11,
+      "manufacturer": "Crown Roof Tiles",
+      "headquarters": "Okeechobee, FL",
+      "profiles_offered": [
+        "flat",
+        "s_tile",
+        "barrel"
+      ],
+      "product_lines": [
+        {
+          "name": "Crown Flat",
+          "profile": "flat",
+          "material": "concrete",
+          "warranty_years": 50,
+          "fl_approval_prefix": "FL12487",
+          "noa_number": null
+        },
+        {
+          "name": "Crown Legacy S-Tile",
+          "profile": "s_tile",
+          "material": "concrete",
+          "warranty_years": 50,
+          "fl_approval_prefix": "FL12487",
+          "noa_number": "NOA 21-0520.03"
+        },
+        {
+          "name": "Crown Barrel",
+          "profile": "barrel",
+          "material": "concrete",
+          "warranty_years": 50,
+          "fl_approval_prefix": "FL12487",
+          "noa_number": null
+        }
+      ],
+      "master_fl_approval": "FL12487"
+    },
+    {
+      "id": 12,
+      "manufacturer": "Westlake Royal Roofing (formerly Boral)",
+      "parent": "Westlake Royal Building Products",
+      "headquarters": "Irving, TX",
+      "profiles_offered": [
+        "flat",
+        "s_tile",
+        "low_profile",
+        "specialty"
+      ],
+      "product_lines": [
+        {
+          "name": "Saxony 900 Slate",
+          "profile": "flat",
+          "material": "concrete",
+          "warranty_years": 50,
+          "fl_approval_prefix": "FL3000",
+          "noa_number": "NOA 19-0828.03"
+        },
+        {
+          "name": "Saxony 900 Shake",
+          "profile": "flat",
+          "material": "concrete",
+          "warranty_years": 50,
+          "fl_approval_prefix": "FL3000",
+          "noa_number": null
+        },
+        {
+          "name": "Villa 900",
+          "profile": "s_tile",
+          "material": "concrete",
+          "warranty_years": 50,
+          "fl_approval_prefix": "FL3000",
+          "noa_number": "NOA 19-0828.03"
+        },
+        {
+          "name": "Barcelona 900",
+          "profile": "s_tile",
+          "material": "concrete",
+          "warranty_years": 50,
+          "fl_approval_prefix": "FL3000",
+          "noa_number": null
+        }
+      ],
+      "master_fl_approval": "FL3000",
+      "master_noa": "NOA 19-0828.03"
+    },
+    {
+      "id": 13,
+      "manufacturer": "Ludowici Roof Tile",
+      "headquarters": "New Lexington, OH",
+      "profiles_offered": [
+        "s_tile",
+        "flat",
+        "shingle_tile",
+        "barrel"
+      ],
+      "product_lines": [
+        {
+          "name": "Ludowici Spanish",
+          "profile": "s_tile",
+          "material": "clay",
+          "warranty_years": 75,
+          "fl_approval_prefix": "FL11521",
+          "noa_number": null
+        },
+        {
+          "name": "Ludowici French",
+          "profile": "shingle_tile",
+          "material": "clay",
+          "warranty_years": 75,
+          "fl_approval_prefix": "FL11521",
+          "noa_number": null
+        },
+        {
+          "name": "Ludowici Americana",
+          "profile": "barrel",
+          "material": "clay",
+          "warranty_years": 75,
+          "fl_approval_prefix": "FL11521",
+          "noa_number": null
+        }
+      ],
+      "master_fl_approval": "FL11521"
+    },
+    {
+      "id": 14,
+      "manufacturer": "Entegra Roof Tile",
+      "headquarters": "Okeechobee, FL",
+      "profiles_offered": [
+        "flat",
+        "s_tile",
+        "low_profile"
+      ],
+      "product_lines": [
+        {
+          "name": "Bella",
+          "profile": "flat",
+          "material": "concrete",
+          "warranty_years": 50,
+          "fl_approval_prefix": "FL11083",
+          "noa_number": "NOA 22-0215.06"
+        },
+        {
+          "name": "Estate",
+          "profile": "s_tile",
+          "material": "concrete",
+          "warranty_years": 50,
+          "fl_approval_prefix": "FL11083",
+          "noa_number": "NOA 22-0215.06"
+        }
+      ],
+      "master_fl_approval": "FL11083",
+      "master_noa": "NOA 22-0215.06"
+    }
+  ],
+  "metal_manufacturers": [
+    {
+      "id": 20,
+      "manufacturer": "McElroy Metal",
+      "headquarters": "Bossier City, LA",
+      "panel_types": [
+        "standing_seam",
+        "5V_crimp",
+        "corrugated",
+        "exposed_fastener"
+      ],
+      "product_lines": [
+        {
+          "name": "Medallion-Lok",
+          "panel_type": "standing_seam",
+          "gauge": "24/26",
+          "profile_height": "1.75\"",
+          "seam_type": "mechanical_lock",
+          "fl_approval_prefix": "FL5323",
+          "noa_number": null
+        },
+        {
+          "name": "Maxima",
+          "panel_type": "standing_seam",
+          "gauge": "24",
+          "profile_height": "1.5\"",
+          "seam_type": "snap_lock",
+          "fl_approval_prefix": "FL5323",
+          "noa_number": null
+        },
+        {
+          "name": "5-V Crimp",
+          "panel_type": "5V_crimp",
+          "gauge": "26/29",
+          "profile_height": "0.5\"",
+          "seam_type": "exposed_fastener",
+          "fl_approval_prefix": "FL5323",
+          "noa_number": null
+        },
+        {
+          "name": "Mesa",
+          "panel_type": "exposed_fastener",
+          "gauge": "26/29",
+          "profile_height": "0.75\"",
+          "seam_type": "exposed_fastener",
+          "fl_approval_prefix": "FL5323",
+          "noa_number": null
+        }
+      ],
+      "master_fl_approval": "FL5323"
+    },
+    {
+      "id": 21,
+      "manufacturer": "Gulf Coast Supply",
+      "headquarters": "Gainesville, FL",
+      "panel_types": [
+        "standing_seam",
+        "5V_crimp",
+        "corrugated"
+      ],
+      "product_lines": [
+        {
+          "name": "GulfLok",
+          "panel_type": "standing_seam",
+          "gauge": "24/26",
+          "profile_height": "1.75\"",
+          "seam_type": "mechanical_lock",
+          "fl_approval_prefix": "FL11903",
+          "noa_number": "NOA 20-0619.08"
+        },
+        {
+          "name": "GulfSnap",
+          "panel_type": "standing_seam",
+          "gauge": "24/26",
+          "profile_height": "1.5\"",
+          "seam_type": "snap_lock",
+          "fl_approval_prefix": "FL11903",
+          "noa_number": null
+        },
+        {
+          "name": "5V Crimp",
+          "panel_type": "5V_crimp",
+          "gauge": "26/29",
+          "profile_height": "0.5\"",
+          "seam_type": "exposed_fastener",
+          "fl_approval_prefix": "FL11903",
+          "noa_number": null
+        }
+      ],
+      "master_fl_approval": "FL11903",
+      "master_noa": "NOA 20-0619.08"
+    },
+    {
+      "id": 22,
+      "manufacturer": "MBCI (CornerStone Building Brands)",
+      "headquarters": "Houston, TX",
+      "panel_types": [
+        "standing_seam",
+        "exposed_fastener",
+        "corrugated"
+      ],
+      "product_lines": [
+        {
+          "name": "SuperLok",
+          "panel_type": "standing_seam",
+          "gauge": "24",
+          "profile_height": "2.0\"",
+          "seam_type": "mechanical_lock",
+          "fl_approval_prefix": "FL13540",
+          "noa_number": null
+        },
+        {
+          "name": "Double-Lok",
+          "panel_type": "standing_seam",
+          "gauge": "24",
+          "profile_height": "2.0\"",
+          "seam_type": "mechanical_lock",
+          "fl_approval_prefix": "FL13540",
+          "noa_number": null
+        },
+        {
+          "name": "PBR",
+          "panel_type": "exposed_fastener",
+          "gauge": "24/26",
+          "profile_height": "1.25\"",
+          "seam_type": "exposed_fastener",
+          "fl_approval_prefix": "FL13540",
+          "noa_number": null
+        }
+      ],
+      "master_fl_approval": "FL13540"
+    },
+    {
+      "id": 23,
+      "manufacturer": "Drexel Metals",
+      "parent": "Carlisle Companies",
+      "headquarters": "Ivyland, PA",
+      "panel_types": [
+        "standing_seam"
+      ],
+      "product_lines": [
+        {
+          "name": "DMC-200S",
+          "panel_type": "standing_seam",
+          "gauge": "24",
+          "profile_height": "2.0\"",
+          "seam_type": "mechanical_lock",
+          "fl_approval_prefix": "FL14923",
+          "noa_number": null
+        },
+        {
+          "name": "DMC-175",
+          "panel_type": "standing_seam",
+          "gauge": "24/26",
+          "profile_height": "1.75\"",
+          "seam_type": "snap_lock",
+          "fl_approval_prefix": "FL14923",
+          "noa_number": null
+        }
+      ],
+      "master_fl_approval": "FL14923"
+    }
+  ],
+  "underlayment_manufacturers": [
+    {
+      "id": 30,
+      "manufacturer": "GAF (FeltBuster / Deck-Armor / StormGuard)",
+      "product_lines": [
+        {
+          "name": "FeltBuster Synthetic",
+          "astm": "D8257",
+          "type": "synthetic_mechanical",
+          "fl_approval_prefix": "FL5027",
+          "noa_number": null,
+          "max_temp_f": 240,
+          "warranty_years": null
+        },
+        {
+          "name": "Deck-Armor",
+          "astm": "D8257",
+          "type": "synthetic_mechanical",
+          "fl_approval_prefix": "FL5027",
+          "noa_number": "NOA 21-0615.02",
+          "max_temp_f": 260,
+          "warranty_years": null
+        },
+        {
+          "name": "StormGuard",
+          "astm": "D1970",
+          "type": "peel_and_stick",
+          "fl_approval_prefix": "FL5027",
+          "noa_number": "NOA 21-0615.02",
+          "max_temp_f": 250,
+          "warranty_years": null
+        },
+        {
+          "name": "WeatherWatch Ice & Water",
+          "astm": "D1970",
+          "type": "peel_and_stick",
+          "fl_approval_prefix": "FL5027",
+          "noa_number": null,
+          "max_temp_f": 250,
+          "warranty_years": null
+        }
+      ],
+      "master_fl_approval": "FL5027"
+    },
+    {
+      "id": 31,
+      "manufacturer": "Owens Corning",
+      "product_lines": [
+        {
+          "name": "ProArmor",
+          "astm": "D8257",
+          "type": "synthetic_mechanical",
+          "fl_approval_prefix": "FL10626",
+          "noa_number": null,
+          "max_temp_f": 260,
+          "warranty_years": null
+        },
+        {
+          "name": "RhinoRoof U20",
+          "astm": "D8257",
+          "type": "synthetic_mechanical",
+          "fl_approval_prefix": "FL10626",
+          "noa_number": null,
+          "max_temp_f": 240,
+          "warranty_years": null
+        },
+        {
+          "name": "WeatherLock Flex",
+          "astm": "D1970",
+          "type": "peel_and_stick",
+          "fl_approval_prefix": "FL10626",
+          "noa_number": "NOA 20-0710.05",
+          "max_temp_f": 250,
+          "warranty_years": null
+        },
+        {
+          "name": "WeatherLock G",
+          "astm": "D1970",
+          "type": "peel_and_stick",
+          "fl_approval_prefix": "FL10626",
+          "noa_number": "NOA 20-0710.05",
+          "max_temp_f": 220,
+          "warranty_years": null
+        }
+      ],
+      "master_fl_approval": "FL10626"
+    },
+    {
+      "id": 32,
+      "manufacturer": "CertainTeed",
+      "product_lines": [
+        {
+          "name": "DiamondDeck",
+          "astm": "D8257",
+          "type": "synthetic_mechanical",
+          "fl_approval_prefix": "FL10959",
+          "noa_number": null,
+          "max_temp_f": 240,
+          "warranty_years": null
+        },
+        {
+          "name": "Roofers' Select",
+          "astm": "D226",
+          "type": "felt_30lb",
+          "fl_approval_prefix": "FL10959",
+          "noa_number": null,
+          "max_temp_f": null,
+          "warranty_years": null
+        },
+        {
+          "name": "WinterGuard HT",
+          "astm": "D1970",
+          "type": "peel_and_stick",
+          "fl_approval_prefix": "FL10959",
+          "noa_number": "NOA 19-0912.04",
+          "max_temp_f": 240,
+          "warranty_years": null
+        }
+      ],
+      "master_fl_approval": "FL10959"
+    },
+    {
+      "id": 33,
+      "manufacturer": "Polyglass",
+      "headquarters": "Deerfield Beach, FL",
+      "product_lines": [
+        {
+          "name": "Polystick MTS Plus",
+          "astm": "D1970",
+          "type": "peel_and_stick_tile",
+          "fl_approval_prefix": "FL10626",
+          "noa_number": "NOA 22-0117.11",
+          "max_temp_f": 260,
+          "warranty_years": null,
+          "tile_rated": true
+        },
+        {
+          "name": "Polystick TU Plus",
+          "astm": "D1970",
+          "type": "peel_and_stick_tile",
+          "fl_approval_prefix": "FL10626",
+          "noa_number": "NOA 22-0117.11",
+          "max_temp_f": 260,
+          "warranty_years": null,
+          "tile_rated": true
+        },
+        {
+          "name": "Elastoflex SA",
+          "astm": "D1970",
+          "type": "peel_and_stick",
+          "fl_approval_prefix": "FL10626",
+          "noa_number": "NOA 22-0117.11",
+          "max_temp_f": 240,
+          "warranty_years": null
+        }
+      ],
+      "master_fl_approval": "FL10626",
+      "master_noa": "NOA 22-0117.11",
+      "notes": "FL-based; strong HVHZ tile-underlayment lineup"
+    }
+  ]
+}

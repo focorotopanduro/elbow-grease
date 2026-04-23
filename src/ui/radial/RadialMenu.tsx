@@ -35,6 +35,9 @@ import {
 } from './FisheyeDeformer';
 import { WheelParticles, type WheelParticlesHandle } from './WheelParticles';
 import { WheelHolographics } from './WheelHolographics';
+// Phase 5 — velocity-predicted sector pre-highlight + a11y.
+import { SectorPredictor } from './SectorPredictor';
+import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 
 // ── Config types (unchanged external API) ──────────────────────
 
@@ -121,6 +124,16 @@ export function RadialMenu({ config }: { config: WheelConfig }) {
   const mouseMovedSinceOpen = useRef(false);
   const particleHandleRef = useRef<WheelParticlesHandle | null>(null);
 
+  // Phase 5 — OS-level reduce-motion. When true, skip scale animations
+  // AND disable velocity prediction (pre-highlighting without visible
+  // cursor motion violates the preference's intent).
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  // Phase 5 — SectorPredictor instance kept stable across renders.
+  // Reset whenever the wheel opens so stale samples from a previous
+  // session don't leak into a new prediction.
+  const predictorRef = useRef<SectorPredictor>(new SectorPredictor());
+
   // Base sectors (stable, hit-test uses these)
   const baseSectors = useMemo(
     () => config.sectors.map((s) => ({
@@ -177,6 +190,12 @@ export function RadialMenu({ config }: { config: WheelConfig }) {
 
   // ── Mouse tracking + commit logic ───────────────────────────
 
+  // Wheel open → fresh predictor. Close handled by the cleanup below.
+  useEffect(() => {
+    if (!isActive) return;
+    predictorRef.current.clear();
+  }, [isActive]);
+
   useEffect(() => {
     if (!isActive) return;
 
@@ -193,10 +212,32 @@ export function RadialMenu({ config }: { config: WheelConfig }) {
       setCursor(normAngle, dist);
       addTrailSample(dx, dy);
 
-      // Hit-test uses BASE sectors (stable)
+      // Phase 5 — feed the predictor. We pass (-dy) so the
+      // predictor's geometry matches sectorAtAngle's angle convention.
+      // Sample timestamping uses performance.now() for monotonic Δt.
+      predictorRef.current.addSample(dx, -dy, performance.now());
+
+      // Hit-test uses BASE sectors (stable).
       let hit: string | null = null;
       if (dist >= config.innerRadiusPx) {
         hit = sectorAtAngle(normAngle, baseSectors);
+      }
+
+      // If the cursor isn't yet inside a sector, ask the predictor
+      // where it's headed. This gives the highlight a ~3-frame head
+      // start on short flicks. When the cursor arrives, the real
+      // hit-test takes over — `hit` trumps the prediction.
+      //
+      // prefers-reduced-motion disables prediction: pre-highlighting
+      // without accompanying cursor motion is a motion cue the user
+      // asked to reduce.
+      if (hit === null && !prefersReducedMotion) {
+        hit = predictorRef.current.predict({
+          baseSectors,
+          innerRadius: config.innerRadiusPx,
+          outerRadius: config.outerRadiusPx,
+          lookaheadMs: 90,
+        });
       }
 
       if (hit !== lastHighlightRef.current) {
@@ -300,12 +341,13 @@ export function RadialMenu({ config }: { config: WheelConfig }) {
       window.removeEventListener('contextmenu', onContextMenu);
       clearTrail();
       lastHighlightRef.current = null;
+      predictorRef.current.clear();
       if (particleHandleRef.current) {
         particleHandleRef.current.setEmitter({ active: false });
       }
     };
   }, [
-    isActive, centerPos, config, baseSectors, markingMode,
+    isActive, centerPos, config, baseSectors, markingMode, prefersReducedMotion,
     setCursor, addTrailSample, setHighlighted, cycleSubtype,
     selectSector, closeWheel, getSubtypeIndex, toggleFavorite,
     triggerRipple, clearTrail,
@@ -359,6 +401,16 @@ export function RadialMenu({ config }: { config: WheelConfig }) {
         radialAudio.confirm();
         sector.onSelect?.(subtypeIdx);
         if (config.tapToSelect) setTimeout(() => closeWheel(), 80);
+      } else if (e.key === 'Escape') {
+        // Phase 5 — Escape closes the wheel cleanly, matching the
+        // universal Escape contract from the enterprise hardening pass.
+        // The global Escape handler (App.tsx KeyboardHandler) will ALSO
+        // see this event, but radialMenuStore.activeWheelId === config.id
+        // short-circuits its priority chain at the "wheel open" step,
+        // so we close here first to avoid a double-close.
+        e.preventDefault();
+        radialAudio.cancel();
+        closeWheel();
       }
     };
 
@@ -390,15 +442,18 @@ export function RadialMenu({ config }: { config: WheelConfig }) {
       {/* Particles / holographics / trail overlay all disabled —
           they were the cause of the wheel's heavy feel and glitches. */}
 
-      {/* Wheel — spring-easing with slight overshoot */}
+      {/* Wheel — spring-easing with slight overshoot.
+          Phase 5: prefers-reduced-motion disables the entry-spring — wheel
+          pops in at its final scale with only an opacity fade. */}
       <div style={{
         ...styles.wheelContainer,
-        transform: `translate(-50%, -50%) scale(${springScale(entryProgress)})`,
+        transform: prefersReducedMotion
+          ? 'translate(-50%, -50%)'
+          : `translate(-50%, -50%) scale(${springScale(entryProgress)})`,
         opacity: entryProgress,
-        // 70ms entry with a steeper spring (more impact, less lag).
-        // The cubic-bezier starts aggressively and settles smoothly —
-        // feels snappy but not jittery.
-        transition: 'transform 70ms cubic-bezier(0.2, 1.8, 0.3, 1), opacity 50ms ease-out',
+        transition: prefersReducedMotion
+          ? 'opacity 50ms ease-out'
+          : 'transform 70ms cubic-bezier(0.2, 1.8, 0.3, 1), opacity 50ms ease-out',
         willChange: 'transform, opacity',
       }}>
         <WheelSVG
@@ -407,6 +462,7 @@ export function RadialMenu({ config }: { config: WheelConfig }) {
           highlightedId={highlightedId}
           recentSectorIds={recentSectorIds}
           entryProgress={entryProgress}
+          prefersReducedMotion={prefersReducedMotion}
         />
 
         {/* Ripple on commit */}
@@ -430,11 +486,20 @@ interface WheelSVGProps {
   highlightedId: string | null;
   recentSectorIds: string[];
   entryProgress: number;
+  prefersReducedMotion: boolean;
 }
 
 const WheelSVG = forwardRef<SVGSVGElement, WheelSVGProps>(function WheelSVG(
-  { config, deformedSectors, highlightedId, recentSectorIds, entryProgress }, ref,
+  { config, deformedSectors, highlightedId, recentSectorIds, entryProgress, prefersReducedMotion }, ref,
 ) {
+  // Phase 5 — the single cubic-bezier that gives every hover transition
+  // its "micro-pop". 1.4 in the first pair is the overshoot that makes
+  // the icon land with a tiny bounce; 0.3,1.0 is the settle curve.
+  // Rejected alternatives: framer-motion (+60KB), react-spring (+40KB) —
+  // a native CSS transition reaches the same perceived quality for 0 deps.
+  const popTransition = prefersReducedMotion
+    ? 'none'
+    : 'transform 90ms cubic-bezier(0.2, 1.4, 0.3, 1), font-size 90ms cubic-bezier(0.2, 1.4, 0.3, 1), fill 70ms linear, opacity 70ms linear';
   const size = config.outerRadiusPx * 2 + 80;
   const cx = size / 2;
   const cy = size / 2;
@@ -518,7 +583,19 @@ const WheelSVG = forwardRef<SVGSVGElement, WheelSVGProps>(function WheelSVG(
         const wedgePath = `M${p1x},${p1y} L${p2x},${p2y} A${rOut},${rOut} 0 ${large} 0 ${p3x},${p3y} L${p4x},${p4y} A${rIn},${rIn} 0 ${large} 1 ${p1x},${p1y} Z`;
 
         return (
-          <g>
+          // Phase 5 — the micro-pop. SVG <g> scales from the wedge's
+          // geometric center (the arc midpoint on the mean radius),
+          // so the wedge appears to pulse outward ~4% without the
+          // sector sliding around. `transform-box: fill-box` anchors
+          // the scale to the shape's own bounds so the transform
+          // doesn't need manually-computed origin coords.
+          <g
+            style={{
+              transformOrigin: `${cx}px ${cy}px`,
+              transform: 'scale(1.04)',
+              transition: popTransition,
+            }}
+          >
             {/* Solid color fill — brighter for clear hover state */}
             <path d={wedgePath} fill={cfg.color} opacity={0.48} />
             {/* Accent edge */}
@@ -563,15 +640,17 @@ const WheelSVG = forwardRef<SVGSVGElement, WheelSVGProps>(function WheelSVG(
               />
             )}
 
-            {/* Icon with drop-shadow when hot */}
+            {/* Icon with drop-shadow when hot.
+                Phase 5 — popTransition gives the icon a subtle 1.4-overshoot
+                scale on hover-enter so the target confirmation is felt
+                before it's cognitively parsed. */}
             <text x={x} y={y} fontSize={iconSize}
               textAnchor="middle" dominantBaseline="middle"
               opacity={iconOpacity}
               style={{
                 userSelect: 'none',
                 filter: isHot ? `drop-shadow(0 0 8px ${cfg.color})` : 'none',
-                // Fast scaling — 70ms so hover feels immediate.
-                transition: 'font-size 70ms cubic-bezier(0.2, 1.2, 0.3, 1)',
+                transition: popTransition,
               }}>
               {cfg.icon}
             </text>
@@ -583,7 +662,7 @@ const WheelSVG = forwardRef<SVGSVGElement, WheelSVGProps>(function WheelSVG(
               opacity={labelOpacity}
               style={{
                 userSelect: 'none', letterSpacing: 1.5, textTransform: 'uppercase',
-                transition: 'font-size 70ms, fill 70ms',
+                transition: popTransition,
               }}>
               {cfg.label}
             </text>

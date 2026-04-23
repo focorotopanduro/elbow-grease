@@ -43,6 +43,10 @@ export const SYSTEM_COLORS: Record<SystemType, string> = {
   cold_supply: '#29b6f6',
   hot_supply:  '#ff7043',
   storm:       '#78909c',
+  // Phase 14.AA.3 — HVAC condensate. Light cyan/purple per
+  // industry drafting convention so it reads distinct from
+  // potable supply blue and DWV waste colors.
+  condensate:  '#9575cd',
 };
 
 export const SYSTEM_LABELS: Record<SystemType, string> = {
@@ -51,6 +55,7 @@ export const SYSTEM_LABELS: Record<SystemType, string> = {
   cold_supply: 'Cold Supply',
   hot_supply:  'Hot Supply',
   storm:       'Storm',
+  condensate:  'Condensate',
 };
 
 export const SYSTEM_KEYS: Record<string, SystemType> = {
@@ -59,11 +64,12 @@ export const SYSTEM_KEYS: Record<string, SystemType> = {
   c: 'cold_supply',
   h: 'hot_supply',
   t: 'storm',
+  d: 'condensate',
 };
 
 // ── Store ───────────────────────────────────────────────────────
 
-const ALL_SYSTEMS: SystemType[] = ['waste', 'vent', 'cold_supply', 'hot_supply', 'storm'];
+const ALL_SYSTEMS: SystemType[] = ['waste', 'vent', 'cold_supply', 'hot_supply', 'storm', 'condensate'];
 
 export const useLayerStore = create<LayerState>((set) => ({
   systems: {
@@ -72,6 +78,7 @@ export const useLayerStore = create<LayerState>((set) => ({
     cold_supply: true,
     hot_supply: true,
     storm: true,
+    condensate: true,
   },
   fittings: true,
   fixtures: true,
@@ -92,7 +99,7 @@ export const useLayerStore = create<LayerState>((set) => ({
   soloSystem: (system) =>
     set(() => {
       const systems: Record<SystemType, boolean> = {
-        waste: false, vent: false, cold_supply: false, hot_supply: false, storm: false,
+        waste: false, vent: false, cold_supply: false, hot_supply: false, storm: false, condensate: false,
       };
       systems[system] = true;
       return { systems };
@@ -101,7 +108,7 @@ export const useLayerStore = create<LayerState>((set) => ({
   showAllSystems: () =>
     set(() => ({
       systems: {
-        waste: true, vent: true, cold_supply: true, hot_supply: true, storm: true,
+        waste: true, vent: true, cold_supply: true, hot_supply: true, storm: true, condensate: true,
       },
     })),
 

@@ -37,6 +37,13 @@ export const SIM_MSG = {
   REMOVE_NODE:         'sim:remove:node',
   REMOVE_EDGE:         'sim:remove:edge',
   SET_GRAPH:           'sim:set:graph',
+  // Phase 3: zero-copy variant — payload is a SharedArrayBuffer handle
+  // + capacity (main thread packs the slab, worker re-wraps and reads).
+  SET_GRAPH_SAB:       'sim:set:graph:sab',
+  // Phase 14.AC.3: one postMessage per debounce window carrying ALL
+  // pipe add/remove mutations pending at flush time. See
+  // `src/engine/worker/mutationBatching.ts` for the payload shape.
+  BATCH_MUTATE:        'sim:batch:mutate',
 
   // Results (worker → main thread)
   GRAPH_UPDATED:       'sim:graph:updated',

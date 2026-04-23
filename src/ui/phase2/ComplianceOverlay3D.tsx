@@ -26,6 +26,7 @@ import * as THREE from 'three';
 import { simBus, SIM_MSG, type CompliancePayload } from '../../engine/graph/MessageBus';
 import { usePipeStore } from '@store/pipeStore';
 import { useFloorParams } from '@store/floorStore';
+import { useReducedMotion } from '@core/a11y/useReducedMotion';
 import type { Vec3 } from '@core/events';
 
 // ── Live violation record ───────────────────────────────────────
@@ -189,6 +190,7 @@ function ViolationMarker({ violation, count }: { violation: ActiveViolation; cou
   const meshRef = useRef<THREE.Mesh>(null!);
   const ringRef = useRef<THREE.Mesh>(null!);
   const groupRef = useRef<THREE.Group>(null!);
+  const reducedMotion = useReducedMotion();
 
   const style = SEVERITY_STYLE[violation.severity];
 
@@ -199,6 +201,24 @@ function ViolationMarker({ violation, count }: { violation: ActiveViolation; cou
     if (violation.fadeStartTs) {
       const age = (now - violation.fadeStartTs) / 1500;
       opacity = Math.max(0, 1 - age);
+    }
+
+    // Reduced motion: static beacon. Still obviously a violation —
+    // colored sphere + ring + callout — but no sine pulses that can
+    // induce motion sickness or cognitive drag for sensitive users.
+    if (reducedMotion) {
+      if (meshRef.current) {
+        meshRef.current.scale.setScalar(opacity);
+        (meshRef.current.material as THREE.MeshStandardMaterial).opacity = 0.75 * opacity;
+        meshRef.current.visible = opacity > 0.01;
+      }
+      if (ringRef.current) {
+        ringRef.current.scale.setScalar(opacity);
+        (ringRef.current.material as THREE.MeshBasicMaterial).opacity = 0.5 * opacity;
+        ringRef.current.visible = opacity > 0.01;
+      }
+      if (groupRef.current) groupRef.current.visible = opacity > 0.01;
+      return;
     }
 
     // Pulse animation
@@ -226,8 +246,10 @@ function ViolationMarker({ violation, count }: { violation: ActiveViolation; cou
 
   return (
     <group ref={groupRef} position={violation.position}>
-      {/* Central pulsing sphere */}
-      <mesh ref={meshRef}>
+      {/* Central pulsing sphere — visual only, `raycast` disabled so
+          clicks fall through to pipes/fixtures underneath. Ditto every
+          decorative mesh below this group. See audit notes. */}
+      <mesh ref={meshRef} raycast={() => null}>
         <sphereGeometry args={[0.12, 14, 14]} />
         <meshStandardMaterial
           color={style.color}
@@ -240,7 +262,7 @@ function ViolationMarker({ violation, count }: { violation: ActiveViolation; cou
       </mesh>
 
       {/* Outer expanding ring */}
-      <mesh ref={ringRef} rotation-x={-Math.PI / 2}>
+      <mesh ref={ringRef} rotation-x={-Math.PI / 2} raycast={() => null}>
         <ringGeometry args={[0.15, 0.22, 24]} />
         <meshBasicMaterial color={style.color} transparent opacity={0.6} side={THREE.DoubleSide} />
       </mesh>
@@ -248,7 +270,7 @@ function ViolationMarker({ violation, count }: { violation: ActiveViolation; cou
       {/* Count badge for clusters */}
       {count > 1 && (
         <Billboard position={[0.15, 0.15, 0]}>
-          <mesh>
+          <mesh raycast={() => null}>
             <circleGeometry args={[0.06, 16]} />
             <meshBasicMaterial color={style.color} />
           </mesh>
@@ -260,11 +282,11 @@ function ViolationMarker({ violation, count }: { violation: ActiveViolation; cou
 
       {/* Callout with code reference */}
       <Billboard position={[0, 0.4, 0]}>
-        <mesh position={[0, 0, -0.005]}>
+        <mesh position={[0, 0, -0.005]} raycast={() => null}>
           <planeGeometry args={[1.8, 0.28]} />
           <meshBasicMaterial color="#0a0a0f" transparent opacity={0.92} />
         </mesh>
-        <mesh position={[0, 0, -0.004]}>
+        <mesh position={[0, 0, -0.004]} raycast={() => null}>
           <planeGeometry args={[1.82, 0.3]} />
           <meshBasicMaterial color={style.color} transparent opacity={0.4} />
         </mesh>

@@ -15,16 +15,26 @@
  * point that pulses when the FSM is in 'idle' state.
  */
 
-import { useRef, useMemo, useCallback } from 'react';
+import { useRef, useMemo, useCallback, memo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { GlowRing } from '@ui/SensoryFeedback';
+import { useReducedMotion } from '@core/a11y/useReducedMotion';
 import { useFSM } from '@hooks/useFSM';
 import { userFSM } from '@core/UserProgressFSM';
 import { useLayerStore } from '@store/layerStore';
 import { useFloorParams } from '@store/floorStore';
 import { useFixtureStore, type FixtureInstance } from '@store/fixtureStore';
 import { useInteractionStore } from '@store/interactionStore';
+// Phase 14.F — in-scene rotation gizmo for the selected fixture.
+import { FixtureRotationGizmo } from '@ui/fixtures/FixtureRotationGizmo';
+// Phase 14.I — multi-select layer (Shift+click toggles membership).
+import { useMultiSelectStore } from '@store/multiSelectStore';
+// Bug-fix pass: fixture hitbox goes click-transparent while a
+// pendingFixture is being placed, so the drop click reaches the
+// FixturePlacementPreview's catcher plane instead of being swallowed
+// here.
+import { useCustomerStore } from '@store/customerStore';
 import { usePhaseFilter } from '@store/phaseStore';
 import { shouldPhaseRender, PHASE_META } from '@core/phases/PhaseTypes';
 import { classifyFixture } from '@core/phases/PhaseClassifier';
@@ -203,8 +213,8 @@ function KitchenSinkModel({ position, params }: ModelProps) {
   const counterThickness = 0.12; // 1.5"
 
   const porcelain = { color: FIXTURE_COLOR, metalness: 0.15, roughness: 0.2 };
-  const stainless = { color: '#a8a8a8', metalness: 0.9, roughness: 0.18 };
-  const chrome = { color: '#c0c4ca', metalness: 0.92, roughness: 0.1 };
+  const stainless = { color: '#a8a8a8', metalness: 0.9, roughness: 0.18, envMapIntensity: 1.8 };
+  const chrome = { color: '#c0c4ca', metalness: 0.92, roughness: 0.1, envMapIntensity: 1.8 };
 
   return (
     <group position={position}>
@@ -386,8 +396,8 @@ function LavatoryModel({ position, params }: ModelProps) {
   const bowlDepth = 6 / 12;
   const counterThick = 0.1;
 
-  const porcelain = { color: FIXTURE_COLOR, metalness: 0.15, roughness: 0.18 };
-  const chrome = { color: '#c0c4ca', metalness: 0.92, roughness: 0.1 };
+  const porcelain = { color: FIXTURE_COLOR, metalness: 0.15, roughness: 0.18, envMapIntensity: 1.3 };
+  const chrome = { color: '#c0c4ca', metalness: 0.92, roughness: 0.1, envMapIntensity: 1.8 };
 
   return (
     <group position={position}>
@@ -413,12 +423,37 @@ function LavatoryModel({ position, params }: ModelProps) {
         <meshStandardMaterial {...porcelain} />
       </mesh>
 
-      {/* Basin cavity */}
+      {/* Basin cavity — carved DOWN into the counter as a hollow cup.
+          Bug-fix: previously used `rotation-x={-Math.PI / 2}` which put
+          the cylinder ON ITS SIDE (Y-axis lying horizontal), so the
+          bowl rendered as a tube sticking sideways out of the counter
+          instead of a downward-opening basin. Now standing upright
+          with `openEnded=true` + double-sided material so the cup
+          interior is visible. */}
       {basinShape === 'oval' || basinShape === 'round' ? (
-        <mesh position={[0, topH + counterThick - bowlDepth / 2, 0]} rotation-x={-Math.PI / 2}>
-          <cylinderGeometry args={[bowlW / 2 * 0.75, bowlW / 2 * 0.6, bowlDepth, 28]} />
-          <meshStandardMaterial color="#e6e2d5" metalness={0.18} roughness={0.25} />
-        </mesh>
+        <>
+          {/* Hollow cup (bowl interior) */}
+          <mesh position={[0, topH + counterThick - bowlDepth / 2, 0]}>
+            <cylinderGeometry
+              args={[bowlW / 2 * 0.40, bowlW / 2 * 0.32, bowlDepth, 28, 1, true]}
+            />
+            <meshStandardMaterial
+              color="#d8d4c7"
+              metalness={0.18}
+              roughness={0.28}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+          {/* Dark disc at counter level — reads as the basin opening
+              when viewed from above. */}
+          <mesh
+            position={[0, topH + counterThick + 0.001, 0]}
+            rotation-x={-Math.PI / 2}
+          >
+            <ringGeometry args={[bowlW / 2 * 0.32, bowlW / 2 * 0.40, 32]} />
+            <meshStandardMaterial color="#1a1a22" side={THREE.DoubleSide} />
+          </mesh>
+        </>
       ) : basinShape === 'vessel' ? (
         // Vessel: bowl sits ON TOP of counter
         <group position={[0, topH + counterThick, 0]}>
@@ -428,11 +463,26 @@ function LavatoryModel({ position, params }: ModelProps) {
           </mesh>
         </group>
       ) : (
-        // Rectangle
-        <mesh position={[0, topH + counterThick - bowlDepth / 2, 0]}>
-          <boxGeometry args={[bowlW * 0.75, bowlDepth, bowlD * 0.6]} />
-          <meshStandardMaterial color="#e6e2d5" metalness={0.18} roughness={0.25} />
-        </mesh>
+        // Rectangle basin — hollow box carved into counter (also got
+        // the "solid box sitting on counter" bug; same fix).
+        <>
+          <mesh position={[0, topH + counterThick - bowlDepth / 2, 0]}>
+            <boxGeometry args={[bowlW * 0.7, bowlDepth, bowlD * 0.55]} />
+            <meshStandardMaterial
+              color="#d8d4c7"
+              metalness={0.18}
+              roughness={0.28}
+            />
+          </mesh>
+          {/* Dark rim at counter level */}
+          <mesh
+            position={[0, topH + counterThick + 0.001, 0]}
+            rotation-x={-Math.PI / 2}
+          >
+            <planeGeometry args={[bowlW * 0.72, bowlD * 0.57]} />
+            <meshStandardMaterial color="#1a1a22" side={THREE.DoubleSide} />
+          </mesh>
+        </>
       )}
 
       {/* Drain */}
@@ -528,8 +578,28 @@ function ShowerModel({ position, params }: { position: [number, number, number];
 
   const tile = { color: '#dfe4e8', metalness: 0.08, roughness: 0.32 };
   const panMat = { color: '#c8cdd2', metalness: 0.12, roughness: 0.4 };
-  const chrome = { color: '#c0c4ca', metalness: 0.92, roughness: 0.1 };
+  const chrome = { color: '#c0c4ca', metalness: 0.92, roughness: 0.1, envMapIntensity: 1.8 };
   const darkChrome = { color: '#707076', metalness: 0.82, roughness: 0.22 };
+  // Bug-fix: shower walls rendered as three solid white tile boxes,
+  // making the fixture read as "a single white box." Real residential
+  // showers today are typically glass-enclosed; the back wall stays
+  // tile (that's where the valve + arm plumbing sit against a stud
+  // wall), but the side walls should be transparent glass so the
+  // enclosure reads correctly and the plumber can SEE the fixtures
+  // behind / inside the shower from any camera angle. Using standard
+  // material with transparency (not MeshPhysicalMaterial) to avoid
+  // introducing a new material type — good enough glass look for
+  // CAD review use.
+  const glass = {
+    color: '#cce7f5',
+    metalness: 0.1,
+    roughness: 0.05,
+    transparent: true,
+    opacity: 0.22,
+    envMapIntensity: 2.2,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+  };
 
   // Shower wall is on -Z (back wall); valve + shower head mount to it
   return (
@@ -574,18 +644,37 @@ function ShowerModel({ position, params }: { position: [number, number, number];
         <meshStandardMaterial {...tile} />
       </mesh>
 
-      {/* Left side wall panel */}
+      {/* Left side wall — GLASS (bug-fix: was solid tile). */}
       <mesh position={[-panW / 2 + 0.01, panThickness + wallHeight / 2, 0]}>
         <boxGeometry args={[0.03, wallHeight, panD]} />
-        <meshStandardMaterial {...tile} />
+        <meshStandardMaterial {...glass} />
+      </mesh>
+      {/* Glass-edge frame trim on left wall (chrome rim, reads glass-edge) */}
+      <mesh position={[-panW / 2 + 0.01, panThickness + 0.04, 0]}>
+        <boxGeometry args={[0.04, 0.03, panD]} />
+        <meshStandardMaterial {...chrome} />
+      </mesh>
+      <mesh position={[-panW / 2 + 0.01, panThickness + wallHeight - 0.04, 0]}>
+        <boxGeometry args={[0.04, 0.03, panD]} />
+        <meshStandardMaterial {...chrome} />
       </mesh>
 
-      {/* Right side wall panel (absent if walk-in) */}
+      {/* Right side wall — GLASS (absent if walk-in) */}
       {wIn < 54 && (
-        <mesh position={[panW / 2 - 0.01, panThickness + wallHeight / 2, 0]}>
-          <boxGeometry args={[0.03, wallHeight, panD]} />
-          <meshStandardMaterial {...tile} />
-        </mesh>
+        <>
+          <mesh position={[panW / 2 - 0.01, panThickness + wallHeight / 2, 0]}>
+            <boxGeometry args={[0.03, wallHeight, panD]} />
+            <meshStandardMaterial {...glass} />
+          </mesh>
+          <mesh position={[panW / 2 - 0.01, panThickness + 0.04, 0]}>
+            <boxGeometry args={[0.04, 0.03, panD]} />
+            <meshStandardMaterial {...chrome} />
+          </mesh>
+          <mesh position={[panW / 2 - 0.01, panThickness + wallHeight - 0.04, 0]}>
+            <boxGeometry args={[0.04, 0.03, panD]} />
+            <meshStandardMaterial {...chrome} />
+          </mesh>
+        </>
       )}
 
       {/* Tile grout line at floor — thin dark strip */}
@@ -726,9 +815,9 @@ function BathtubModel({ position, params }: { position: [number, number, number]
   const style = String(params?.tubStyle ?? 'alcove');
   const freestand = style === 'freestand';
 
-  const porcelain = { color: FIXTURE_COLOR, metalness: 0.15, roughness: 0.18 };
+  const porcelain = { color: FIXTURE_COLOR, metalness: 0.15, roughness: 0.18, envMapIntensity: 1.3 };
   const interiorMat = { color: '#e6e2d5', metalness: 0.2, roughness: 0.22 };
-  const chrome = { color: '#c0c4ca', metalness: 0.92, roughness: 0.1 };
+  const chrome = { color: '#c0c4ca', metalness: 0.92, roughness: 0.1, envMapIntensity: 1.8 };
 
   // Tub sits ON the floor — Y=0 is floor, top of rim at Y=H
   return (
@@ -905,8 +994,8 @@ function UrinalModel({ position, params }: { position: [number, number, number];
   const urinalW = 14 / 12;     // 14" wide
   const urinalD = 14 / 12;     // 14" projection from wall
 
-  const porcelain = { color: FIXTURE_COLOR, metalness: 0.15, roughness: 0.18 };
-  const chrome = { color: '#c0c4ca', metalness: 0.92, roughness: 0.1 };
+  const porcelain = { color: FIXTURE_COLOR, metalness: 0.15, roughness: 0.18, envMapIntensity: 1.3 };
+  const chrome = { color: '#c0c4ca', metalness: 0.92, roughness: 0.1, envMapIntensity: 1.8 };
 
   return (
     <group position={position}>
@@ -1116,8 +1205,8 @@ function DrinkingFountainModel({ position, params }: { position: [number, number
   const basinW = 16 / 12;
   const basinD = 13 / 12;
 
-  const stainless = { color: '#b8bec4', metalness: 0.82, roughness: 0.22 };
-  const chrome = { color: '#c0c4ca', metalness: 0.92, roughness: 0.1 };
+  const stainless = { color: '#b8bec4', metalness: 0.82, roughness: 0.22, envMapIntensity: 1.8 };
+  const chrome = { color: '#c0c4ca', metalness: 0.92, roughness: 0.1, envMapIntensity: 1.8 };
 
   return (
     <group position={position}>
@@ -1199,7 +1288,7 @@ function DrinkingFountainModel({ position, params }: { position: [number, number
  * Dishwasher — 24" × 24" × 34" under-counter. Door on front.
  */
 function DishwasherModel({ position, params }: { position: [number, number, number]; params?: Record<string, unknown> }) {
-  const stainless = { color: '#b8bec4', metalness: 0.82, roughness: 0.22 };
+  const stainless = { color: '#b8bec4', metalness: 0.82, roughness: 0.22, envMapIntensity: 1.8 };
   const W = 24 / 12, D = 24 / 12, H = 34 / 12;
   const powerMode = String(params?.powerMode ?? '120V');
   return (
@@ -1270,6 +1359,396 @@ function ClothesWasherModel({ position }: { position: [number, number, number]; 
   );
 }
 
+// ── Phase 14.Y.2 — equipment + specialty fixture models ──────
+//
+// Compact + accurate-to-industry geometries. Each model is <= 12
+// meshes and uses shared materials so large scenes stay light.
+// Dimensions match the FixtureSpec registry (ConnectionPoints.ts).
+
+type EquipModelProps = {
+  position: [number, number, number];
+  params?: Record<string, unknown>;
+};
+
+const INCH_EQ = 1 / 12;
+
+/** Shared brass material for inline valves + heater fittings. */
+function brassMaterial() {
+  return (
+    <meshStandardMaterial
+      color="#c8a46a"
+      metalness={0.85}
+      roughness={0.28}
+      emissive="#3a2b10"
+      emissiveIntensity={0.12}
+    />
+  );
+}
+
+function steelMaterial(tint = '#e5eaf0') {
+  return (
+    <meshStandardMaterial color={tint} metalness={0.6} roughness={0.35} />
+  );
+}
+
+/**
+ * Water heater — cylindrical tank, capacity-scaled. Cold + hot
+ * connections sprout from the top; T&P valve is a horn on the
+ * side; drain spigot at the base. Gas heaters get a flue collar
+ * on top; electric heaters get a tell-tale element cover on the
+ * side. Tank shell wrapped in "insulating jacket" color.
+ */
+function WaterHeaterModel({ position, params }: EquipModelProps) {
+  const capacityGal = Number(params?.capacityGal ?? 50);
+  const energy = String(params?.energy ?? 'gas');
+  // Dimensions must agree with waterHeaterGeometry() in ConnectionPoints
+  const diameter = capacityGal <= 40 ? 20 * INCH_EQ
+    : capacityGal <= 50 ? 22 * INCH_EQ
+    : 24 * INCH_EQ;
+  const height = capacityGal <= 40 ? 58 * INCH_EQ
+    : capacityGal <= 50 ? 60 * INCH_EQ
+    : 72 * INCH_EQ;
+  const radius = diameter / 2;
+  const jacketColor = energy === 'electric' ? '#d9dde2' : '#e8e1d0';
+
+  return (
+    <group position={position}>
+      {/* Tank shell — tall cylinder, standing on its base */}
+      <mesh position={[0, height / 2, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[radius, radius, height, 28]} />
+        <meshStandardMaterial color={jacketColor} metalness={0.15} roughness={0.55} />
+      </mesh>
+      {/* Top cap — slightly dimmer so it reads as separate piece */}
+      <mesh position={[0, height, 0]}>
+        <cylinderGeometry args={[radius * 0.95, radius, 2 * INCH_EQ, 28]} />
+        <meshStandardMaterial color="#9faab7" metalness={0.55} roughness={0.4} />
+      </mesh>
+      {/* Cold inlet stub (top-left) */}
+      <mesh position={[radius * 0.6, height + 1.5 * INCH_EQ, 0]}>
+        <cylinderGeometry args={[0.6 * INCH_EQ, 0.6 * INCH_EQ, 3 * INCH_EQ, 10]} />
+        {brassMaterial()}
+      </mesh>
+      {/* Hot outlet stub (top-right) */}
+      <mesh position={[-radius * 0.6, height + 1.5 * INCH_EQ, 0]}>
+        <cylinderGeometry args={[0.6 * INCH_EQ, 0.6 * INCH_EQ, 3 * INCH_EQ, 10]} />
+        {brassMaterial()}
+      </mesh>
+      {/* T&P relief — horn on the upper side, aimed along +Z */}
+      <mesh position={[0, height * 0.8, radius * 0.95]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.5 * INCH_EQ, 0.5 * INCH_EQ, 4 * INCH_EQ, 10]} />
+        {brassMaterial()}
+      </mesh>
+      {/* Drain spigot at base */}
+      <mesh position={[0, 3 * INCH_EQ, radius * 0.9]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.4 * INCH_EQ, 0.4 * INCH_EQ, 2 * INCH_EQ, 10]} />
+        {brassMaterial()}
+      </mesh>
+      {/* Energy marker: gas heaters get a flue collar on top; electric
+          heaters get a round element-access cover on the side. */}
+      {energy === 'gas' ? (
+        <mesh position={[0, height + 3 * INCH_EQ, 0]}>
+          <cylinderGeometry args={[2 * INCH_EQ, 2 * INCH_EQ, 2 * INCH_EQ, 16]} />
+          <meshStandardMaterial color="#6a7380" metalness={0.7} roughness={0.4} />
+        </mesh>
+      ) : (
+        <mesh position={[0, height * 0.45, radius * 0.98]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[2 * INCH_EQ, 2 * INCH_EQ, 0.3 * INCH_EQ, 16]} />
+          <meshStandardMaterial color="#7a848f" metalness={0.6} roughness={0.4} />
+        </mesh>
+      )}
+    </group>
+  );
+}
+
+/**
+ * Tankless water heater — wall-mounted slim rectangle. Faceplate
+ * visible from the front with a small control grille.
+ */
+function TanklessWaterHeaterModel({ position }: EquipModelProps) {
+  const width = 18 * INCH_EQ;
+  const height = 26 * INCH_EQ;
+  const depth = 10 * INCH_EQ;
+  return (
+    <group position={position}>
+      <mesh position={[0, height / 2, 0]} castShadow>
+        <boxGeometry args={[width, height, depth]} />
+        <meshStandardMaterial color="#c3c9d1" metalness={0.5} roughness={0.35} />
+      </mesh>
+      {/* Faceplate detail */}
+      <mesh position={[0, height / 2, depth / 2 + 0.005]}>
+        <planeGeometry args={[width * 0.85, height * 0.75]} />
+        <meshStandardMaterial color="#8b99a9" metalness={0.4} roughness={0.4} />
+      </mesh>
+      {/* Vent grille */}
+      <mesh position={[0, height * 0.85, depth / 2 + 0.01]}>
+        <planeGeometry args={[width * 0.4, height * 0.05]} />
+        <meshStandardMaterial color="#3a4250" metalness={0.2} roughness={0.7} />
+      </mesh>
+      {/* Bottom connection stubs */}
+      <mesh position={[-width * 0.25, 2 * INCH_EQ, 0]}>
+        <cylinderGeometry args={[0.6 * INCH_EQ, 0.6 * INCH_EQ, 3 * INCH_EQ, 10]} />
+        {brassMaterial()}
+      </mesh>
+      <mesh position={[width * 0.25, 2 * INCH_EQ, 0]}>
+        <cylinderGeometry args={[0.6 * INCH_EQ, 0.6 * INCH_EQ, 3 * INCH_EQ, 10]} />
+        {brassMaterial()}
+      </mesh>
+      {/* Gas stub (center-bottom) — yellow tag to distinguish */}
+      <mesh position={[0, 2 * INCH_EQ, 0]}>
+        <cylinderGeometry args={[0.5 * INCH_EQ, 0.5 * INCH_EQ, 3 * INCH_EQ, 10]} />
+        <meshStandardMaterial color="#d8b747" metalness={0.5} roughness={0.4} />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Bidet — porcelain elongated bowl + rim with rear faucet stem.
+ */
+function BidetModel({ position }: EquipModelProps) {
+  const W = 24 * INCH_EQ;
+  const D = 14 * INCH_EQ;
+  const H = 15 * INCH_EQ;
+  return (
+    <group position={position}>
+      {/* Base pedestal */}
+      <mesh position={[0, H * 0.3, 0]} castShadow>
+        <boxGeometry args={[W * 0.8, H * 0.6, D * 0.6]} />
+        <meshStandardMaterial color={FIXTURE_COLOR} metalness={0.05} roughness={0.35} />
+      </mesh>
+      {/* Oval bowl (flattened sphere) */}
+      <mesh position={[0, H * 0.85, 0]}>
+        <sphereGeometry args={[Math.min(W, D) * 0.45, 20, 12]} />
+        <meshStandardMaterial color={FIXTURE_COLOR} metalness={0.05} roughness={0.3} />
+      </mesh>
+      {/* Bowl cavity (dark inset) */}
+      <mesh position={[0, H * 0.95, 0]}>
+        <cylinderGeometry args={[W * 0.32, W * 0.22, 2 * INCH_EQ, 20, 1, true]} />
+        <meshStandardMaterial color="#3b4250" metalness={0.2} roughness={0.6} side={THREE.DoubleSide} />
+      </mesh>
+      {/* Rear faucet stem */}
+      <mesh position={[0, H + 1 * INCH_EQ, -D * 0.3]}>
+        <cylinderGeometry args={[0.6 * INCH_EQ, 0.6 * INCH_EQ, 4 * INCH_EQ, 10]} />
+        {brassMaterial()}
+      </mesh>
+      {/* Spout */}
+      <mesh position={[0, H + 3 * INCH_EQ, -D * 0.25]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.5 * INCH_EQ, 0.5 * INCH_EQ, 2 * INCH_EQ, 10]} />
+        {brassMaterial()}
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Laundry tub — single-compartment rectangular basin with basic
+ * faucet. Dark-plastic aesthetic common for fiberglass tubs.
+ */
+function LaundryTubModel({ position }: EquipModelProps) {
+  const W = 24 * INCH_EQ;
+  const D = 20 * INCH_EQ;
+  const H = 34 * INCH_EQ;
+  return (
+    <group position={position}>
+      {/* Outer body */}
+      <mesh position={[0, H / 2, 0]} castShadow>
+        <boxGeometry args={[W, H, D]} />
+        <meshStandardMaterial color="#485769" metalness={0.1} roughness={0.55} />
+      </mesh>
+      {/* Basin inset (dark) */}
+      <mesh position={[0, H - 2 * INCH_EQ, 0]}>
+        <boxGeometry args={[W * 0.88, 0.3 * INCH_EQ, D * 0.85]} />
+        <meshStandardMaterial color="#2b3545" metalness={0.3} roughness={0.5} />
+      </mesh>
+      {/* Rim */}
+      <mesh position={[0, H, 0]}>
+        <boxGeometry args={[W, 1 * INCH_EQ, D]} />
+        <meshStandardMaterial color="#5c6d82" metalness={0.2} roughness={0.45} />
+      </mesh>
+      {/* Back-wall faucet */}
+      <mesh position={[0, H + 3 * INCH_EQ, -D * 0.4]}>
+        <boxGeometry args={[4 * INCH_EQ, 1.5 * INCH_EQ, 2 * INCH_EQ]} />
+        {brassMaterial()}
+      </mesh>
+      {/* Spout */}
+      <mesh position={[0, H + 3 * INCH_EQ, -D * 0.15]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.5 * INCH_EQ, 0.5 * INCH_EQ, 5 * INCH_EQ, 10]} />
+        {brassMaterial()}
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Utility / slop sink — larger commercial version of laundry tub
+ * with heavier rim + hose-bib supply instead of a consumer faucet.
+ */
+function UtilitySinkModel({ position }: EquipModelProps) {
+  const W = 36 * INCH_EQ;
+  const D = 24 * INCH_EQ;
+  const H = 36 * INCH_EQ;
+  return (
+    <group position={position}>
+      <mesh position={[0, H / 2, 0]} castShadow>
+        <boxGeometry args={[W, H, D]} />
+        <meshStandardMaterial color="#6a7a8c" metalness={0.1} roughness={0.5} />
+      </mesh>
+      {/* Deep basin inset */}
+      <mesh position={[0, H - 4 * INCH_EQ, 0]}>
+        <boxGeometry args={[W * 0.92, 0.4 * INCH_EQ, D * 0.9]} />
+        <meshStandardMaterial color="#283140" metalness={0.2} roughness={0.55} />
+      </mesh>
+      {/* Rim */}
+      <mesh position={[0, H, 0]}>
+        <boxGeometry args={[W + 2 * INCH_EQ, 2 * INCH_EQ, D + 2 * INCH_EQ]} />
+        <meshStandardMaterial color="#7a8898" metalness={0.3} roughness={0.4} />
+      </mesh>
+      {/* Wall-mount hose-bib supply */}
+      <mesh position={[-W * 0.35, H + 5 * INCH_EQ, -D * 0.45]}>
+        <boxGeometry args={[3 * INCH_EQ, 4 * INCH_EQ, 2 * INCH_EQ]} />
+        {brassMaterial()}
+      </mesh>
+      {/* Threaded spout */}
+      <mesh position={[-W * 0.35, H + 5 * INCH_EQ, -D * 0.25]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.6 * INCH_EQ, 0.6 * INCH_EQ, 4 * INCH_EQ, 10]} />
+        {brassMaterial()}
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Expansion tank — small horizontal cylindrical pressure vessel
+ * painted the distinctive blue used by Amtrol / Watts PLT-5.
+ */
+function ExpansionTankModel({ position }: EquipModelProps) {
+  const diameter = 8 * INCH_EQ;
+  const height = 11 * INCH_EQ;
+  const radius = diameter / 2;
+  return (
+    <group position={position}>
+      {/* Body */}
+      <mesh position={[0, height / 2, 0]} castShadow>
+        <cylinderGeometry args={[radius, radius, height, 20]} />
+        <meshStandardMaterial color="#2a6fd6" metalness={0.3} roughness={0.4} />
+      </mesh>
+      {/* Top dome */}
+      <mesh position={[0, height + radius * 0.3, 0]}>
+        <sphereGeometry args={[radius, 20, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial color="#1f58a8" metalness={0.35} roughness={0.4} />
+      </mesh>
+      {/* Inline threaded connection */}
+      <mesh position={[0, radius * 0.15, 0]}>
+        <cylinderGeometry args={[0.6 * INCH_EQ, 0.6 * INCH_EQ, 1.5 * INCH_EQ, 10]} />
+        {brassMaterial()}
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Backflow preventer — horizontal brass body with relief port
+ * pointing down. Representative of a Watts 009 RPZ.
+ */
+function BackflowPreventerModel({ position }: EquipModelProps) {
+  const length = 12 * INCH_EQ;
+  const height = 6 * INCH_EQ;
+  return (
+    <group position={position}>
+      {/* Body */}
+      <mesh position={[0, height / 2, 0]} castShadow>
+        <boxGeometry args={[length, height, 4 * INCH_EQ]} />
+        {brassMaterial()}
+      </mesh>
+      {/* Test cocks (two small stubs on top) */}
+      <mesh position={[-length * 0.2, height + 1 * INCH_EQ, 0]}>
+        <cylinderGeometry args={[0.4 * INCH_EQ, 0.4 * INCH_EQ, 2 * INCH_EQ, 8]} />
+        {brassMaterial()}
+      </mesh>
+      <mesh position={[length * 0.2, height + 1 * INCH_EQ, 0]}>
+        <cylinderGeometry args={[0.4 * INCH_EQ, 0.4 * INCH_EQ, 2 * INCH_EQ, 8]} />
+        {brassMaterial()}
+      </mesh>
+      {/* Relief port aimed down */}
+      <mesh position={[0, 0, 0]}>
+        <cylinderGeometry args={[0.8 * INCH_EQ, 0.8 * INCH_EQ, 2 * INCH_EQ, 12]} />
+        <meshStandardMaterial color="#d8b747" metalness={0.4} roughness={0.5} />
+      </mesh>
+      {/* Inlet flange */}
+      <mesh position={[-length / 2, height / 2, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[height * 0.55, height * 0.55, 1 * INCH_EQ, 14]} />
+        {brassMaterial()}
+      </mesh>
+      {/* Outlet flange */}
+      <mesh position={[length / 2, height / 2, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[height * 0.55, height * 0.55, 1 * INCH_EQ, 14]} />
+        {brassMaterial()}
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Pressure-reducing valve — smaller inline brass valve body with
+ * a hex adjusting cap on top.
+ */
+function PressureReducingValveModel({ position }: EquipModelProps) {
+  const length = 6 * INCH_EQ;
+  const height = 4 * INCH_EQ;
+  return (
+    <group position={position}>
+      <mesh position={[0, height / 2, 0]} castShadow>
+        <boxGeometry args={[length, height, 3 * INCH_EQ]} />
+        {brassMaterial()}
+      </mesh>
+      {/* Adjusting bell on top */}
+      <mesh position={[0, height + 1.5 * INCH_EQ, 0]}>
+        <cylinderGeometry args={[1.5 * INCH_EQ, 1.8 * INCH_EQ, 3 * INCH_EQ, 16]} />
+        {steelMaterial('#c8cfd8')}
+      </mesh>
+      {/* Inlet nipple */}
+      <mesh position={[-length / 2 - 0.5 * INCH_EQ, height / 2, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.75 * INCH_EQ, 0.75 * INCH_EQ, 1 * INCH_EQ, 10]} />
+        {brassMaterial()}
+      </mesh>
+      {/* Outlet nipple */}
+      <mesh position={[length / 2 + 0.5 * INCH_EQ, height / 2, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.75 * INCH_EQ, 0.75 * INCH_EQ, 1 * INCH_EQ, 10]} />
+        {brassMaterial()}
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Cleanout access — inline DWV coupling with a square-head plug
+ * visible on one side.
+ */
+function CleanoutAccessModel({ position }: EquipModelProps) {
+  const length = 6 * INCH_EQ;
+  const diameter = 4 * INCH_EQ;
+  const radius = diameter / 2;
+  return (
+    <group position={position}>
+      {/* Body (the pipe section) */}
+      <mesh position={[0, radius, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[radius, radius, length, 20]} />
+        <meshStandardMaterial color="#ffa726" metalness={0.15} roughness={0.55} />
+      </mesh>
+      {/* Plug on the short (-Z) side */}
+      <mesh position={[0, radius, -radius * 0.8]}>
+        <cylinderGeometry args={[radius * 0.7, radius * 0.7, 1 * INCH_EQ, 14]} />
+        <meshStandardMaterial color="#4a3120" metalness={0.2} roughness={0.6} />
+      </mesh>
+      {/* Plug hex head */}
+      <mesh position={[0, radius, -radius * 1.1]}>
+        <cylinderGeometry args={[radius * 0.45, radius * 0.45, 0.5 * INCH_EQ, 6]} />
+        <meshStandardMaterial color="#2a1f14" metalness={0.3} roughness={0.5} />
+      </mesh>
+    </group>
+  );
+}
+
 // ── Generic fallback ────────────────────────────────────────────
 
 function GenericFixtureModel({ position }: { position: [number, number, number]; params?: Record<string, unknown> }) {
@@ -1301,6 +1780,16 @@ const MODEL_MAP: Partial<Record<FixtureSubtype, ModelFC>> = {
   dishwasher:        DishwasherModel,
   clothes_washer:    ClothesWasherModel,
   mop_sink:          KitchenSinkModel,  // kitchen-sink geometry works OK for mop sinks
+  // Phase 14.Y.2 — equipment + specialty models
+  water_heater:            WaterHeaterModel,
+  tankless_water_heater:   TanklessWaterHeaterModel,
+  bidet:                   BidetModel,
+  laundry_tub:             LaundryTubModel,
+  utility_sink:            UtilitySinkModel,
+  expansion_tank:          ExpansionTankModel,
+  backflow_preventer:      BackflowPreventerModel,
+  pressure_reducing_valve: PressureReducingValveModel,
+  cleanout_access:         CleanoutAccessModel,
 };
 
 // ── Public fixture component ────────────────────────────────────
@@ -1424,9 +1913,32 @@ interface FixtureWithSelectionProps {
   selectFixture: (id: string) => void;
 }
 
-function FixtureWithSelection({
+/**
+ * Phase 14.AD.3 — wrapped in React.memo. Default shallow compare is
+ * correct because every prop is already ref-stable under Zustand's
+ * immutable-update convention:
+ *
+ *   fixture        — object ref unchanged when the fixture itself
+ *                    wasn't mutated. Other fixtures moving or new
+ *                    ones being placed produces a new `fixtureMap`
+ *                    ref at the parent but leaves this fixture's
+ *                    object identity untouched.
+ *   selectFixture  — stable Zustand action ref.
+ *   dim / opacity / interactive / selected / phaseColor — primitives
+ *                    (or string-equal for phaseColor).
+ *
+ * Effect: a 50-fixture scene where one fixture moves re-renders
+ * exactly ONE FixtureWithSelection subtree, not fifty.
+ */
+// Exported for regression tests that assert the memo wrapper stays
+// in place; not intended for external rendering use.
+export const FixtureWithSelection = memo(function FixtureWithSelection({
   fixture, dim, ghostOpacity, interactive, selected, phaseColor, selectFixture,
 }: FixtureWithSelectionProps) {
+  // Phase 14.I — multi-select highlight. Per-fixture subscription so
+  // only fixtures whose membership flips re-render.
+  const inMultiSelect = useMultiSelectStore((s) => s.fixtureIds[fixture.id] === true);
+  const isHighlighted = selected || inMultiSelect;
   const rotDeg = (fixture.params.rotationDeg as number | undefined) ?? 0;
   // Stable rotation tuple — avoids R3F resetting rotation every render.
   const rotation = useMemo<[number, number, number]>(
@@ -1434,47 +1946,89 @@ function FixtureWithSelection({
     [rotDeg],
   );
   // Stable click handler — recomputed only when id changes.
+  // Phase 14.I / 14.M — modifier-aware selection:
+  //   bare click          → single-select (clear multi)
+  //   Shift+click         → toggle in multi-select
+  //   Alt+click           → remove from multi-select
+  //   Ctrl+Shift+click    → "select similar" — add every fixture of
+  //                         the same subtype to multi-select
   const handleClick = useCallback(
     (e: ThreeEvent<MouseEvent>) => {
       if (!interactive) return;
       e.stopPropagation();
+      const ne = e.nativeEvent;
+      const multi = useMultiSelectStore.getState();
+      if (ne.altKey) {
+        multi.removeFixture(fixture.id);
+        return;
+      }
+      if (ne.ctrlKey && ne.shiftKey) {
+        const all = Object.values(useFixtureStore.getState().fixtures)
+          .filter((f) => f.subtype === fixture.subtype)
+          .map((f) => f.id);
+        multi.addMany([], all);
+        return;
+      }
+      if (ne.shiftKey) {
+        multi.toggleFixture(fixture.id);
+        return;
+      }
+      multi.clear();
       selectFixture(fixture.id);
     },
-    [interactive, selectFixture, fixture.id],
+    [interactive, selectFixture, fixture.id, fixture.subtype],
   );
 
   return (
-    <group position={fixture.position} rotation={rotation}>
-      {/* Fixture geometry (re-centered at group origin) */}
-      <FixtureModel position={[0, 0, 0]} subtype={fixture.subtype} showGlow={!dim} params={fixture.params} />
+    <>
+      <group position={fixture.position} rotation={rotation}>
+        {/* Fixture geometry (re-centered at group origin) */}
+        <FixtureModel position={[0, 0, 0]} subtype={fixture.subtype} showGlow={!dim} params={fixture.params} />
 
-      {/* Click hitbox — invisible BOX sized to the real fixture footprint.
-          Previously a small sphere at y=0.4 couldn't hit a toilet's tank
-          or a tub's far end. A box covering the full footprint lets you
-          click ANYWHERE on the fixture to open its settings. */}
-      <FixtureHitbox fixture={fixture} onClick={handleClick} />
+        {/* Click hitbox — invisible BOX sized to the real fixture footprint.
+            Previously a small sphere at y=0.4 couldn't hit a toilet's tank
+            or a tub's far end. A box covering the full footprint lets you
+            click ANYWHERE on the fixture to open its settings. */}
+        <FixtureHitbox fixture={fixture} onClick={handleClick} />
 
-      {/* Ghost overlay when off-floor */}
-      {dim && (
-        <mesh position={[0, 0.5, 0]} raycast={() => null}>
-          <sphereGeometry args={[0.8, 12, 12]} />
-          <meshBasicMaterial
-            color="#1a1f26"
-            transparent
-            opacity={1 - ghostOpacity * 0.9}
-            depthWrite={false}
-          />
-        </mesh>
+        {/* Ghost overlay when off-floor. Capped at 0.45 opacity so the
+            fixture stays identifiable even when the floor is heavily
+            ghosted — previously this could reach 0.955, rendering
+            fixtures as near-black blobs that users read as "broken." */}
+        {dim && (
+          <mesh position={[0, 0.5, 0]} raycast={() => null}>
+            <sphereGeometry args={[0.8, 12, 12]} />
+            <meshBasicMaterial
+              color="#2c3342"
+              transparent
+              opacity={Math.min(0.45, 1 - ghostOpacity * 0.9)}
+              depthWrite={false}
+            />
+          </mesh>
+        )}
+
+        {/* Phase-colored halo (under selection halo) */}
+        {phaseColor && !dim && <PhaseHalo color={phaseColor} />}
+
+        {/* Selection halo — Phase 14.I: shows for single-select OR
+            multi-select membership. */}
+        {isHighlighted && <SelectionHalo />}
+      </group>
+
+      {/* Phase 14.F — in-scene rotation gizmo. Only the SINGLE-selected
+          fixture gets the gizmo; multi-selected fixtures show only the
+          halo, because group-rotate around a centroid is a v2 feature
+          and showing a gizmo per fixture in a group would be noisy. */}
+      {selected && !dim && (
+        <FixtureRotationGizmo
+          fixtureId={fixture.id}
+          position={fixture.position}
+          currentRotationDeg={rotDeg}
+        />
       )}
-
-      {/* Phase-colored halo (under selection halo) */}
-      {phaseColor && !dim && <PhaseHalo color={phaseColor} />}
-
-      {/* Selection halo */}
-      {selected && <SelectionHalo />}
-    </group>
+    </>
   );
-}
+});
 
 /**
  * FixtureHitbox — invisible click-target sized to the fixture's real
@@ -1495,6 +2049,13 @@ function FixtureHitbox({
 }) {
   const mode = useInteractionStore((s) => s.mode);
   const drawActive = mode === 'draw';
+  // Phase 14-bug-fix: when a fixture is pending placement, every
+  // existing fixture's hitbox becomes click-transparent so the drop
+  // click (handled by FixturePlacementPreview's catcher plane) is not
+  // swallowed. Previously, clicking near an existing fixture while
+  // trying to drop a new one would hit this hitbox first; its
+  // stopImmediatePropagation then killed the drop.
+  const placementActive = useCustomerStore((s) => s.pendingFixture !== null);
 
   // Use the connection-point geometry helper to get the real footprint.
   // Import is local so PhaseHalo stays at the top of the ordering.
@@ -1504,7 +2065,9 @@ function FixtureHitbox({
   );
   const { width, depth, height } = geom.footprint;
 
-  const handlePointerDown = drawActive ? undefined : (e: ThreeEvent<MouseEvent>) => {
+  const clickInert = drawActive || placementActive;
+
+  const handlePointerDown = clickInert ? undefined : (e: ThreeEvent<MouseEvent>) => {
     // Belt-and-suspenders: R3F stopPropagation halts the R3F chain, and
     // stopImmediatePropagation on the native event prevents the canvas-
     // level click listener in DrawInteraction from also firing if a user
@@ -1517,9 +2080,11 @@ function FixtureHitbox({
     <mesh
       position={[0, height / 2, 0]}
       onPointerDown={handlePointerDown}
-      // Skip raycast entirely in Draw mode — the whole fixture becomes
-      // click-transparent so pipes can be drawn right through it.
-      raycast={drawActive ? () => null : undefined}
+      // Skip raycast entirely in Draw mode AND during fixture-
+      // placement — the whole fixture becomes click-transparent so
+      // pipes can be drawn right through it, and so a pending-drop
+      // click reaches the placement catcher cleanly.
+      raycast={clickInert ? () => null : undefined}
     >
       <boxGeometry args={[width, height, depth]} />
       <meshBasicMaterial transparent opacity={0} depthWrite={false} />
@@ -1539,8 +2104,16 @@ function PhaseHalo({ color }: { color: string }) {
 
 function SelectionHalo() {
   const meshRef = useRef<THREE.Mesh>(null!);
+  const reducedMotion = useReducedMotion();
   useFrame(({ clock }) => {
     if (!meshRef.current) return;
+    if (reducedMotion) {
+      // Static yellow ring — selection is still obvious from the
+      // color and position, just no per-frame pulse.
+      meshRef.current.scale.setScalar(1);
+      (meshRef.current.material as THREE.MeshBasicMaterial).opacity = 0.7;
+      return;
+    }
     const t = clock.elapsedTime;
     const s = 1 + 0.08 * Math.sin(t * 4);
     meshRef.current.scale.setScalar(s);

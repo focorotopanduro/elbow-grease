@@ -113,7 +113,7 @@ export function LayerPanel() {
   // Count pipes per system
   const pipeCounts = useMemo(() => {
     const counts: Record<SystemType, number> = {
-      waste: 0, vent: 0, cold_supply: 0, hot_supply: 0, storm: 0,
+      waste: 0, vent: 0, cold_supply: 0, hot_supply: 0, storm: 0, condensate: 0,
     };
     for (const pipe of Object.values(pipes)) {
       counts[pipe.system]++;

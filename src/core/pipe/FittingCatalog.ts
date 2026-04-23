@@ -348,36 +348,93 @@ export function requiresBendFittings(material: PipeMaterial): boolean {
 /**
  * Default tee type for branch-joining two pipes of this material.
  *
- * Real field-practice rules:
+ * Phase 14.AD.22 — ORIENTATION-AWARE DWV classifier.
  *
- *   PVC DWV           — only two tees are ever stocked: **sanitary tees**
- *                       (perpendicular branch, the "san-tee") and
- *                       **combos** (combination wye + 1/8 bend, the
- *                       workhorse for long-sweep horizontal branching).
- *                       A plain tee and a plain wye exist on paper but
- *                       nobody puts them in a truck.
+ * Real field-practice rules (per PVC catalog + UPC 706.3 + user
+ * specification 2026-04-20):
  *
- *   Cast Iron DWV     — same as PVC: santee or combo only.
+ *   PVC / Cast Iron DWV:
+ *     • Horizontal main with a VERTICAL branch (up-vent, or a
+ *       horizontal drain line tapping into a vertical stack) →
+ *       **sanitary tee** (san-tee). The san-tee's perpendicular
+ *       branch inlet is designed exactly for this case.
+ *     • Vertical main with a HORIZONTAL branch (stack drop
+ *       transitioning to a lateral drain) → **combo wye + 1/8
+ *       bend** (combo). The combo's built-in 45° sweep lets the
+ *       flow turn gracefully without a hydraulic jump.
+ *     • Horizontal main with a HORIZONTAL branch (both pipes laid
+ *       flat on the floor — DWV branch lateral) → **combo** too.
+ *       Plumbers install these with the middle inlet against the
+ *       floor so the branch's 45° sweep carries flow back into
+ *       canonical drainage direction.
+ *     • 45° branch ON A HORIZONTAL PLANE with no vertical
+ *       component either side → plain **wye** (rarer; the simpler
+ *       Y-fitting without the 1/8 bend).
  *
- *   Supply (PEX,      — a plain **tee** covers every case. PEX in
- *   copper, CPVC,       particular uses the Uponor ProPEX tee as the
- *   galvanized)         standard branch fitting.
+ *   Supply (PEX, copper, CPVC, galvanized):
+ *     • Any branch → plain **tee**. Supply systems don't care
+ *       about flow-sweep the way drainage does.
  *
- * Rule: perpendicular branch (~90°) → sanitary tee. Any other angle
- * on DWV → combo (the combo's 1/8 bend naturally brings the branch
- * back into horizontal alignment regardless of original branch angle).
+ * If orientation vectors are NOT provided the function falls back
+ * to angle-only classification (used by legacy tests + call sites
+ * that don't plumb direction through). Angle-only rules:
+ *   • ~90° → sanitary_tee (assumes horizontal-to-vertical)
+ *   • ~45° → wye
+ *   • other → combo_wye_eighth
+ *
+ * Y is the world vertical axis (THREE.js convention).
  */
+export interface TeeClassifyOpts {
+  /** Unit vector along the main run (the through pipe's direction). */
+  mainDir?: readonly [number, number, number];
+  /** Unit vector along the branch (the tapping pipe's direction, outward). */
+  branchDir?: readonly [number, number, number];
+}
+
 export function defaultTeeFor(
   material: PipeMaterial,
   branchAngleDeg: number,
   isDWV: boolean,
+  opts: TeeClassifyOpts = {},
 ): FittingType {
   if (FLEXIBLE.includes(material)) return 'tee';
-  if (isDWV) {
-    // PVC / ABS / cast iron: exactly two choices in the field.
-    if (Math.abs(branchAngleDeg - 90) <= 20) return 'sanitary_tee';
-    return 'combo_wye_eighth';
+  if (!isDWV) {
+    // Supply-side rigid (copper, CPVC, galv): plain tee.
+    return 'tee';
   }
-  // Supply-side rigid (copper, CPVC, galv): plain tee.
-  return 'tee';
+
+  const { mainDir, branchDir } = opts;
+  if (mainDir && branchDir) {
+    // Y-axis dominance determines "vertical" vs "horizontal" run.
+    // 0.7 cutoff ≈ 45° off-vertical; anything with a stronger Y
+    // component than that is treated as a riser/stack.
+    const VERT_CUTOFF = 0.7;
+    const mainVertical = Math.abs(mainDir[1]) >= VERT_CUTOFF;
+    const mainHorizontal = Math.abs(mainDir[1]) <= 1 - VERT_CUTOFF; // y ≤ 0.3
+    const branchVertical = Math.abs(branchDir[1]) >= VERT_CUTOFF;
+    const branchHorizontal = Math.abs(branchDir[1]) <= 1 - VERT_CUTOFF;
+
+    // Rule 1: horizontal main + vertical branch → san-tee.
+    if (mainHorizontal && branchVertical) return 'sanitary_tee';
+    // Rule 2: vertical main + horizontal branch → combo.
+    if (mainVertical && branchHorizontal) return 'combo_wye_eighth';
+    // Rule 3: both horizontal (laid flat DWV lateral) → combo.
+    if (mainHorizontal && branchHorizontal) {
+      // Strictly-45° horizontal branch with no vertical component
+      // is a plain wye; otherwise combo handles the sweep.
+      if (Math.abs(branchAngleDeg - 45) <= 10) return 'wye';
+      return 'combo_wye_eighth';
+    }
+    // Rule 4: both vertical (stack continuation + cleanout tee or
+    // a parallel vent stack) → san-tee with the branch pointing
+    // sideways. This is the upper-floor vent case.
+    if (mainVertical && branchVertical) return 'sanitary_tee';
+    // Mixed / in-between angles (e.g. a 45°-up branch off a
+    // horizontal main) — fall through to angle heuristic.
+  }
+
+  // Angle-only fallback (no directions provided).
+  if (Math.abs(branchAngleDeg - 90) <= 20) return 'sanitary_tee';
+  if (Math.abs(branchAngleDeg - 45) <= 15) return 'wye';
+  return 'combo_wye_eighth';
 }

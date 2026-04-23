@@ -22,9 +22,32 @@ import type { PipeMaterial } from '../../engine/graph/GraphEdge';
  * the joint overlap that gets soldered. For PVC it's the socket cement
  * contact length. For PEX it's the fitting insert length.
  */
-const PVC_SOCKET_DEPTH: Record<number, number> = {
-  0.5:  0.875, 0.75: 1.125, 1: 1.375, 1.25: 1.625, 1.5: 1.875,
-  2:    2.375, 2.5:  2.875, 3: 3.625, 4: 4.625,    6: 6.625,
+// PVC DWV fitting socket depths, ASTM D-2665.
+// Values taken from the Charlotte Plastics / Spears / JM Eagle catalogs
+// (they're standardized within 1/32" across the major manufacturers).
+// Phase 14.AD.6 audit finding: the prior values were ~50% too deep —
+// they equaled each diameter's OUTSIDE DIAMETER (2" nominal Sch40 =
+// 2.375" OD), suggesting the original author pasted OD values by
+// mistake. Real DWV socket depth is ~0.7× pipe OD.
+const PVC_SOCKET_DEPTH_DWV: Record<number, number> = {
+  0.5:  0.562, 0.75: 0.688, 1: 0.875, 1.25: 1.000, 1.5: 1.250,
+  2:    1.625, 2.5:  1.875, 3: 2.250, 4: 3.000,    6: 4.000,
+};
+
+// Sch 40 / Sch 80 PRESSURE fitting socket depths, ASTM D-1785.
+// Pressure fittings seat pipes slightly deeper than DWV because they
+// carry line pressure and need more cement contact area.
+const PVC_SOCKET_DEPTH_SCH40: Record<number, number> = {
+  0.5:  0.688, 0.75: 0.750, 1: 0.875, 1.25: 1.000, 1.5: 1.125,
+  2:    1.500, 2.5:  1.750, 3: 2.250, 4: 3.000,    6: 3.500,
+};
+
+const PVC_SOCKET_DEPTH_SCH80: Record<number, number> = {
+  // Sch 80 fittings have the same socket depths as Sch 40 in the
+  // Spears pressure catalog — both use the same hub dimensions.
+  // Difference is wall thickness, not socket depth.
+  0.5:  0.688, 0.75: 0.750, 1: 0.875, 1.25: 1.000, 1.5: 1.125,
+  2:    1.500, 2.5:  1.750, 3: 2.250, 4: 3.000,    6: 3.500,
 };
 
 const COPPER_SOLDER_DEPTH: Record<number, number> = {
@@ -39,14 +62,52 @@ const CAST_HUB_DEPTH: Record<number, number> = {
   1.5: 2.5, 2: 2.5, 3: 3.0, 4: 3.5, 6: 4.5,
 };
 
+/**
+ * Phase 14.AD.15 — NPT (National Pipe Taper) effective thread
+ * engagement length per ASME B1.20.1. Values represent L2, the
+ * length of effective threads that must engage for a pressure-
+ * tight seal on tapered pipe threads. Hand-tight plus wrench-tight
+ * engagement in practice is L2 + 2-3 additional turns, but L2 is
+ * the canonical "socket depth equivalent" for a threaded joint.
+ *
+ * The pre-AD.15 fallback was `nominalIn * 0.9` — a flat multiplier
+ * that's close at 1" (0.9 vs real 0.683") but diverges for larger
+ * sizes (at 4" the old multiplier gave 3.6 vs real 1.3"). The
+ * discrepancy made galvanized steel fittings visually stretched
+ * along the pipe axis.
+ */
+const GALV_NPT_ENGAGEMENT: Record<number, number> = {
+  // Residential small-diameter supply + gas
+  0.125:  0.2611,  // 1/8"
+  0.25:   0.4018,  // 1/4"
+  0.375:  0.4078,  // 3/8"
+  0.5:    0.5337,  // 1/2"
+  0.75:   0.5457,  // 3/4"
+  1:      0.6828,
+  1.25:   0.7068,
+  1.5:    0.7235,
+  2:      0.7565,
+  // Larger-diameter commercial / industrial
+  2.5:    1.1375,
+  3:      1.2000,
+  4:      1.3000,
+  5:      1.4063,
+  6:      1.5125,
+};
+
 /** Socket (hub) depth in INCHES for a given material + nominal size. */
 export function getSocketDepthIn(material: PipeMaterial, nominalIn: number): number {
   switch (material) {
     case 'pvc_sch40':
+      return PVC_SOCKET_DEPTH_SCH40[nominalIn] ?? nominalIn * 0.75;
     case 'pvc_sch80':
+      return PVC_SOCKET_DEPTH_SCH80[nominalIn] ?? nominalIn * 0.75;
     case 'abs':
+      // ABS DWV fittings use DWV socket depths (same as PVC DWV).
+      return PVC_SOCKET_DEPTH_DWV[nominalIn] ?? nominalIn * 0.75;
     case 'cpvc':
-      return PVC_SOCKET_DEPTH[nominalIn] ?? nominalIn * 1.1;
+      // CPVC pressure fittings use depths close to Sch 40 PVC.
+      return PVC_SOCKET_DEPTH_SCH40[nominalIn] ?? nominalIn * 0.75;
     case 'copper_type_l':
     case 'copper_type_m':
       return COPPER_SOLDER_DEPTH[nominalIn] ?? nominalIn;
@@ -56,7 +117,11 @@ export function getSocketDepthIn(material: PipeMaterial, nominalIn: number): num
     case 'ductile_iron':
       return CAST_HUB_DEPTH[nominalIn] ?? nominalIn * 1.2;
     case 'galvanized_steel':
-      return nominalIn * 0.9; // threaded engagement
+      // Phase 14.AD.15 — NPT L2 engagement length per ASME B1.20.1.
+      // Was: flat `nominalIn * 0.9` multiplier, which was close at
+      // 1" but diverged sharply at 3"+ (4" old gave 3.6" vs real
+      // 1.3"). Fallback to the old multiplier for out-of-table sizes.
+      return GALV_NPT_ENGAGEMENT[nominalIn] ?? nominalIn * 0.9;
     default:
       return nominalIn;
   }

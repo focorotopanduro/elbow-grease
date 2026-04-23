@@ -28,10 +28,14 @@ export function RulerCatcher() {
   const setPreviewEnd = useMeasureStore((s) => s.setPreviewEnd);
   const commit = useMeasureStore((s) => s.commitMeasurement);
   const proposeScalePair = useMeasureStore((s) => s.proposeScalePair);
+  // Phase 14.G — level + origin calibrate actions.
+  const applyLevelFromPair = useMeasureStore((s) => s.applyLevelFromPair);
+  const applyOriginShift = useMeasureStore((s) => s.applyOriginShift);
   const activeFloor = useFloorStore((s) => s.floors[s.activeFloorId]);
   const floorY = activeFloor?.elevationBase ?? 0;
 
-  if (mode !== 'ruler' && mode !== 'scale') return null;
+  // Active for any 2-click (ruler/scale/level) or 1-click (origin) tool.
+  if (mode === 'off') return null;
 
   const onMove = (e: ThreeEvent<PointerEvent>) => {
     setPreviewEnd([e.point.x, floorY, e.point.z]);
@@ -41,14 +45,24 @@ export function RulerCatcher() {
     if (e.button !== 0) return;
     e.stopPropagation();
     const pt: Vec3 = [e.point.x, floorY, e.point.z];
+
+    // Origin is a ONE-click tool — apply on first click.
+    if (mode === 'calibrate_origin') {
+      applyOriginShift(pt);
+      return;
+    }
+
+    // Ruler / scale / level are TWO-click tools.
     if (!pendingStart) {
       setPendingStart(pt);
       return;
     }
     if (mode === 'ruler') {
       commit(pendingStart, pt);
-    } else {
+    } else if (mode === 'scale') {
       proposeScalePair(pendingStart, pt);
+    } else if (mode === 'calibrate_level') {
+      applyLevelFromPair(pendingStart, pt);
     }
   };
 

@@ -14,6 +14,9 @@
  */
 
 import { eventBus } from '../EventBus';
+import { logger } from '@core/logger/Logger';
+
+const log = logger('XR');
 
 // ── XR events ───────────────────────────────────────────────────
 
@@ -122,7 +125,8 @@ export class XRSessionManager {
 
       return true;
     } catch (err) {
-      console.warn('XR session request failed, falling back to desktop:', err);
+      // Expected on non-XR devices — info, not a warning.
+      log.info('session request failed, falling back to desktop', err);
       this.capabilities.activeTier = 'desktop';
       eventBus.emit(XR_EV.TIER_CHANGED, 'desktop');
       return false;
