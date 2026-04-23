@@ -71,6 +71,31 @@ and doubles maintenance for a solo-built tool.
   events are grandfathered — rename only when you're already editing
   that file.
 
+#### CONTRIBUTING — adding a new event
+
+When defining a new entry in `src/core/events.ts`, before you commit:
+
+1. **Pick the scope.** Does the payload reference entities from
+   exactly one workspace?
+    - Plumbing only (pipe / fixture / manifold ids, DFU / WSFU
+      numbers, IPC code refs) → prefix `EV.PLUMBING_...`.
+    - Roofing only (section / penetration / vertex ids, FL wind-
+      zone data, shingle specs) → prefix `EV.ROOFING_...`.
+    - Neither / both (file IO, customer, pricing, app mode,
+      selection, backdrop, measurement) → bare `EV.{NOUN}_{VERB}`.
+   When in doubt, re-read §3's store classification — events and
+   stores share the same scope taxonomy.
+2. **Pick the verb form.** Pub/sub events use past tense
+   (`_COMPLETE`, `_PLACED`, `_CHANGED`). If you're expressing
+   intent to mutate, you want a COMMAND, not an event — those
+   live on the CommandBus under `src/core/commands/` and use the
+   imperative form (`plumbing.pipe.add`, `roofing.section.add`).
+3. **Do NOT rename existing events** to fit this pattern.
+   Renaming `EV.PIPE_COMPLETE` → `EV.PLUMBING_PIPE_COMPLETE` would
+   churn every subscriber + every God Mode log line that users
+   might reference when reporting bugs. Rename opportunistically
+   only when you're already editing the file for another reason.
+
 ### Command naming
 
 Same pattern: `plumbing.pipe.add`, `roofing.section.add`. Commands that
