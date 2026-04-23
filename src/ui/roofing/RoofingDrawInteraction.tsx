@@ -26,6 +26,7 @@
  */
 
 import { useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import * as THREE from 'three';
 import { useThree, type ThreeEvent } from '@react-three/fiber';
 import {
@@ -54,13 +55,22 @@ function distance(a: GroundPoint, b: GroundPoint): number {
 
 export function RoofingDrawInteraction() {
   const mode = useRoofingDrawStore((s) => s.mode);
-  const defaults = useRoofingDrawStore((s) => ({
-    roofType: s.defaultRoofType,
-    sectionType: s.defaultSectionType,
-    slope: s.defaultSlope,
-    overhang: s.defaultOverhang,
-    elevation: s.defaultElevation,
-  }));
+  // `useShallow` is MANDATORY for an object-returning selector —
+  // without it, Zustand's default `Object.is` equality sees the
+  // fresh `{...}` literal as "changed" on every store mutation,
+  // which React 18's `useSyncExternalStoreWithSelector` interprets
+  // as a torn snapshot → infinite re-render → React error #185.
+  // `useShallow` compares the returned object's fields pairwise so
+  // same-values returns the cached reference.
+  const defaults = useRoofingDrawStore(
+    useShallow((s) => ({
+      roofType: s.defaultRoofType,
+      sectionType: s.defaultSectionType,
+      slope: s.defaultSlope,
+      overhang: s.defaultOverhang,
+      elevation: s.defaultElevation,
+    })),
+  );
 
   // Cursor feedback — switch to a crosshair while drawing so the
   // user knows clicks will land as vertices.
