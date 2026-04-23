@@ -83,14 +83,31 @@ export function FeedbackOverlay() {
 
   return (
     <div style={styles.root}>
-      {/* State badge — top-left */}
-      <div style={{ ...styles.badge, borderColor: STATE_COLORS[state] }}>
+      {/* State badge — top-left.
+          role="status" + aria-live="polite" so screen readers announce
+          FSM transitions (IDLE → ROUTING → CONFIRMED …) without
+          interrupting the user mid-speech. */}
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        aria-label={`Mode: ${STATE_LABELS[state]}`}
+        style={{ ...styles.badge, borderColor: STATE_COLORS[state] }}
+      >
         <div style={{ ...styles.dot, backgroundColor: STATE_COLORS[state] }} />
         {STATE_LABELS[state]}
       </div>
 
-      {/* Toast stack — bottom-center */}
-      <div style={styles.toastStack}>
+      {/* Toast stack — bottom-center.
+          role="log" + aria-live="polite" so the queue of cues and
+          rewards is announced as it grows. */}
+      <div
+        role="log"
+        aria-live="polite"
+        aria-relevant="additions"
+        aria-label="Feedback messages"
+        style={styles.toastStack}
+      >
         {toasts.map((t) => {
           const age = (Date.now() - t.born) / 2500;
           const opacity = age < 0.1 ? age / 0.1 : age > 0.7 ? (1 - age) / 0.3 : 1;

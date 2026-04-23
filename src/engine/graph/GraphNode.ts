@@ -42,13 +42,13 @@ export type NodeType =
   | 'source'
   | 'drain';
 
-export type SystemType = 'waste' | 'vent' | 'cold_supply' | 'hot_supply' | 'storm';
+export type SystemType = 'waste' | 'vent' | 'cold_supply' | 'hot_supply' | 'storm' | 'condensate';
 
 // ── Fixture subtypes ────────────────────────────────────────────
 
 export type FixtureSubtype =
-  | 'water_closet'     // toilet
-  | 'lavatory'         // bathroom sink
+  | 'water_closet'         // toilet
+  | 'lavatory'             // bathroom sink
   | 'kitchen_sink'
   | 'bathtub'
   | 'shower'
@@ -59,7 +59,17 @@ export type FixtureSubtype =
   | 'hose_bibb'
   | 'urinal'
   | 'mop_sink'
-  | 'drinking_fountain';
+  | 'drinking_fountain'
+  // Phase 14.Y additions — equipment + specialty fixtures.
+  | 'water_heater'         // tank-type gas/electric
+  | 'tankless_water_heater'
+  | 'bidet'
+  | 'laundry_tub'          // vs laundry_standpipe (washer trap stub)
+  | 'utility_sink'         // basement / garage slop-sink
+  | 'expansion_tank'       // closed-system thermal expansion
+  | 'backflow_preventer'   // RPZ / PVB / DCV
+  | 'pressure_reducing_valve'
+  | 'cleanout_access';     // accessible cleanout fitting (distinct from inline)
 
 // ── DFU lookup (IPC Table 709.1 / 710.1) ───────────────────────
 
@@ -77,6 +87,16 @@ export const DFU_TABLE: Record<FixtureSubtype, number> = {
   urinal:            2,
   mop_sink:          3,
   drinking_fountain: 0.5,
+  // Phase 14.Y — equipment + specialty fixtures DFU contributions.
+  water_heater:            0,    // supply appliance, no drainage
+  tankless_water_heater:   0,
+  bidet:                   2,
+  laundry_tub:             2,
+  utility_sink:            2,
+  expansion_tank:          0,    // inline pressure vessel, no drain
+  backflow_preventer:      0,    // inline valve, relief port is not a fixture drain
+  pressure_reducing_valve: 0,
+  cleanout_access:         0,    // DWV access, no flow
 };
 
 // ── Trap arm max distance (IPC Table 906.1) ─────────────────────
@@ -116,6 +136,23 @@ export const SUPPLY_TABLE: Record<FixtureSubtype, SupplyDemand> = {
   urinal:            { coldWSFU: 2.5, hotWSFU: 0,    totalWSFU: 2.5, minBranchSize: 0.375 },
   mop_sink:          { coldWSFU: 0.7, hotWSFU: 0.7,  totalWSFU: 1.4, minBranchSize: 0.5   },
   drinking_fountain: { coldWSFU: 0.25,hotWSFU: 0,    totalWSFU: 0.25,minBranchSize: 0.375 },
+  // Phase 14.Y — equipment + specialty fixtures supply demand.
+  // Water heater: cold inlet feeds the tank. Hot load is whatever
+  // the house demands; WSFU is for sizing the inlet, ≈ 30 for a
+  // typical 40-gal residential gas heater (IPC E103.3 table).
+  water_heater:            { coldWSFU: 3,   hotWSFU: 0,    totalWSFU: 3,   minBranchSize: 0.75 },
+  tankless_water_heater:   { coldWSFU: 8,   hotWSFU: 0,    totalWSFU: 8,   minBranchSize: 0.75 },
+  // Bidet spray + douche: ASME A112.4.3 equivalents — both hot and cold.
+  bidet:             { coldWSFU: 1,   hotWSFU: 1,    totalWSFU: 2,   minBranchSize: 0.5 },
+  // Laundry tub: two-compartment basin, similar to kitchen sink.
+  laundry_tub:       { coldWSFU: 1.4, hotWSFU: 1.4,  totalWSFU: 2,   minBranchSize: 0.5 },
+  // Utility / slop sink: basement washdown, cold + hot.
+  utility_sink:      { coldWSFU: 1.4, hotWSFU: 1.4,  totalWSFU: 2,   minBranchSize: 0.5 },
+  // Inline devices: no supply demand, just a carrier of flow.
+  expansion_tank:          { coldWSFU: 0,   hotWSFU: 0,    totalWSFU: 0,   minBranchSize: 0 },
+  backflow_preventer:      { coldWSFU: 0,   hotWSFU: 0,    totalWSFU: 0,   minBranchSize: 0 },
+  pressure_reducing_valve: { coldWSFU: 0,   hotWSFU: 0,    totalWSFU: 0,   minBranchSize: 0 },
+  cleanout_access:         { coldWSFU: 0,   hotWSFU: 0,    totalWSFU: 0,   minBranchSize: 0 },
 };
 
 // ── Node interface ──────────────────────────────────────────────

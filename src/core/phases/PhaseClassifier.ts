@@ -4,7 +4,7 @@
  *
  * Heuristics (applied in order; first match wins):
  *
- *   1. Explicit override via phaseStore.overrides → use that
+ *   1. Explicit override via plumbingPhaseStore.overrides → use that
  *   2. Fixture subtype:
  *        - floor_drain below Y=0 → underground
  *        - everything else → trim

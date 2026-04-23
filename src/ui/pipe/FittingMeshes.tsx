@@ -15,12 +15,17 @@
 import { useMemo, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { usePipeStore } from '@store/pipeStore';
-import { useLayerStore } from '@store/layerStore';
+import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 import { useFloorParams } from '@store/floorStore';
-import { usePhaseFilter } from '@store/phaseStore';
+import { usePhaseFilter } from '@store/plumbingPhaseStore';
 import { shouldPhaseRender } from '@core/phases/PhaseTypes';
 import { classifyPipe } from '@core/phases/PhaseClassifier';
-import { generateAllFittings, type FittingInstance } from './FittingGenerator';
+import {
+  generateJunctionFittings,
+  type FittingInstance,
+} from './FittingGenerator';
+import { getFittingCache } from '@core/pipe/fittingCache';
+import { mergePexRuns } from '@core/pipe/mergePexRuns';
 import { getPipeMaterial } from './PipeMaterial';
 import { getOuterDiameterFt, getOuterRadiusFt } from '@core/pipe/PipeSizeSpec';
 import {
@@ -262,7 +267,14 @@ function buildMathBend(
   return mergeGeometries([torus, hubA, hubB]);
 }
 
-function getElbow90Geo(material: PipeMaterial, diameter: number): THREE.BufferGeometry {
+// ── Exported geometry accessors ──────────────────────────────
+// Phase 14.Q — LiveFittings (the pre-commit preview) reuses these
+// caches to render fitting ghosts at each junction during drawing.
+// Keeping one canonical geometry per {type, material, diameter}
+// avoids duplicating the swept-torus build and keeps caches warm
+// for when the pipe actually commits.
+
+export function getElbow90Geo(material: PipeMaterial, diameter: number): THREE.BufferGeometry {
   const key = `elbow90-${material}-${diameter}`;
   let geo = geoCache.get(key);
   if (geo) return geo;
@@ -271,7 +283,97 @@ function getElbow90Geo(material: PipeMaterial, diameter: number): THREE.BufferGe
   return geo;
 }
 
-function getElbow45Geo(material: PipeMaterial, diameter: number): THREE.BufferGeometry {
+/**
+ * Phase 14.V — Uponor ProPEX 90° elbow geometry.
+ *
+ * Distinguished from the rigid `bend_90` by:
+ *   • Tighter centerline radius (ProPEX elbows pull the corner
+ *     closer; Uponor spec is ~1.5× OD).
+ *   • Expansion-ring COLLARS at each end — slightly wider band
+ *     encircling the socket, visually echoing the crimped
+ *     stainless/brass ProPEX ring.
+ *
+ * Together those two cues read as "Uponor fitting" at a glance
+ * even before the user clicks to see the fitting label.
+ */
+export function getPexElbow90Geo(material: PipeMaterial, diameter: number): THREE.BufferGeometry {
+  const key = `pexelbow90-${material}-${diameter}`;
+  let geo = geoCache.get(key);
+  if (geo) return geo;
+  geo = buildPexElbow90(material, diameter);
+  geoCache.set(key, geo);
+  return geo;
+}
+
+function buildPexElbow90(
+  material: PipeMaterial,
+  diameter: number,
+): THREE.BufferGeometry {
+  const pipeOdFt = getOuterDiameterFt(material, diameter);
+  const pipeR = pipeOdFt / 2;
+  // Tighter bend radius than rigid — Uponor ProPEX 90° is ~1.5× OD
+  // vs. rigid short-sweep at ~1.3× OD, so still compact but shaped
+  // to accommodate the expansion-ring end geometry.
+  const bendR = pipeOdFt * 1.5;
+  // Collar = wider than the hub, marking the expansion ring. 1.25×
+  // OD gives a clearly-visible ring without dominating the fitting.
+  const collarR = pipeOdFt * 0.625; // 1.25 × radius
+  const hubR = pipeOdFt * 0.55;
+  // Collar thickness along pipe axis
+  const collarLen = pipeOdFt * 0.35;
+  // Socket extending past the collar (hub body)
+  const socketDepth = pipeOdFt * 1.0;
+  const angleRad = Math.PI / 2;
+
+  // Main torus — the bend itself
+  const torus = new THREE.TorusGeometry(
+    bendR,
+    pipeR,
+    TORUS_TUBE_SEGS,
+    arcSegs(angleRad),
+    angleRad,
+  );
+  torus.rotateZ(-angleRad / 2);
+
+  // Helper to place a cylinder along the tangent at a given arc angle
+  const placeAtArc = (ang: number, length: number, radius: number, outward: number): THREE.CylinderGeometry => {
+    const cyl = new THREE.CylinderGeometry(radius, radius, length, CYL_SEGS);
+    const cx = Math.cos(ang) * bendR;
+    const cy = Math.sin(ang) * bendR;
+    const tangent = new THREE.Vector3(-Math.sin(ang), Math.cos(ang), 0);
+    const q = new THREE.Quaternion().setFromUnitVectors(
+      new THREE.Vector3(0, 1, 0),
+      tangent,
+    );
+    const m = new THREE.Matrix4().compose(
+      new THREE.Vector3(
+        cx + tangent.x * outward,
+        cy + tangent.y * outward,
+        0,
+      ),
+      q,
+      new THREE.Vector3(1, 1, 1),
+    );
+    cyl.applyMatrix4(m);
+    return cyl;
+  };
+
+  // Hub A (entry) — sits just past the torus end, oriented outward
+  const hubA = placeAtArc(-angleRad / 2, socketDepth, hubR, -socketDepth / 2);
+  // Hub B (exit)
+  const hubB = placeAtArc(angleRad / 2, socketDepth, hubR, socketDepth / 2);
+
+  // Expansion-ring COLLARS — wider disc just outboard of each hub.
+  // The `-socketDepth + collarLen / 2` offset places them at the
+  // exact end of the hub (outboard side) so they read as the ring
+  // that would sit around the incoming PEX tube.
+  const collarA = placeAtArc(-angleRad / 2, collarLen, collarR, -socketDepth - collarLen / 2);
+  const collarB = placeAtArc(angleRad / 2, collarLen, collarR, socketDepth + collarLen / 2);
+
+  return mergeGeometries([torus, hubA, hubB, collarA, collarB]);
+}
+
+export function getElbow45Geo(material: PipeMaterial, diameter: number): THREE.BufferGeometry {
   const key = `elbow45-${material}-${diameter}`;
   let geo = geoCache.get(key);
   if (geo) return geo;
@@ -280,7 +382,7 @@ function getElbow45Geo(material: PipeMaterial, diameter: number): THREE.BufferGe
   return geo;
 }
 
-function getBend22_5Geo(material: PipeMaterial, diameter: number): THREE.BufferGeometry {
+export function getBend22_5Geo(material: PipeMaterial, diameter: number): THREE.BufferGeometry {
   const key = `bend225-${material}-${diameter}`;
   let geo = geoCache.get(key);
   if (geo) return geo;
@@ -289,7 +391,7 @@ function getBend22_5Geo(material: PipeMaterial, diameter: number): THREE.BufferG
   return geo;
 }
 
-function getBend90LongSweepGeo(material: PipeMaterial, diameter: number): THREE.BufferGeometry {
+export function getBend90LongSweepGeo(material: PipeMaterial, diameter: number): THREE.BufferGeometry {
   const key = `bend90ls-${material}-${diameter}`;
   let geo = geoCache.get(key);
   if (geo) return geo;
@@ -568,6 +670,133 @@ function getCouplingGeo(material: PipeMaterial, diameter: number): THREE.BufferG
 }
 
 /**
+ * Cap — closed-end stopper that slips over a pipe terminus.
+ *
+ * Phase 14.AD.9 — previously aliased to `getCouplingGeo` (L.948-950
+ * in the dispatch switch), which is an OPEN cylinder with a central
+ * stop ring. A real cap has:
+ *   - One hub socket at the pipe side (same diameter as coupling hub)
+ *   - A CLOSED DOME / FLAT END on the outside
+ *   - No through-hole
+ *
+ * Visually: coupling = short tube you can see through; cap = tube
+ * closed at the far end. The difference reads clearly even at mid
+ * camera distance on a DWV cleanout stub or a capped future-expansion
+ * line.
+ */
+function getCapGeo(material: PipeMaterial, diameter: number): THREE.BufferGeometry {
+  const key = `cap-${material}-${diameter}`;
+  let geo = geoCache.get(key);
+  if (geo) return geo;
+
+  const pipeOd = getOuterDiameterFt(material, diameter);
+  const pipeR = pipeOd / 2;
+  const hubR = getHubOuterRadiusFt(material, pipeOd);
+  const socket = getSocketDepthFt(material, diameter);
+
+  // Hub socket — open toward the pipe side, closed on the other.
+  // Body length = socket depth + a short closed-dome portion at the end.
+  const domeLen = pipeR * 0.5; // half a pipe-radius of closed material past the socket
+  const totalLen = socket + domeLen;
+  // Center the cap along +X so the open end sits at x = -socket/2 - …
+  // Actually: we want the OPEN end (where pipe enters) at x=0 and the
+  // closed end (dome) at x = +totalLen. Build along local X axis.
+  const body = new THREE.CylinderGeometry(hubR, hubR, totalLen, CYL_SEGS);
+  body.rotateZ(Math.PI / 2);
+  body.translate(totalLen / 2, 0, 0);
+
+  // Closed dome end: a disc at the far end of the body. Use a
+  // cylinder-like disc (radius = hubR, thin). This closes the tube
+  // so it visually reads as a cap rather than a pipe stub.
+  const domeDisc = new THREE.CylinderGeometry(hubR, hubR * 0.98, pipeR * 0.1, CYL_SEGS);
+  domeDisc.rotateZ(Math.PI / 2);
+  domeDisc.translate(totalLen + pipeR * 0.05, 0, 0);
+
+  // Stop ring inside the socket (pipe butts up against it).
+  const stop = buildStopRing(
+    pipeR, hubR,
+    new THREE.Vector3(socket, 0, 0),
+    new THREE.Vector3(1, 0, 0),
+  );
+
+  geo = mergeGeometries([body, domeDisc, stop]);
+  geoCache.set(key, geo);
+  return geo;
+}
+
+/**
+ * Cross — true 4-way fitting with perpendicular branches. Used when
+ * four pipes meet at a single point (supply manifolds, DWV stacks
+ * with 4 tributaries).
+ *
+ * Phase 14.AD.10 — previously aliased to `getTeeStraightGeo`
+ * (L.942-943), which only has 3 hubs. A true cross has:
+ *   - One through-line (main) — 2 hubs
+ *   - One perpendicular line — 2 hubs
+ *   - Central stop ring at the intersection
+ *
+ * The geometry is symmetric across both axes. Each branch is a
+ * straight cylinder; the two cylinders intersect at the origin.
+ */
+function getCrossGeo(material: PipeMaterial, diameter: number): THREE.BufferGeometry {
+  const key = `x-${material}-${diameter}`;
+  let geo = geoCache.get(key);
+  if (geo) return geo;
+
+  const pipeOd = getOuterDiameterFt(material, diameter);
+  const pipeR = pipeOd / 2;
+  const hubR = getHubOuterRadiusFt(material, pipeOd);
+  const socket = getSocketDepthFt(material, diameter);
+  const portOffset = getPortOffsetFt(material, pipeOd);
+
+  // Main through-line (along X axis) — two hubs + central body.
+  const mainLen = (portOffset + socket) * 2;
+  const main = new THREE.CylinderGeometry(hubR, hubR, mainLen, CYL_SEGS);
+  main.rotateZ(Math.PI / 2);
+
+  // Perpendicular branch (along Z axis) — two hubs + central body.
+  // Use Z so it's visually distinct from the main X axis; the
+  // fitting instance can be rotated to any orientation via its
+  // quaternion.
+  const branchLen = (portOffset + socket) * 2;
+  const branch = new THREE.CylinderGeometry(hubR, hubR, branchLen, CYL_SEGS);
+  // Default cylinder axis is Y; rotate to Z so branches run along Z.
+  branch.rotateX(Math.PI / 2);
+
+  // Four hubs (shoulders) — one at each port. The buildHubShoulder
+  // helper positions them so the OUTER end sits at `center`, inward
+  // along `axis`. Place each at the port offset along its respective
+  // half-axis.
+  const hubMainPos = buildHubShoulder(
+    material, pipeR,
+    new THREE.Vector3(portOffset + socket / 2, 0, 0),
+    new THREE.Vector3(1, 0, 0),
+  );
+  const hubMainNeg = buildHubShoulder(
+    material, pipeR,
+    new THREE.Vector3(-portOffset - socket / 2, 0, 0),
+    new THREE.Vector3(-1, 0, 0),
+  );
+  const hubBranchPos = buildHubShoulder(
+    material, pipeR,
+    new THREE.Vector3(0, 0, portOffset + socket / 2),
+    new THREE.Vector3(0, 0, 1),
+  );
+  const hubBranchNeg = buildHubShoulder(
+    material, pipeR,
+    new THREE.Vector3(0, 0, -portOffset - socket / 2),
+    new THREE.Vector3(0, 0, -1),
+  );
+
+  // Central stop ring at the intersection.
+  const stop = buildStopRing(pipeR, hubR, new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 0, 0));
+
+  geo = mergeGeometries([main, branch, hubMainPos, hubMainNeg, hubBranchPos, hubBranchNeg, stop]);
+  geoCache.set(key, geo);
+  return geo;
+}
+
+/**
  * Reducer — conical transition from `diameter` to `diameter2` with
  * both hubs and a visible shoulder step at each end.
  */
@@ -604,6 +833,76 @@ function getReducerGeo(
   hubSmall.translate(transitionLen / 2 + socketSmall / 2, 0, 0);
 
   geo = mergeGeometries([cone, hubBig, hubSmall]);
+  geoCache.set(key, geo);
+  return geo;
+}
+
+/**
+ * Bushing — hub-on-small-side + spigot-on-large-side reducing
+ * adapter. Phase 14.AD.12.
+ *
+ * Asymmetric geometry, unlike the reducer coupling (both hubs):
+ *   • LARGE end: SPIGOT — a straight cylinder at the pipe's outer
+ *     diameter. Slips INTO an adjacent fitting's socket. No hub
+ *     lip on this side.
+ *   • SMALL end: HUB — full socket with stop ring for a pipe of
+ *     the smaller diameter.
+ *   • Between: a short conical transition.
+ *
+ * Real-world usage: adapt a 2" tee outlet down to 1.5" pipe
+ * without needing a separate reducing coupling. Common for
+ * retrofit / repair where sizes transition at an existing
+ * fitting.
+ *
+ * Orientation: spigot end at local -X, hub end at local +X. The
+ * instance quaternion rotates the whole bushing to align with
+ * the pipe's travel direction (same convention as `getCouplingGeo`
+ * post-AD.11).
+ */
+function getBushingGeo(
+  material: PipeMaterial,
+  diameter: number,
+  diameter2: number,
+): THREE.BufferGeometry {
+  const key = `bsh-${material}-${diameter}-${diameter2}`;
+  let geo = geoCache.get(key);
+  if (geo) return geo;
+
+  const bigOd = getOuterDiameterFt(material, diameter);
+  const smallOd = getOuterDiameterFt(material, diameter2);
+  const bigR = bigOd / 2;
+  const smallR = smallOd / 2;
+  const smallHubR = getHubOuterRadiusFt(material, smallOd);
+  const socketSmall = getSocketDepthFt(material, diameter2);
+
+  // Spigot on the big side — matches pipe OD exactly (slips into a
+  // host fitting's socket sized for this diameter). Length = the
+  // expected insert depth for a pipe of this diameter.
+  const spigotLen = getSocketDepthFt(material, diameter);
+  const spigot = new THREE.CylinderGeometry(bigR, bigR, spigotLen, CYL_SEGS);
+  spigot.rotateZ(Math.PI / 2);
+  spigot.translate(-spigotLen / 2, 0, 0);
+
+  // Conical transition from big to small. Bushings are compact, so
+  // transition is short relative to a full reducer coupling.
+  const transitionLen = Math.max(bigR, smallR) * 1.2;
+  const cone = new THREE.CylinderGeometry(smallR, bigR, transitionLen, CYL_SEGS);
+  cone.rotateZ(Math.PI / 2);
+  cone.translate(transitionLen / 2, 0, 0);
+
+  // Hub on the small side — full socket with stop ring.
+  const hub = new THREE.CylinderGeometry(smallHubR, smallHubR, socketSmall, CYL_SEGS);
+  hub.rotateZ(Math.PI / 2);
+  hub.translate(transitionLen + socketSmall / 2, 0, 0);
+
+  // Stop ring at the inside of the hub so the pipe seats against it.
+  const stop = buildStopRing(
+    smallR, smallHubR,
+    new THREE.Vector3(transitionLen, 0, 0),
+    new THREE.Vector3(1, 0, 0),
+  );
+
+  geo = mergeGeometries([spigot, cone, hub, stop]);
   geoCache.set(key, geo);
   return geo;
 }
@@ -776,6 +1075,56 @@ function mergeGeometries(geos: THREE.BufferGeometry[]): THREE.BufferGeometry {
   return merged;
 }
 
+// ── Geometry dispatch (exported for testability) ─────────────────
+
+/**
+ * Phase 14.AD.13 — single entry point for getting the cached
+ * `BufferGeometry` for any `FittingType`. Mirrors the switch inside
+ * `buildGroups` so the snapshot test harness can exercise every
+ * geometry builder through one function without individually
+ * exporting each internal builder.
+ *
+ * `diameter2` is only consulted for reducer + bushing, which are
+ * two-diameter transitions. For all other types it's ignored.
+ *
+ * Returns the same cached THREE.BufferGeometry the renderer uses —
+ * caller must NOT mutate it.
+ */
+export function getFittingGeometryByType(
+  type: string,
+  material: PipeMaterial,
+  diameter: number,
+  diameter2?: number,
+): THREE.BufferGeometry {
+  const d2 = diameter2 ?? diameter;
+  switch (type) {
+    case 'bend_22_5':        return getBend22_5Geo(material, diameter);
+    case 'bend_45':          return getElbow45Geo(material, diameter);
+    case 'elbow_45':         return getElbow45Geo(material, diameter);
+    case 'bend_90':          return getElbow90Geo(material, diameter);
+    case 'elbow_90':         return getElbow90Geo(material, diameter);
+    case 'pex_elbow_90':     return getPexElbow90Geo(material, diameter);
+    case 'bend_90_ls':       return getBend90LongSweepGeo(material, diameter);
+    case 'tee':              return getTeeStraightGeo(material, diameter);
+    case 'sanitary_tee':     return getSanitaryTeeGeo(material, diameter);
+    case 'wye':              return getWyeGeo(material, diameter);
+    case 'combo_wye_eighth': return getComboGeo(material, diameter);
+    case 'cross':            return getCrossGeo(material, diameter);
+    case 'reducer':          return getReducerGeo(material, diameter, d2);
+    case 'bushing':          return getBushingGeo(material, diameter, d2);
+    case 'coupling':         return getCouplingGeo(material, diameter);
+    case 'cap':              return getCapGeo(material, diameter);
+    case 'cleanout_adapter': return getCleanoutGeo(material, diameter);
+    case 'closet_flange':    return getClosetFlangeGeo(material, diameter);
+    case 'p_trap':           return getPTrapGeo(material, diameter);
+    case 'manifold_2':       return getManifoldGeo(material, diameter, 2);
+    case 'manifold_4':       return getManifoldGeo(material, diameter, 4);
+    case 'manifold_6':       return getManifoldGeo(material, diameter, 6);
+    case 'manifold_8':       return getManifoldGeo(material, diameter, 8);
+    default:                 return getElbow90Geo(material, diameter);
+  }
+}
+
 // ── Fitting type groups ─────────────────────────────────────────
 
 type FittingGroup = {
@@ -817,6 +1166,11 @@ function buildGroups(fittings: FittingInstance[]): FittingGroup[] {
       case 'elbow_90':
         geometry = getElbow90Geo(mat, diam);
         break;
+      case 'pex_elbow_90':
+        // Phase 14.V — Uponor ProPEX elbow. Distinct from bend_90
+        // via the expansion-ring collars baked into the geometry.
+        geometry = getPexElbow90Geo(mat, diam);
+        break;
       case 'bend_90_ls':
         geometry = getBend90LongSweepGeo(mat, diam);
         break;
@@ -833,14 +1187,26 @@ function buildGroups(fittings: FittingInstance[]): FittingGroup[] {
         geometry = getComboGeo(mat, diam);
         break;
       case 'cross':
-        geometry = getTeeStraightGeo(mat, diam);
+        // Phase 14.AD.10 — real 4-way cross with 4 hubs. Previously
+        // aliased to getTeeStraightGeo (3 hubs).
+        geometry = getCrossGeo(mat, diam);
         break;
       case 'reducer':
         geometry = getReducerGeo(mat, diam, sample.diameter2 ?? diam);
         break;
+      case 'bushing':
+        // Phase 14.AD.12 — asymmetric reducer (hub + spigot), unlike
+        // `reducer` which has two hubs. diameter = large side
+        // (spigot), diameter2 = small side (hub).
+        geometry = getBushingGeo(mat, diam, sample.diameter2 ?? diam);
+        break;
       case 'coupling':
-      case 'cap':
         geometry = getCouplingGeo(mat, diam);
+        break;
+      case 'cap':
+        // Phase 14.AD.9 — real closed-end cap. Previously aliased
+        // to getCouplingGeo (open cylinder).
+        geometry = getCapGeo(mat, diam);
         break;
       case 'cleanout_adapter':
         geometry = getCleanoutGeo(mat, diam);
@@ -917,8 +1283,8 @@ function FittingGroup({ group }: { group: FittingGroup }) {
 
 export function FittingRenderer() {
   const pipes = usePipeStore((state) => state.pipes);
-  const fittingsVisible = useLayerStore((s) => s.fittings);
-  const systemVisibility = useLayerStore((s) => s.systems);
+  const fittingsVisible = usePlumbingLayerStore((s) => s.fittings);
+  const systemVisibility = usePlumbingLayerStore((s) => s.systems);
   const getFloorParams = useFloorParams();
   const phaseFilter = usePhaseFilter();
 
@@ -929,14 +1295,32 @@ export function FittingRenderer() {
       let yMin = p.points[0]?.[1] ?? 0, yMax = yMin;
       for (const pt of p.points) { if (pt[1] < yMin) yMin = pt[1]; if (pt[1] > yMax) yMax = pt[1]; }
       const fp = getFloorParams(yMin, yMax);
-      if (!fp.visible || fp.opacity < 0.9) return false;
+      // Bug-fix (user report "no fittings on riser"): the old `fp.opacity
+      // < 0.9` cull dropped ALL fittings for any pipe spanning multiple
+      // floors (floorStore returns 0.82 for risers) OR viewed on a
+      // ghosted non-active floor. The pipe itself kept rendering
+      // (PipeRenderer uses `ghostify` instead of culling) so the scene
+      // showed naked pipes with no elbows / tees / couplings. Now: cull
+      // ONLY when the floor is literally hidden (fp.visible === false)
+      // or the ghost is effectively zero (< 0.05). Full-opacity fittings
+      // on a ghosted floor look slightly bright vs. the pipe but they
+      // are correct + visible.
+      if (!fp.visible || fp.opacity < 0.05) return false;
       const autoPhase = classifyPipe(p);
       const effectivePhase = phaseFilter.pipeOverride(p.id) ?? autoPhase;
       return shouldPhaseRender(effectivePhase, phaseFilter.activePhase, phaseFilter.mode);
     });
     if (pipeList.length === 0) return [];
 
-    const fittings = generateAllFittings(pipeList);
+    // Phase 14.T — use the memoized per-pipe cache for bends + flex
+    // warnings. Junctions still recompute each pass; they're cheap
+    // relative to the bend scan and they cross pipes so caching
+    // them per-pipe isn't meaningful.
+    const cache = getFittingCache();
+    const perPipe = cache.collectPerPipe(pipeList);
+    const { mergedVertices } = mergePexRuns(pipeList);
+    const junctions = generateJunctionFittings(pipeList, mergedVertices);
+    const fittings: FittingInstance[] = [...perPipe, ...junctions];
     return buildGroups(fittings);
   }, [pipes, fittingsVisible, systemVisibility, getFloorParams, phaseFilter]);
 

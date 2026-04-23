@@ -258,6 +258,196 @@ function drinkingFountainGeometry(p?: Record<string, unknown>): FixtureGeometry 
   };
 }
 
+// ── Phase 14.Y additions ──────────────────────────────────────
+
+/**
+ * Tank-type water heater — 40 / 50 / 75 gal. Cylindrical vessel
+ * with cold inlet (top, typically left), hot outlet (top, right),
+ * T&P relief, drain spigot at base, and optional gas/flue or
+ * electric element stubs.
+ *
+ * ASME A.O. Smith / Rheem residential dimensions:
+ *   40 gal gas: ∅20", H 58"
+ *   50 gal gas: ∅22", H 60"
+ *   75 gal gas: ∅24", H 72"
+ * Default = 50 gal.
+ */
+function waterHeaterGeometry(p?: Record<string, unknown>): FixtureGeometry {
+  const capacityGal = Number(p?.capacityGal ?? 50);
+  const diameterFt = capacityGal <= 40 ? 20 * INCH
+    : capacityGal <= 50 ? 22 * INCH
+    : 24 * INCH;
+  const heightFt = capacityGal <= 40 ? 58 * INCH
+    : capacityGal <= 50 ? 60 * INCH
+    : 72 * INCH;
+  const radius = diameterFt / 2;
+  // Connection cluster on top of the tank.
+  const topY = heightFt;
+  const coldOffsetX = radius * 0.6; // cold on one side
+  const hotOffsetX = -radius * 0.6; // hot on the other
+  return {
+    footprint: { width: diameterFt, depth: diameterFt, height: heightFt },
+    points: [
+      // Cold inlet — dip tube into tank top
+      { id: 'cold', label: 'Cold In',  position: [coldOffsetX, topY, 0], role: 'cold',  draggable: true, drivenBy: ['coldOffset'] },
+      // Hot outlet — the primary hot supply source for the whole house
+      { id: 'hot',  label: 'Hot Out',  position: [hotOffsetX,  topY, 0], role: 'hot',   draggable: true, drivenBy: ['hotOffset'] },
+      // T&P relief (safety) — runs to floor drain / outside
+      { id: 'tp_relief', label: 'T&P',  position: [0, topY, radius * 0.6], role: 'overflow', draggable: false },
+      // Drain spigot at base for servicing
+      { id: 'drain', label: 'Drain',   position: [0, 3 * INCH, radius * 0.9], role: 'drain', draggable: false },
+    ],
+  };
+}
+
+/**
+ * Tankless water heater — wall-mounted, gas or electric. Much
+ * smaller footprint. Cold in + hot out + gas stub (or nothing for
+ * electric) + flue collar. Representative: Rheem RTGH-95 / Rinnai
+ * RU199iN ~ 18"W × 26"H × 10"D.
+ */
+function tanklessWaterHeaterGeometry(_p?: Record<string, unknown>): FixtureGeometry {
+  const width = 18 * INCH;
+  const height = 26 * INCH;
+  const depth = 10 * INCH;
+  // Connections clustered on the bottom of the unit.
+  const bottomY = 3 * INCH;
+  return {
+    footprint: { width, depth, height },
+    points: [
+      { id: 'cold',    label: 'Cold In',  position: [-width * 0.25, bottomY, 0], role: 'cold', draggable: true },
+      { id: 'hot',     label: 'Hot Out',  position: [ width * 0.25, bottomY, 0], role: 'hot',  draggable: true },
+      { id: 'gas',     label: 'Gas',      position: [ 0,            bottomY, 0], role: 'ref',  draggable: false },
+      { id: 'tp_relief', label: 'T&P',    position: [ width * 0.45, bottomY - INCH, 0], role: 'overflow', draggable: false },
+    ],
+  };
+}
+
+/**
+ * Bidet — ASME A112.19.2 floor-mounted. Small basin with rim
+ * supply + perineal + drain. Standard 24"W × 14"D × 15"H.
+ */
+function bidetGeometry(_p?: Record<string, unknown>): FixtureGeometry {
+  const width = 24 * INCH;
+  const depth = 14 * INCH;
+  const height = 15 * INCH;
+  const drainY = height * 0.1;
+  const supplyY = height * 0.75;
+  return {
+    footprint: { width, depth, height },
+    points: [
+      { id: 'drain', label: 'Drain', position: [0,  drainY, 0], role: 'drain', draggable: true },
+      { id: 'cold',  label: 'Cold',  position: [ 4 * INCH, supplyY, -depth * 0.4], role: 'cold', draggable: true },
+      { id: 'hot',   label: 'Hot',   position: [-4 * INCH, supplyY, -depth * 0.4], role: 'hot',  draggable: true },
+    ],
+  };
+}
+
+/**
+ * Laundry tub — single-compartment, floor-mounted basin. Typical
+ * 24"W × 20"D × 34"H. Drain in center, faucet at back.
+ */
+function laundryTubGeometry(_p?: Record<string, unknown>): FixtureGeometry {
+  const width = 24 * INCH;
+  const depth = 20 * INCH;
+  const height = 34 * INCH;
+  return {
+    footprint: { width, depth, height },
+    points: [
+      { id: 'drain', label: 'Drain', position: [0, 14 * INCH, 0], role: 'drain', draggable: true },
+      { id: 'cold',  label: 'Cold',  position: [ 2 * INCH, 32 * INCH, -depth * 0.4], role: 'cold', draggable: true },
+      { id: 'hot',   label: 'Hot',   position: [-2 * INCH, 32 * INCH, -depth * 0.4], role: 'hot',  draggable: true },
+    ],
+  };
+}
+
+/**
+ * Utility / slop sink — commercial-grade wash-down basin. Bigger
+ * than laundry tub, 36"W × 24"D × 36"H. Often floor-mount with
+ * vacuum breaker on the hose-bib supply.
+ */
+function utilitySinkGeometry(_p?: Record<string, unknown>): FixtureGeometry {
+  const width = 36 * INCH;
+  const depth = 24 * INCH;
+  const height = 36 * INCH;
+  return {
+    footprint: { width, depth, height },
+    points: [
+      { id: 'drain', label: 'Drain', position: [0, 14 * INCH, 0], role: 'drain', draggable: true },
+      { id: 'cold',  label: 'Cold',  position: [ 3 * INCH, 34 * INCH, -depth * 0.4], role: 'cold', draggable: true },
+      { id: 'hot',   label: 'Hot',   position: [-3 * INCH, 34 * INCH, -depth * 0.4], role: 'hot',  draggable: true },
+    ],
+  };
+}
+
+/**
+ * Thermal expansion tank — inline pressure vessel, typically
+ * plumbed into the cold supply to the water heater. Small: 8"
+ * diameter × 11" tall for residential 2-gal unit.
+ */
+function expansionTankGeometry(_p?: Record<string, unknown>): FixtureGeometry {
+  const diameter = 8 * INCH;
+  const height = 11 * INCH;
+  return {
+    footprint: { width: diameter, depth: diameter, height },
+    points: [
+      // Single threaded connection at one end
+      { id: 'inline', label: 'Inline', position: [0, 0, 0], role: 'cold', draggable: false },
+    ],
+  };
+}
+
+/**
+ * Backflow preventer (RPZ / PVB / DCV) — inline device with two
+ * NPT connections + a vented relief port. Representative Watts
+ * 009 RPZ: ~12" long × 6" tall end-to-end.
+ */
+function backflowPreventerGeometry(_p?: Record<string, unknown>): FixtureGeometry {
+  const length = 12 * INCH;
+  const height = 6 * INCH;
+  return {
+    footprint: { width: length, depth: 4 * INCH, height },
+    points: [
+      { id: 'in',   label: 'Inlet',  position: [-length / 2, height / 2, 0], role: 'cold', draggable: false },
+      { id: 'out',  label: 'Outlet', position: [ length / 2, height / 2, 0], role: 'cold', draggable: false },
+      { id: 'relief', label: 'Relief', position: [0, 0, 0], role: 'overflow', draggable: false },
+    ],
+  };
+}
+
+/**
+ * Pressure-reducing valve — inline brass body, typical Watts N45B.
+ * 6" end-to-end, 4" tall.
+ */
+function pressureReducingValveGeometry(_p?: Record<string, unknown>): FixtureGeometry {
+  const length = 6 * INCH;
+  const height = 4 * INCH;
+  return {
+    footprint: { width: length, depth: 3 * INCH, height },
+    points: [
+      { id: 'in',  label: 'Inlet',  position: [-length / 2, height / 2, 0], role: 'cold', draggable: false },
+      { id: 'out', label: 'Outlet', position: [ length / 2, height / 2, 0], role: 'cold', draggable: false },
+    ],
+  };
+}
+
+/**
+ * Accessible cleanout — DWV service access. 4" body, 6" total
+ * length including the plug. Inline on a drain line.
+ */
+function cleanoutAccessGeometry(_p?: Record<string, unknown>): FixtureGeometry {
+  const length = 6 * INCH;
+  const diameter = 4 * INCH;
+  return {
+    footprint: { width: length, depth: diameter, height: diameter },
+    points: [
+      { id: 'in',  label: 'DWV In',  position: [-length / 2, diameter / 2, 0], role: 'drain', draggable: false },
+      { id: 'out', label: 'DWV Out', position: [ length / 2, diameter / 2, 0], role: 'drain', draggable: false },
+      { id: 'plug', label: 'Plug',   position: [0, diameter / 2, -diameter / 2], role: 'ref', draggable: false },
+    ],
+  };
+}
+
 // ── Dispatcher ─────────────────────────────────────────────────
 
 export function getFixtureGeometry(
@@ -278,6 +468,16 @@ export function getFixtureGeometry(
     case 'urinal':            return urinalGeometry(params);
     case 'mop_sink':          return mopSinkGeometry(params);
     case 'drinking_fountain': return drinkingFountainGeometry(params);
+    // Phase 14.Y additions
+    case 'water_heater':           return waterHeaterGeometry(params);
+    case 'tankless_water_heater':  return tanklessWaterHeaterGeometry(params);
+    case 'bidet':                  return bidetGeometry(params);
+    case 'laundry_tub':            return laundryTubGeometry(params);
+    case 'utility_sink':           return utilitySinkGeometry(params);
+    case 'expansion_tank':         return expansionTankGeometry(params);
+    case 'backflow_preventer':     return backflowPreventerGeometry(params);
+    case 'pressure_reducing_valve':return pressureReducingValveGeometry(params);
+    case 'cleanout_access':        return cleanoutAccessGeometry(params);
   }
 }
 

@@ -16,6 +16,12 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useEvent } from '@hooks/useEventBus';
 import { EV, type CuePayload, type RewardPayload } from '@core/events';
+// Phase 10.C — respect OS-level "reduce motion" for continuous
+// animations. One-shot FX (CollisionFlash, SnapBurst, CompletePulse)
+// are deliberately kept lively — they fire infrequently and carry
+// feedback signal. The sustained breathing of GlowRing is the one
+// that causes the real ergonomic problem.
+import { useReducedMotion } from '@core/a11y/useReducedMotion';
 
 // ── GlowRing ────────────────────────────────────────────────────
 // Renders a pulsing torus at a given position to signal "attach here."
@@ -28,9 +34,17 @@ interface GlowRingProps {
 
 export function GlowRing({ position, color = '#00e5ff', active = true }: GlowRingProps) {
   const ref = useRef<THREE.Mesh>(null!);
+  const reducedMotion = useReducedMotion();
 
   useFrame(({ clock }) => {
     if (!ref.current) return;
+    if (reducedMotion) {
+      // Static "on" state — still visible, but not pulsating.
+      ref.current.scale.setScalar(1);
+      (ref.current.material as THREE.MeshStandardMaterial).opacity =
+        active ? 0.65 : 0.15;
+      return;
+    }
     const s = active ? 1 + Math.sin(clock.elapsedTime * 3) * 0.15 : 1;
     ref.current.scale.setScalar(s);
     (ref.current.material as THREE.MeshStandardMaterial).opacity =

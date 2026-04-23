@@ -14,7 +14,7 @@
  * Color accents come from PHASE_META.
  */
 
-import { usePhaseStore } from '@store/phaseStore';
+import { usePlumbingPhaseStore } from '@store/plumbingPhaseStore';
 import { PHASE_META, PHASE_ORDER, type ConstructionPhase } from '@core/phases/PhaseTypes';
 import { usePipeStore } from '@store/pipeStore';
 import { useFixtureStore } from '@store/fixtureStore';
@@ -22,17 +22,17 @@ import { classifyPipe, classifyFixture } from '@core/phases/PhaseClassifier';
 import { useMemo } from 'react';
 
 export function PhaseSelectorBar() {
-  const activePhase = usePhaseStore((s) => s.activePhase);
-  const mode = usePhaseStore((s) => s.visibilityMode);
-  const tintByPhase = usePhaseStore((s) => s.tintByPhase);
-  const showHalo = usePhaseStore((s) => s.showPhaseHalo);
-  const setActive = usePhaseStore((s) => s.setActivePhase);
-  const setMode = usePhaseStore((s) => s.setVisibilityMode);
-  const cycle = usePhaseStore((s) => s.cycleVisibilityMode);
-  const toggleTint = usePhaseStore((s) => s.toggleTint);
-  const toggleHalo = usePhaseStore((s) => s.toggleHalo);
-  const pipeOverrides = usePhaseStore((s) => s.pipeOverrides);
-  const fixtureOverrides = usePhaseStore((s) => s.fixtureOverrides);
+  const activePhase = usePlumbingPhaseStore((s) => s.activePhase);
+  const mode = usePlumbingPhaseStore((s) => s.visibilityMode);
+  const tintByPhase = usePlumbingPhaseStore((s) => s.tintByPhase);
+  const showHalo = usePlumbingPhaseStore((s) => s.showPhaseHalo);
+  const setActive = usePlumbingPhaseStore((s) => s.setActivePhase);
+  const setMode = usePlumbingPhaseStore((s) => s.setVisibilityMode);
+  const cycle = usePlumbingPhaseStore((s) => s.cycleVisibilityMode);
+  const toggleTint = usePlumbingPhaseStore((s) => s.toggleTint);
+  const toggleHalo = usePlumbingPhaseStore((s) => s.toggleHalo);
+  const pipeOverrides = usePlumbingPhaseStore((s) => s.pipeOverrides);
+  const fixtureOverrides = usePlumbingPhaseStore((s) => s.fixtureOverrides);
   const pipes = usePipeStore((s) => s.pipes);
   const fixtures = useFixtureStore((s) => s.fixtures);
 

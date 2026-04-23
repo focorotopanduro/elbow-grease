@@ -7,7 +7,7 @@
  *   Status hints
  */
 
-import { useInteractionStore, type InteractionMode } from '@store/interactionStore';
+import { usePlumbingDrawStore, type InteractionMode } from '@store/plumbingDrawStore';
 import { usePipeStore } from '@store/pipeStore';
 
 // ── Mode buttons ────────────────────────────────────────────────
@@ -21,16 +21,18 @@ const MODES: { key: InteractionMode; label: string; icon: string; shortcut: stri
 const DIAMETERS = [0.5, 0.75, 1, 1.5, 2, 3, 4, 6];
 
 export function Toolbar() {
-  const mode = useInteractionStore((s) => s.mode);
-  const isDrawing = useInteractionStore((s) => s.isDrawing);
-  const pointCount = useInteractionStore((s) => s.drawPoints.length);
-  const setMode = useInteractionStore((s) => s.setMode);
-  const drawPlane = useInteractionStore((s) => s.drawPlane);
-  const togglePlane = useInteractionStore((s) => s.toggleDrawPlane);
-  const quality = useInteractionStore((s) => s.pipeQuality);
-  const toggleQuality = useInteractionStore((s) => s.togglePipeQuality);
-  const diameter = useInteractionStore((s) => s.drawDiameter);
-  const setDiameter = useInteractionStore((s) => s.setDrawDiameter);
+  const mode = usePlumbingDrawStore((s) => s.mode);
+  const isDrawing = usePlumbingDrawStore((s) => s.isDrawing);
+  const pointCount = usePlumbingDrawStore((s) => s.drawPoints.length);
+  const setMode = usePlumbingDrawStore((s) => s.setMode);
+  const drawPlane = usePlumbingDrawStore((s) => s.drawPlane);
+  const togglePlane = usePlumbingDrawStore((s) => s.toggleDrawPlane);
+  const quality = usePlumbingDrawStore((s) => s.pipeQuality);
+  const toggleQuality = usePlumbingDrawStore((s) => s.togglePipeQuality);
+  const diameter = usePlumbingDrawStore((s) => s.drawDiameter);
+  const setDiameter = usePlumbingDrawStore((s) => s.setDrawDiameter);
+  const orthoClickDrag = usePlumbingDrawStore((s) => s.orthoClickDragMode);
+  const toggleOrthoClickDrag = usePlumbingDrawStore((s) => s.toggleOrthoClickDragMode);
   const pipeCount = usePipeStore((s) => Object.keys(s.pipes).length);
 
   return (
@@ -108,6 +110,24 @@ export function Toolbar() {
           {quality === '3d' ? '3D Pipes' : 'Fast Mode'}
         </span>
         <kbd style={styles.kbd}>Q</kbd>
+      </button>
+
+      {/* Phase 14.AD.23 — ortho click-drag draw mode toggle. Active
+          by default; disable for users who prefer the classic
+          click-to-place-points flow. Only has an effect in top /
+          front / side / bottom views; perspective + isometric
+          still use the classic tool. */}
+      <button
+        style={{ ...styles.btn,
+          borderColor: orthoClickDrag ? '#ff9800' : '#333',
+          background: orthoClickDrag ? 'rgba(255,152,0,0.1)' : 'transparent' }}
+        onClick={toggleOrthoClickDrag}
+        title="Toggle CAD-style click-drag drawing in ortho views (Shift+O)">
+        <span style={styles.icon}>{orthoClickDrag ? '✋' : '✏️'}</span>
+        <span style={{ ...styles.label, color: orthoClickDrag ? '#ff9800' : '#666' }}>
+          {orthoClickDrag ? 'Ortho Drag: ON' : 'Ortho Drag: off'}
+        </span>
+        <kbd style={styles.kbd}>⇧O</kbd>
       </button>
 
       {/* Pipe count */}

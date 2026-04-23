@@ -64,6 +64,7 @@ export const FITTING_TO_IFC: Record<FittingType, string> = {
   bend_90_ls:       'IfcPipeFitting',
   elbow_90:         'IfcPipeFitting',
   elbow_45:         'IfcPipeFitting',
+  pex_elbow_90:     'IfcPipeFitting',
   tee:              'IfcPipeFitting',
   sanitary_tee:     'IfcPipeFitting',
   wye:              'IfcPipeFitting',
@@ -71,6 +72,7 @@ export const FITTING_TO_IFC: Record<FittingType, string> = {
   cross:            'IfcPipeFitting',
   coupling:         'IfcPipeFitting',
   reducer:          'IfcPipeFitting',
+  bushing:          'IfcPipeFitting',
   cap:              'IfcPipeFitting',
   cleanout_adapter: 'IfcPipeFitting',
   p_trap:           'IfcPipeFitting',
@@ -87,6 +89,7 @@ export const SYSTEM_TO_IFC: Record<SystemType, { type: string; predefined: strin
   cold_supply: { type: 'IfcDistributionSystem', predefined: 'DOMESTICCOLDWATER' },
   hot_supply:  { type: 'IfcDistributionSystem', predefined: 'DOMESTICHOTWATER' },
   storm:       { type: 'IfcDistributionSystem', predefined: 'STORMWATER' },
+  condensate:  { type: 'IfcDistributionSystem', predefined: 'CONDENSATE' },
 };
 
 // ── IFC material mappings ───────────────────────────────────────
@@ -113,6 +116,7 @@ export const FITTING_PREDEFINED: Record<FittingType, string> = {
   bend_90_ls:       'BEND',
   elbow_90:         'BEND',
   elbow_45:         'BEND',
+  pex_elbow_90:     'BEND',
   tee:              'JUNCTION',
   sanitary_tee:     'JUNCTION',
   wye:              'JUNCTION',
@@ -120,6 +124,7 @@ export const FITTING_PREDEFINED: Record<FittingType, string> = {
   cross:            'JUNCTION',
   coupling:         'CONNECTOR',
   reducer:          'TRANSITION',
+  bushing:          'TRANSITION',
   cap:              'ENTRY',
   cleanout_adapter: 'ENTRY',
   p_trap:           'TRAP',

@@ -21,6 +21,7 @@ import { useFrame } from '@react-three/fiber';
 import { Line, Text, Billboard } from '@react-three/drei';
 import * as THREE from 'three';
 import { useEvent } from '@hooks/useEventBus';
+import { useRafEvent } from '@hooks/useRafEvent';
 import { EV, type Vec3, type PipeRouteUpdatePayload } from '@core/events';
 import { AUTOROUTE_EV } from '@core/pathfinding/AutoRouter';
 import {
@@ -56,7 +57,9 @@ function ClashMarker({ collision }: { collision: SegmentCollision }) {
 
   return (
     <group>
-      <mesh ref={ref} position={collision.midpoint}>
+      {/* Clash sphere + Billboard label are decorative — pointer events
+          should fall through to pipes/fixtures underneath. */}
+      <mesh ref={ref} position={collision.midpoint} raycast={() => null}>
         <sphereGeometry args={[0.08, 10, 10]} />
         <meshStandardMaterial
           color={color}
@@ -74,7 +77,7 @@ function ClashMarker({ collision }: { collision: SegmentCollision }) {
         collision.midpoint[1] + 0.3,
         collision.midpoint[2],
       ]}>
-        <mesh position={[0, 0, -0.005]}>
+        <mesh position={[0, 0, -0.005]} raycast={() => null}>
           <planeGeometry args={[1.2, 0.15]} />
           <meshBasicMaterial color="#0a0a0f" transparent opacity={0.9} />
         </mesh>
@@ -118,7 +121,9 @@ function ClearanceHalo({ element, clearance, hasViolation }: ClearanceHaloProps)
   const color = hasViolation ? '#ff1744' : '#ffc107';
 
   return (
-    <mesh position={center}>
+    // Clearance halo is a visual aid — never an interaction target.
+    // Selecting the structural element underneath should work through it.
+    <mesh position={center} raycast={() => null}>
       <boxGeometry args={size} />
       <meshStandardMaterial
         color={color}
@@ -180,10 +185,22 @@ export function InterferenceVisualizer({
 }: InterferenceVisualizerProps) {
   const [prediction, setPrediction] = useState<CollisionPrediction | null>(null);
   const [previewPoints, setPreviewPoints] = useState<Vec3[]>([]);
-  const existingPipes = usePipeStore((s) => Object.values(s.pipes));
+  // Select the stable record reference, then memoize the values array.
+  // The prior `s => Object.values(s.pipes)` returned a fresh array on
+  // every store emission, failing Zustand's Object.is equality and
+  // re-rendering this component whenever ANY field in pipeStore changed
+  // (pivotSession, undoStack, …). See rendering audit notes in
+  // docs/adr/024-rendering-foundation.md "Audit pass".
+  const pipesRecord = usePipeStore((s) => s.pipes);
+  const existingPipes = useMemo(() => Object.values(pipesRecord), [pipesRecord]);
 
-  // Live collision prediction during route drawing
-  useEvent<PipeRouteUpdatePayload>(EV.PIPE_ROUTE_UPDATE, (payload) => {
+  // Live collision prediction during route drawing.
+  //
+  // useRafEvent coalesces the bursty PIPE_ROUTE_UPDATE stream down to
+  // at most one handler invocation per animation frame — predictCollisions
+  // is O(elements × points) and was previously running on every single
+  // pointermove (120+ Hz on high-refresh displays). See Phase 14.AC.1.
+  useRafEvent<PipeRouteUpdatePayload>(EV.PIPE_ROUTE_UPDATE, (payload) => {
     if (payload.points.length < 2) return;
     setPreviewPoints([...payload.points]);
     const result = predictCollisions(

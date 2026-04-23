@@ -17,6 +17,8 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { useFixtureStore } from '@store/fixtureStore';
 import { useFixtureEditorStore } from '@store/fixtureEditorStore';
+// Phase 14.F — inspector-mode toggle (mini vs detail).
+import { useFixtureInspectorStore } from '@store/fixtureInspectorStore';
 import { PARAM_SCHEMA, type ParamField, type ParamSection } from '@core/fixtures/FixtureParams';
 import type { FixtureSubtype } from '../../engine/graph/GraphNode';
 
@@ -36,6 +38,16 @@ const SUBTYPE_ICON: Record<FixtureSubtype, string> = {
   urinal:            '🔵',
   mop_sink:          '🧽',
   drinking_fountain: '⛲',
+  // Phase 14.Y additions
+  water_heater:            '🔥',
+  tankless_water_heater:   '⚡',
+  bidet:                   '🚻',
+  laundry_tub:             '🧺',
+  utility_sink:            '🪣',
+  expansion_tank:          '🫧',
+  backflow_preventer:      '⛔',
+  pressure_reducing_valve: '⚙',
+  cleanout_access:         '🔧',
 };
 
 const SUBTYPE_LABEL: Record<FixtureSubtype, string> = {
@@ -52,6 +64,16 @@ const SUBTYPE_LABEL: Record<FixtureSubtype, string> = {
   urinal:            'Urinal',
   mop_sink:          'Mop Sink',
   drinking_fountain: 'Drinking Fountain',
+  // Phase 14.Y additions
+  water_heater:            'Water Heater',
+  tankless_water_heater:   'Tankless Water Heater',
+  bidet:                   'Bidet',
+  laundry_tub:             'Laundry Tub',
+  utility_sink:            'Utility Sink',
+  expansion_tank:          'Expansion Tank',
+  backflow_preventer:      'Backflow Preventer',
+  pressure_reducing_valve: 'Pressure-Reducing Valve',
+  cleanout_access:         'Cleanout Access',
 };
 
 // ── Draggable window position hook ─────────────────────────────
@@ -101,6 +123,10 @@ export function FixtureParamWindow() {
 
   const drag = useDraggable({ x: Math.max(200, window.innerWidth - 620), y: 140 });
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  // Phase 14.F — only render this full detail editor when inspector
+  // mode is 'detail'. 'mini' mode yields to FixtureMiniCard.
+  const inspectorMode = useFixtureInspectorStore((s) => s.mode);
+  const setInspectorMode = useFixtureInspectorStore((s) => s.setMode);
 
   // Reset drag pos if window goes off-screen after resize
   useEffect(() => {
@@ -129,9 +155,14 @@ export function FixtureParamWindow() {
   }, [selectedId, fixture, selectFixture, removeFixture]);
 
   if (!fixture || !schema) return null;
+  // Phase 14.F — hand off to FixtureMiniCard when in mini mode. Users
+  // reopen the detail editor from the mini card's Expand button.
+  if (inspectorMode !== 'detail') return null;
 
   return (
     <div
+      role="dialog"
+      aria-label={`${SUBTYPE_LABEL[fixture.subtype]} parameters`}
       style={{
         position: 'fixed',
         left: drag.pos.x,
@@ -175,9 +206,19 @@ export function FixtureParamWindow() {
             {String(fixture.params.tag ?? '—')} · DFU {dfu.toFixed(1)} · WSFU {wsfu.cold.toFixed(1)}c/{wsfu.hot.toFixed(1)}h
           </div>
         </div>
+        {/* Phase 14.F — collapse to mini card (keeps selection). */}
+        <button
+          onClick={() => setInspectorMode('mini')}
+          title="Collapse to mini card (keep selection, free the view)"
+          aria-label="Collapse to mini card"
+          style={collapseBtnStyle}
+        >
+          ⇲
+        </button>
         <button
           onClick={() => selectFixture(null)}
           title="Close (Esc)"
+          aria-label="Close fixture parameters"
           style={closeBtnStyle}
         >
           ✕
@@ -437,6 +478,21 @@ const closeBtnStyle: React.CSSProperties = {
   color: '#ffd54f',
   cursor: 'pointer',
   fontSize: 11,
+  padding: 0,
+};
+
+// Phase 14.F — "collapse to mini" button next to the close button.
+// Same dimensions + palette as close so they read as a pair.
+const collapseBtnStyle: React.CSSProperties = {
+  width: 22,
+  height: 22,
+  marginRight: 4,
+  background: 'transparent',
+  border: '1px solid rgba(0, 229, 255, 0.35)',
+  borderRadius: 4,
+  color: '#00e5ff',
+  cursor: 'pointer',
+  fontSize: 12,
   padding: 0,
 };
 

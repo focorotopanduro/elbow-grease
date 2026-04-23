@@ -13,7 +13,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { usePipeStore, getColorForDiameter } from '@store/pipeStore';
-import { useLayerStore } from '@store/layerStore';
+import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 import { autoSave } from '@core/project/AutoSave';
 import { exportProjectFile, importProjectFile } from '@core/project/ProjectFileIO';
 import type { SerializeInput } from '@core/project/ProjectSerializer';
@@ -38,7 +38,7 @@ export function ProjectPanel({
   onNewProject,
 }: ProjectPanelProps) {
   const pipes = usePipeStore((s) => s.pipes);
-  const layers = useLayerStore();
+  const layers = usePlumbingLayerStore();
   const pipeCount = Object.keys(pipes).length;
 
   const [projectName, setProjectName] = useState('Untitled Project');
@@ -63,8 +63,13 @@ export function ProjectPanel({
       fixtures: layers.fixtures,
       dimensions: layers.dimensions,
     },
+    // Camera state lives in `useIsoCameraStore` (mode + frustumSize) —
+    // the SerializedCamera `position/target/fov` fields predate that
+    // store and are currently write-only (no deserializer consumes them).
+    // A future project-format bump should swap these for mode + frustum
+    // once we have a concrete reason to restore the exact view on load.
     camera: {
-      position: [6, 8, 6], // TODO: read from actual camera
+      position: [6, 8, 6],
       target: [0, 0, 0],
       fov: 50,
     },

@@ -1,27 +1,31 @@
 /**
- * AutoRouteTrigger — when a fixture is dropped from the FIXTURE wheel,
- * this component detects the drop position, finds the nearest existing
- * pipe network (main), and invokes HILOCoordinator to offer auto-route
- * alternatives via the Pareto frontier.
+ * AutoRouteTrigger — auto-routes a newly-placed fixture to the nearest
+ * existing pipe of matching system type.
  *
- * Flow:
- *   1. User selects fixture from FIXTURE wheel (pendingFixture in customerStore)
- *   2. User clicks on canvas → fixture drops at that position
- *   3. AutoRouteTrigger finds the nearest committed pipe of matching system
- *   4. Calls HILOCoordinator.generateRoutes() for that endpoint pair
- *   5. User sees Pareto-ranked route candidates in RouteSuggestionPanel
- *   6. User picks one → pipe commits, adding to the network
+ * Flow (updated):
+ *   1. User picks fixture from FIXTURE wheel → `pendingFixture` set.
+ *   2. `FixturePlacementPreview` renders a ghost + drop-catcher plane.
+ *   3. User clicks → FixturePlacementPreview commits the fixture into
+ *      `fixtureStore` AND emits `EV.FIXTURE_PLACED`.
+ *   4. This component listens for `EV.FIXTURE_PLACED`; looks up the
+ *      customer's template for the subtype/variant, finds the nearest
+ *      existing pipe endpoint, and calls `AutoRouter` to generate
+ *      route alternatives via the Pareto frontier.
+ *
+ * Why this split? The old implementation did both the drop AND the
+ * auto-route via a canvas-level native click listener. Problem: other
+ * R3F handlers called `stopImmediatePropagation()` on pointerdown,
+ * and the event priority was fragile. If an existing fixture's hitbox
+ * caught the click first, the drop silently failed. Moving the drop
+ * into R3F (FixturePlacementPreview) + keeping auto-route in the
+ * event-bus listener makes both pieces independent and reliable.
  *
  * The component renders no visible UI — it's pure event orchestration.
  */
 
-import { useEffect, useRef, useCallback } from 'react';
-import { useThree } from '@react-three/fiber';
-import * as THREE from 'three';
+import { useEffect } from 'react';
 import { useCustomerStore } from '@store/customerStore';
-import { useFixtureStore } from '@store/fixtureStore';
 import { usePipeStore } from '@store/pipeStore';
-import { useInteractionStore } from '@store/interactionStore';
 import { eventBus } from '@core/EventBus';
 import { EV, type Vec3 } from '@core/events';
 import { getAutoRouter } from '@core/pathfinding/AutoRouter';
@@ -39,7 +43,7 @@ function findNearestEndpoint(
 
   for (const pipe of pipes) {
     if (pipe.system !== system) continue;
-    // Check start + end of pipe
+    // Check start + end of pipe.
     for (const pos of [pipe.points[0], pipe.points[pipe.points.length - 1]]) {
       if (!pos) continue;
       const dx = pos[0] - target[0];
@@ -58,102 +62,67 @@ function findNearestEndpoint(
 // ── Component ───────────────────────────────────────────────────
 
 export function AutoRouteTrigger() {
-  const { raycaster, camera, pointer } = useThree();
-  const plane = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0));
-  const hit = useRef(new THREE.Vector3());
-
-  const getGroundHit = useCallback((): Vec3 => {
-    raycaster.setFromCamera(pointer, camera);
-    raycaster.ray.intersectPlane(plane.current, hit.current);
-    return [hit.current.x, hit.current.y, hit.current.z];
-  }, [raycaster, camera, pointer]);
-
   useEffect(() => {
-    const canvas = document.querySelector('canvas');
-    if (!canvas) return;
+    // Subscribe ONCE on mount. No frame-rate dep churn: the previous
+    // approach rebuilt this listener every frame because a useCallback
+    // depended on `raycaster/camera/pointer`; that race window
+    // contributed to the "drop sometimes just doesn't fire" bug.
+    const unsubscribe = eventBus.on(EV.FIXTURE_PLACED, (payload) => {
+      // fixtureStore.addFixture emits with { id, subtype, position, params }.
+      // Older emitters use { id, type, position, dfu }. Handle both.
+      const p = payload as {
+        id?: string;
+        subtype?: string;
+        type?: string;
+        position?: Vec3;
+        params?: Record<string, unknown>;
+      };
+      const pos = p.position;
+      if (!pos || pos.length !== 3) return;
+      const subtype = (p.subtype ?? p.type) as string | undefined;
+      if (!subtype) return;
+      // Tag carries the variant (set by FixturePlacementPreview via
+      // addFixture paramOverrides). Fall back to pendingFixture for
+      // any manually-emitted FIXTURE_PLACED.
+      const variant = (p.params?.['tag'] as string | undefined)
+        ?? useCustomerStore.getState().pendingFixture?.variant;
+      if (!variant) return;
 
-    const onClick = (e: MouseEvent) => {
-      if (e.button !== 0) return;
+      const template = useCustomerStore
+        .getState()
+        .getActiveTemplate(subtype as never, variant);
+      if (!template) return;
 
-      const pending = useCustomerStore.getState().pendingFixture;
-      if (!pending) return;
-
-      // Only act if we're in navigate mode (not drawing, not selecting)
-      const mode = useInteractionStore.getState().mode;
-      if (mode !== 'navigate') return;
-
-      // Determine drop position
-      const dropPos = getGroundHit();
-
-      // Resolve the template from the active customer
-      const template = useCustomerStore.getState().getActiveTemplate(
-        pending.subtype,
-        pending.variant,
-      );
-      if (!template) {
-        // No customer template for this variant — still drop the basic
-        // fixture so the user sees their click produced something.
-        useFixtureStore.getState().addFixture(pending.subtype, dropPos, {
-          tag: pending.variant,
-        });
-        eventBus.emit(EV.FIXTURE_PLACED, {
-          id: `fx-${Date.now()}`,
-          type: pending.subtype,
-          position: dropPos,
-          dfu: 0,
-        });
-        useCustomerStore.getState().setPendingFixture(null);
-        return;
-      }
-
-      // Actually add the fixture to the authoritative fixtureStore so
-      // FixtureLayerFromStore renders it. Previously only the event was
-      // fired — nothing listened, so nothing ever appeared in the scene.
-      useFixtureStore.getState().addFixture(pending.subtype, dropPos, {
-        tag: pending.variant,
-      });
-
-      // Emit a fixture-placed event (for solver / auto-route consumers)
-      const fixtureId = `fx-${Date.now()}`;
-      eventBus.emit(EV.FIXTURE_PLACED, {
-        id: fixtureId,
-        type: pending.subtype,
-        position: dropPos,
-        dfu: 0,
-      });
-
-      // Try to auto-route each connection port to the nearest existing main
       const router = getAutoRouter();
       router.setExistingPipes(Object.values(usePipeStore.getState().pipes));
 
-      // Waste connection
+      // Waste connection — route this port to the nearest drain main.
       if (template.connections.waste) {
         const fromPort: Vec3 = [
-          dropPos[0] + template.connections.waste.position[0],
-          dropPos[1] + template.connections.waste.position[1],
-          dropPos[2] + template.connections.waste.position[2],
+          pos[0] + template.connections.waste.position[0],
+          pos[1] + template.connections.waste.position[1],
+          pos[2] + template.connections.waste.position[2],
         ];
         const nearestMain = findNearestEndpoint(fromPort, 'waste');
         if (nearestMain) {
-          router.routeWithAlternatives({
-            startFixtureId: fixtureId,
-            endFixtureId: 'main',
-            startPos: fromPort,
-            endPos: nearestMain,
-            system: 'waste',
-            mode: 'hilo',
-            fixtureSubtype: pending.subtype,
-          }, 4);
+          router.routeWithAlternatives(
+            {
+              startFixtureId: p.id ?? `fx-${Date.now()}`,
+              endFixtureId: 'main',
+              startPos: fromPort,
+              endPos: nearestMain,
+              system: 'waste',
+              mode: 'hilo',
+              fixtureSubtype: subtype as never,
+            },
+            4,
+          );
         }
       }
+    });
 
-      // Clear the pending state — fixture has been placed
-      useCustomerStore.getState().setPendingFixture(null);
-    };
-
-    canvas.addEventListener('click', onClick);
-    return () => canvas.removeEventListener('click', onClick);
-  }, [getGroundHit]);
+    return unsubscribe;
+  }, []);
 
   return null;
 }

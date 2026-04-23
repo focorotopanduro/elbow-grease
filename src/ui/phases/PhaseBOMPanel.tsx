@@ -19,7 +19,7 @@
 import { useMemo, useState } from 'react';
 import { usePipeStore } from '@store/pipeStore';
 import { useFixtureStore } from '@store/fixtureStore';
-import { usePhaseStore } from '@store/phaseStore';
+import { usePlumbingPhaseStore } from '@store/plumbingPhaseStore';
 import { PHASE_META, PHASE_ORDER, PHASE_LABOR_MULT, type ConstructionPhase } from '@core/phases/PhaseTypes';
 import { classifyPipe, classifyFixture } from '@core/phases/PhaseClassifier';
 import { generateAllFittings } from '@ui/pipe/FittingGenerator';
@@ -74,9 +74,9 @@ interface PhaseTotals {
 export function PhaseBOMPanel() {
   const pipes = usePipeStore((s) => s.pipes);
   const fixtures = useFixtureStore((s) => s.fixtures);
-  const activePhase = usePhaseStore((s) => s.activePhase);
-  const pipeOverrides = usePhaseStore((s) => s.pipeOverrides);
-  const fixtureOverrides = usePhaseStore((s) => s.fixtureOverrides);
+  const activePhase = usePlumbingPhaseStore((s) => s.activePhase);
+  const pipeOverrides = usePlumbingPhaseStore((s) => s.pipeOverrides);
+  const fixtureOverrides = usePlumbingPhaseStore((s) => s.fixtureOverrides);
   const [collapsed, setCollapsed] = useState(false);
 
   const totals = useMemo(() => computeTotals(pipes, fixtures, pipeOverrides, fixtureOverrides), [pipes, fixtures, pipeOverrides, fixtureOverrides]);

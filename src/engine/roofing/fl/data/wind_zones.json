@@ -1,0 +1,695 @@
+{
+  "wind_zones": [
+    {
+      "id": 1,
+      "county": "Escambia",
+      "region": "Panhandle West",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C",
+      "notes": "Gulf coast; Pensacola"
+    },
+    {
+      "id": 2,
+      "county": "Santa Rosa",
+      "region": "Panhandle West",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 3,
+      "county": "Okaloosa",
+      "region": "Panhandle West",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 4,
+      "county": "Walton",
+      "region": "Panhandle West",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 5,
+      "county": "Bay",
+      "region": "Panhandle West",
+      "vult_peak_mph": 150,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C",
+      "notes": "Hurricane Michael 2018 landfall"
+    },
+    {
+      "id": 6,
+      "county": "Holmes",
+      "region": "Panhandle West",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 7,
+      "county": "Washington",
+      "region": "Panhandle West",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 8,
+      "county": "Jackson",
+      "region": "Panhandle West",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 9,
+      "county": "Calhoun",
+      "region": "Panhandle West",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 10,
+      "county": "Gulf",
+      "region": "Panhandle West",
+      "vult_peak_mph": 150,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 11,
+      "county": "Franklin",
+      "region": "Panhandle East",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 12,
+      "county": "Liberty",
+      "region": "Panhandle East",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 13,
+      "county": "Gadsden",
+      "region": "Panhandle East",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 14,
+      "county": "Leon",
+      "region": "Big Bend",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B",
+      "notes": "Tallahassee; state capital"
+    },
+    {
+      "id": 15,
+      "county": "Wakulla",
+      "region": "Big Bend",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 16,
+      "county": "Jefferson",
+      "region": "Big Bend",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "B"
+    },
+    {
+      "id": 17,
+      "county": "Madison",
+      "region": "Big Bend",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 18,
+      "county": "Taylor",
+      "region": "Big Bend",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 19,
+      "county": "Hamilton",
+      "region": "North Central",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 20,
+      "county": "Lafayette",
+      "region": "Big Bend",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 21,
+      "county": "Dixie",
+      "region": "Big Bend",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 22,
+      "county": "Suwannee",
+      "region": "North Central",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 23,
+      "county": "Columbia",
+      "region": "North Central",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 24,
+      "county": "Baker",
+      "region": "NE Florida",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 25,
+      "county": "Union",
+      "region": "North Central",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 26,
+      "county": "Bradford",
+      "region": "North Central",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 27,
+      "county": "Alachua",
+      "region": "North Central",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B",
+      "notes": "Gainesville; UF campus"
+    },
+    {
+      "id": 28,
+      "county": "Gilchrist",
+      "region": "North Central",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 29,
+      "county": "Levy",
+      "region": "Nature Coast",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 30,
+      "county": "Nassau",
+      "region": "NE Florida",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 31,
+      "county": "Duval",
+      "region": "NE Florida",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C",
+      "notes": "Jacksonville; verified 130-140 range, peak used"
+    },
+    {
+      "id": 32,
+      "county": "Clay",
+      "region": "NE Florida",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 33,
+      "county": "Putnam",
+      "region": "NE Florida",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 34,
+      "county": "St. Johns",
+      "region": "NE Florida",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C",
+      "notes": "St. Augustine"
+    },
+    {
+      "id": 35,
+      "county": "Flagler",
+      "region": "NE Florida",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 36,
+      "county": "Marion",
+      "region": "North Central",
+      "vult_peak_mph": 130,
+      "wbdr_flag": 0,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B",
+      "notes": "Ocala; large lakes may trigger Exp D locally"
+    },
+    {
+      "id": 37,
+      "county": "Citrus",
+      "region": "Nature Coast",
+      "vult_peak_mph": 150,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 38,
+      "county": "Sumter",
+      "region": "Central",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 39,
+      "county": "Lake",
+      "region": "Central",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B",
+      "notes": "Large lakes; Exp D possible near shore"
+    },
+    {
+      "id": 40,
+      "county": "Volusia",
+      "region": "Space Coast",
+      "vult_peak_mph": 150,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C",
+      "notes": "Daytona"
+    },
+    {
+      "id": 41,
+      "county": "Seminole",
+      "region": "Central",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 42,
+      "county": "Orange",
+      "region": "Central",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B",
+      "notes": "Orlando; verified 130-140 range"
+    },
+    {
+      "id": 43,
+      "county": "Osceola",
+      "region": "Central",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 44,
+      "county": "Brevard",
+      "region": "Space Coast",
+      "vult_peak_mph": 160,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C",
+      "notes": "Cape Canaveral; barrier islands higher"
+    },
+    {
+      "id": 45,
+      "county": "Hernando",
+      "region": "Nature Coast",
+      "vult_peak_mph": 150,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 46,
+      "county": "Pasco",
+      "region": "Tampa Bay",
+      "vult_peak_mph": 150,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 47,
+      "county": "Hillsborough",
+      "region": "Tampa Bay",
+      "vult_peak_mph": 160,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C",
+      "notes": "Tampa; verified 150-160 range, peak used"
+    },
+    {
+      "id": 48,
+      "county": "Pinellas",
+      "region": "Tampa Bay",
+      "vult_peak_mph": 160,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C",
+      "notes": "St. Pete/Clearwater; barrier islands"
+    },
+    {
+      "id": 49,
+      "county": "Polk",
+      "region": "Central",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B",
+      "notes": "Lakeland; inland"
+    },
+    {
+      "id": 50,
+      "county": "Manatee",
+      "region": "SW Coast",
+      "vult_peak_mph": 160,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 51,
+      "county": "Sarasota",
+      "region": "SW Coast",
+      "vult_peak_mph": 160,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 52,
+      "county": "Hardee",
+      "region": "Heartland",
+      "vult_peak_mph": 140,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 53,
+      "county": "Highlands",
+      "region": "Heartland",
+      "vult_peak_mph": 150,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 54,
+      "county": "DeSoto",
+      "region": "Heartland",
+      "vult_peak_mph": 150,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 55,
+      "county": "Charlotte",
+      "region": "SW Coast",
+      "vult_peak_mph": 170,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C",
+      "notes": "Punta Gorda; Hurricane Ian 2022"
+    },
+    {
+      "id": 56,
+      "county": "Glades",
+      "region": "Heartland",
+      "vult_peak_mph": 160,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 57,
+      "county": "Lee",
+      "region": "SW Coast",
+      "vult_peak_mph": 170,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C",
+      "notes": "Fort Myers/Cape Coral; verified 160-170 range"
+    },
+    {
+      "id": 58,
+      "county": "Hendry",
+      "region": "SW Coast",
+      "vult_peak_mph": 160,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 59,
+      "county": "Collier",
+      "region": "SW Coast",
+      "vult_peak_mph": 170,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C",
+      "notes": "Naples; verified 160-170 range, Collier county enforces strict"
+    },
+    {
+      "id": 60,
+      "county": "Okeechobee",
+      "region": "Heartland",
+      "vult_peak_mph": 160,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 0,
+      "exposure_default": "B"
+    },
+    {
+      "id": 61,
+      "county": "Indian River",
+      "region": "Treasure Coast",
+      "vult_peak_mph": 160,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 62,
+      "county": "St. Lucie",
+      "region": "Treasure Coast",
+      "vult_peak_mph": 170,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 63,
+      "county": "Martin",
+      "region": "Treasure Coast",
+      "vult_peak_mph": 170,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C"
+    },
+    {
+      "id": 64,
+      "county": "Palm Beach",
+      "region": "SE Florida",
+      "vult_peak_mph": 170,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C",
+      "notes": "West Palm Beach; adjacent to HVHZ"
+    },
+    {
+      "id": 65,
+      "county": "Broward",
+      "region": "SE Florida HVHZ",
+      "vult_peak_mph": 170,
+      "wbdr_flag": 1,
+      "hvhz_flag": 1,
+      "coastal_flag": 1,
+      "exposure_default": "C",
+      "notes": "HVHZ; Broward Product Control approval required; TAS 201/202/203 openings"
+    },
+    {
+      "id": 66,
+      "county": "Miami-Dade",
+      "region": "SE Florida HVHZ",
+      "vult_peak_mph": 175,
+      "wbdr_flag": 1,
+      "hvhz_flag": 1,
+      "coastal_flag": 1,
+      "exposure_default": "C",
+      "notes": "HVHZ; Miami-Dade NOA required for all envelope products"
+    },
+    {
+      "id": 67,
+      "county": "Monroe",
+      "region": "Florida Keys",
+      "vult_peak_mph": 180,
+      "wbdr_flag": 1,
+      "hvhz_flag": 0,
+      "coastal_flag": 1,
+      "exposure_default": "C",
+      "notes": "Keys peak 180 mph; Mainland Monroe ~170; local amendments treat as HVHZ-equivalent in some municipalities"
+    }
+  ]
+}

@@ -15,8 +15,15 @@
  */
 
 import { eventBus } from '../EventBus';
-import { EV } from '../events';
+import { EV, type PipeCompletePayload } from '../events';
 import { serializeToJSON, deserializeProject, type SerializeInput, type DeserializeResult } from './ProjectSerializer';
+import { ProjectBundle } from './ProjectBundle';
+import { createFsAdapter } from './fs';
+import type { ProjectEvent } from './ProjectEvents';
+import { getFlag } from '@store/featureFlagStore';
+import { logger } from '@core/logger/Logger';
+
+const log = logger('AutoSave');
 
 // ── Storage keys ────────────────────────────────────────────────
 
@@ -34,6 +41,46 @@ export class AutoSaveManager {
   private saveCount = 0;
 
   /**
+   * Phase 4: when the `projectBundle` feature flag is on, AutoSave
+   * additionally writes to a crash-safe bundle via the FsAdapter.
+   * This path runs IN PARALLEL with the legacy localStorage path
+   * during rollout — both keep state so a bundle bug never loses
+   * progress. Once Phase 4 graduates to default-on, the localStorage
+   * path stays as a dev-only fallback.
+   */
+  private bundle: ProjectBundle<SerializeInput> | null = null;
+  private bundleInitAttempted = false;
+
+  private async getOrInitBundle(): Promise<ProjectBundle<SerializeInput> | null> {
+    if (this.bundle) return this.bundle;
+    if (this.bundleInitAttempted) return null; // already failed once
+    this.bundleInitAttempted = true;
+    try {
+      const fs = await createFsAdapter();
+      const bundle = new ProjectBundle<SerializeInput>(
+        fs,
+        'autosave/current.elbow',
+        {
+          projectName: 'Autosave',
+          appVersion: '0.1.0',
+          serializeSnapshot: () => this.getState?.() ?? {
+            pipes: [], fixtures: [], structures: [],
+            layers: { systems: {} as any, fittings: true, fixtures: true, dimensions: true },
+            camera: { position: [0, 0, 0], target: [0, 0, 0], fov: 45 },
+          },
+        },
+      );
+      await bundle.ensureOpen();
+      this.bundle = bundle;
+      return bundle;
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      log.warn('bundle init failed, staying on localStorage', err);
+      return null;
+    }
+  }
+
+  /**
    * Start auto-saving. Provide a function that returns the current
    * design state when called.
    */
@@ -46,9 +93,19 @@ export class AutoSaveManager {
     }, AUTOSAVE_INTERVAL_MS);
 
     // Event-driven saves (on pipe commit)
-    eventBus.on(EV.PIPE_COMPLETE, () => {
+    eventBus.on<PipeCompletePayload>(EV.PIPE_COMPLETE, (payload) => {
       this.dirty = true;
-      // Debounce: don't save more than once per 5 seconds
+      // Debounce localStorage rewrite to 5s, but append to the
+      // bundle log IMMEDIATELY — one small append is cheap and that's
+      // the whole point of the bundle's crash resilience.
+      void this.appendBundleEvent({
+        k: 'pipe.add',
+        t: performance.now(),
+        id: payload.id,
+        points: payload.points,
+        diameter: payload.diameter,
+        material: payload.material,
+      });
       const now = Date.now();
       if (now - this.lastSaveTime > 5000) {
         this.save();
@@ -89,13 +146,52 @@ export class AutoSaveManager {
       localStorage.setItem(`${STORAGE_PREFIX}-0`, json);
       localStorage.setItem(`${STORAGE_PREFIX}-timestamp`, new Date().toISOString());
 
+      // Phase 4: if the bundle path is on, compact() captures a full
+      // snapshot + truncates the log. We do this on explicit `save()`
+      // which users implicitly trigger every ~30s or on pipe-commit
+      // pulses. If the bundle isn't ready yet the call is a no-op.
+      void this.compactBundle();
+
       this.dirty = false;
       this.lastSaveTime = Date.now();
       this.saveCount++;
       return true;
     } catch (err) {
-      console.warn('[AutoSave] Failed to save:', err);
+      log.warn('save failed', err);
       return false;
+    }
+  }
+
+  /**
+   * Append a logical project event to the bundle if the flag is on.
+   * Silent no-op if the flag is off or the bundle failed to init.
+   */
+  private async appendBundleEvent(evt: ProjectEvent): Promise<void> {
+    if (!getFlag('projectBundle')) return;
+    const bundle = await this.getOrInitBundle();
+    if (!bundle) return;
+    try {
+      await bundle.appendEvent(evt);
+    } catch (err) {
+      // Log once, never throw — bundle failures must not break the UI.
+      // eslint-disable-next-line no-console
+      log.warn('bundle.appendEvent failed', err);
+    }
+  }
+
+  /**
+   * Compact the bundle (write snapshot + truncate log) if the flag
+   * is on. Called from `save()`.
+   */
+  private async compactBundle(): Promise<void> {
+    if (!getFlag('projectBundle')) return;
+    const bundle = await this.getOrInitBundle();
+    if (!bundle) return;
+    try {
+      await bundle.compact();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      log.warn('bundle.compact failed', err);
     }
   }
 
@@ -120,7 +216,7 @@ export class AutoSaveManager {
     try {
       return deserializeProject(json);
     } catch (err) {
-      console.warn(`[AutoSave] Failed to load slot ${slot}:`, err);
+      log.warn(`failed to load slot ${slot}`, err);
       return null;
     }
   }

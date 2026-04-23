@@ -39,14 +39,20 @@ interface MaterialLook {
 }
 
 const MATERIAL_LOOK: Record<PipeMaterialType, MaterialLook> = {
-  // PVC / ABS / CPVC — slightly glossier than pure matte so the
-  // warehouse HDRI gives them a subtle highlight stripe.
-  pvc_sch40:        { baseColor: '#e8e4d9', metalness: 0.05, roughness: 0.48, emissiveIntensity: 0.03, diameterTintBlend: 0.12 },
-  pvc_sch80:        { baseColor: '#4a5264', metalness: 0.08, roughness: 0.42, emissiveIntensity: 0.03, diameterTintBlend: 0.10 },
-  abs:              { baseColor: '#1a1a1c', metalness: 0.05, roughness: 0.58, emissiveIntensity: 0.02, diameterTintBlend: 0.08 },
-  cpvc:             { baseColor: '#d6b88a', metalness: 0.06, roughness: 0.45, emissiveIntensity: 0.03, diameterTintBlend: 0.10 },
-  // PEX — soft satin plastic. Slightly higher metalness+lower rough
-  // than PVC reads as "wet" plastic, matching real PEX-A appearance.
+  // PVC / ABS / CPVC — plastic pipes carry a STRONG diameter tint so
+  // users can instantly read "green = 3", orange = 2", purple = 1.5".
+  // Before this bug-fix pass the blend was 0.08-0.12, which made
+  // every plastic pipe read as near-white material color; the
+  // diameter signal was lost. Now 0.70 lets the material base
+  // contribute only surface character (satin vs matte) while the
+  // diameter color dominates.
+  pvc_sch40:        { baseColor: '#e8e4d9', metalness: 0.05, roughness: 0.48, emissiveIntensity: 0.05, diameterTintBlend: 0.70 },
+  pvc_sch80:        { baseColor: '#4a5264', metalness: 0.08, roughness: 0.42, emissiveIntensity: 0.05, diameterTintBlend: 0.65 },
+  abs:              { baseColor: '#1a1a1c', metalness: 0.05, roughness: 0.58, emissiveIntensity: 0.04, diameterTintBlend: 0.55 },
+  cpvc:             { baseColor: '#d6b88a', metalness: 0.06, roughness: 0.45, emissiveIntensity: 0.05, diameterTintBlend: 0.65 },
+  // PEX — metal-ish plastic. For supply (hot/cold) industry uses red +
+  // blue by system, so we keep that. For the (rare) DWV use we fall
+  // back to diameter tint so the pipe still reads sized.
   pex:              { baseColor: '#f1f1f1', metalness: 0.10, roughness: 0.40, emissiveIntensity: 0.04, diameterTintBlend: 0.00 },
   // Copper — bumped metalness toward unity + lower roughness gives the
   // warm gloss you see on new copper runs. Slight emissive keeps
@@ -69,6 +75,10 @@ const PEX_SYSTEM_COLOR: Record<SystemType, string> = {
   waste:       '#eeeeee',  // white
   vent:        '#eeeeee',
   storm:       '#5b6f84',
+  // Phase 14.AA.3 — HVAC condensate gets a light purple so it
+  // reads distinct from the blue PEX cold lines even though both
+  // carry cool water.
+  condensate:  '#9575cd',
 };
 
 // ── Helpers ─────────────────────────────────────────────────────

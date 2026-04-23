@@ -1,117 +1,145 @@
 /**
- * NavStatusChip — persistent top-center HUD showing the three things
- * that control whether orbit camera works:
+ * NavStatusChip — compact top-center status indicator.
  *
- *   [MODE: Navigate/Draw/Select] [CAM: Perspective/Top/...] [ORBIT: ON/OFF]
+ * Bug-fix pass: was previously a ~500 px-wide persistent bar with a
+ * tutorial-style "▶ ORBIT · L-drag rotate · R-drag pan · wheel zoom"
+ * string that the user correctly called out as intrusive. Collapsed
+ * now into:
  *
- * When orbit is OFF, the chip shows WHY (which of the three conditions
- * isn't met) so you can fix it with one click. Each segment is
- * clickable to restore the needed state.
+ *   • Two tiny dots (NAV / CAM). Click either to snap back to default.
+ *   • Warnings only appear when state is ABNORMAL (pending fixture,
+ *     non-navigate mode, non-perspective camera, pivot lock).
+ *   • The verbose help string is gone from the persistent HUD — it
+ *     now lives in the hover tooltip of each chip, so new users can
+ *     still discover bindings but existing users aren't nagged.
  */
 
-import { useInteractionStore } from '@store/interactionStore';
+import { useState } from 'react';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { useIsoCameraStore } from '@ui/cameras/IsoCamera';
 import { usePipeStore } from '@store/pipeStore';
 import { useCustomerStore } from '@store/customerStore';
 
 export function NavStatusChip() {
-  const mode = useInteractionStore((s) => s.mode);
-  const setMode = useInteractionStore((s) => s.setMode);
+  const mode = usePlumbingDrawStore((s) => s.mode);
+  const setMode = usePlumbingDrawStore((s) => s.setMode);
   const cameraMode = useIsoCameraStore((s) => s.mode);
   const setCameraMode = useIsoCameraStore((s) => s.setMode);
   const pivoting = usePipeStore((s) => s.pivotSession !== null);
   const pending = useCustomerStore((s) => s.pendingFixture);
   const setPending = useCustomerStore((s) => s.setPendingFixture);
 
-  // Camera controls always active unless a pipe-pivot is happening.
-  //   Perspective       → rotate + pan + zoom
-  //   Top/Front/Side/Iso → pan + zoom only (rotate locked for drafting)
-  const canMove = !pivoting;
-  const canRotate = cameraMode === 'perspective' && !pivoting;
+  const [expanded, setExpanded] = useState(false);
+
+  const modeOk = mode === 'navigate';
+  const camOk = cameraMode === 'perspective';
+  const anomaly = !modeOk || !camOk || !!pending || pivoting;
 
   return (
     <div
       style={{
         position: 'fixed',
-        top: 192,
+        top: 10,
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 45,
         display: 'flex',
-        gap: 4,
-        padding: 4,
-        background: 'rgba(6,12,20,0.92)',
-        border: `1px solid ${canMove ? '#66bb6a' : '#ef5350'}`,
-        borderRadius: 8,
+        gap: 3,
+        padding: '2px 4px',
+        background: anomaly ? 'rgba(239,83,80,0.12)' : 'rgba(6,12,20,0.5)',
+        border: `1px solid ${anomaly ? 'rgba(239,83,80,0.5)' : 'rgba(120,180,220,0.15)'}`,
+        borderRadius: 12,
         fontFamily: 'Consolas, monospace',
-        fontSize: 10,
+        fontSize: 9,
         pointerEvents: 'auto',
-        boxShadow: canMove ? '0 0 10px rgba(102,187,106,0.35)' : '0 0 10px rgba(239,83,80,0.35)',
       }}
+      onMouseEnter={() => setExpanded(true)}
+      onMouseLeave={() => setExpanded(false)}
     >
-      {/* MODE segment */}
+      {/* MODE dot */}
       <button
         onClick={() => setMode('navigate')}
-        title="Interaction mode — Navigate lets you orbit the camera"
-        style={segStyle(mode === 'navigate', '#66bb6a')}
+        title={`Mode: ${mode}. Click to switch to Navigate (orbit-ready).`}
+        style={dotStyle(modeOk, '#66bb6a', expanded)}
       >
-        {mode === 'navigate' ? '◉' : '○'} NAV
+        {expanded ? (modeOk ? 'NAV' : mode.toUpperCase()) : (modeOk ? '●' : '○')}
       </button>
 
-      {/* CAMERA segment */}
+      {/* CAMERA dot */}
       <button
         onClick={() => setCameraMode('perspective')}
-        title="Camera view — Perspective is the only one that lets you orbit"
-        style={segStyle(cameraMode === 'perspective', '#4fc3f7')}
+        title={`Camera: ${cameraMode}. Click to switch to Perspective (rotate-enabled).`}
+        style={dotStyle(camOk, '#4fc3f7', expanded)}
       >
-        {cameraMode === 'perspective' ? '◉' : '○'} {cameraMode.toUpperCase().slice(0, 5)}
+        {expanded ? cameraMode.toUpperCase().slice(0, 5) : (camOk ? '●' : '○')}
       </button>
 
-      {/* PENDING fixture warning (blocks clicks even in navigate mode) */}
+      {/* Warnings (always visible, even collapsed) */}
       {pending && (
         <button
           onClick={() => setPending(null)}
-          title="A fixture is pending placement — clicks drop that fixture, not orbit"
-          style={{ ...segStyle(false, '#ffa726'), cursor: 'pointer' }}
+          title="A fixture is pending placement — clicks drop that fixture. Click here to cancel."
+          style={warnStyle('#ffa726')}
         >
-          ✕ PENDING: {pending.variant}
+          ✕ {pending.variant}
         </button>
       )}
-
-      {/* PIVOT warning */}
       {pivoting && (
-        <div style={segStyle(false, '#ffa726')}>⚠ PIVOT</div>
+        <div style={warnStyle('#ffa726')}>⚠ PIVOT</div>
       )}
 
-      {/* Camera-control verdict */}
-      <div
-        style={{
-          ...segStyle(canMove, canMove ? '#66bb6a' : '#ef5350'),
-          fontWeight: 700,
-          pointerEvents: 'none',
-        }}
-      >
-        {!canMove
-          ? '■ CAMERA LOCKED'
-          : canRotate
-            ? '▶ ORBIT · L-drag rotate · R-drag pan · wheel zoom'
-            : '▶ PAN + ZOOM · R-drag pan · wheel zoom · (rotate locked in this view)'}
-      </div>
+      {/* Expanded help (hover only) */}
+      {expanded && !pending && !pivoting && (
+        <div style={helpStyle}>
+          {modeOk && camOk
+            ? 'L-drag rotate · R-drag pan · wheel zoom'
+            : modeOk
+              ? 'Ortho view — pan + zoom (no rotate)'
+              : 'Not in Navigate mode — click NAV to restore orbit'}
+        </div>
+      )}
     </div>
   );
 }
 
-function segStyle(active: boolean, color: string): React.CSSProperties {
+function dotStyle(active: boolean, color: string, expanded: boolean): React.CSSProperties {
   return {
-    padding: '5px 10px',
+    padding: expanded ? '2px 6px' : '1px 4px',
     background: active ? `${color}22` : 'transparent',
-    border: `1px solid ${active ? color : 'rgba(120,180,220,0.2)'}`,
-    borderRadius: 4,
+    border: `1px solid ${active ? color : 'rgba(120,180,220,0.25)'}`,
+    borderRadius: 8,
     color: active ? color : '#7a8592',
     cursor: 'pointer',
     fontFamily: 'Consolas, monospace',
-    fontSize: 10,
-    letterSpacing: 1,
+    fontSize: 9,
+    letterSpacing: 0.5,
+    whiteSpace: 'nowrap',
+    minWidth: expanded ? 34 : 16,
+    textAlign: 'center',
+    transition: 'min-width 0.12s ease',
+  };
+}
+
+function warnStyle(color: string): React.CSSProperties {
+  return {
+    padding: '1px 6px',
+    background: `${color}22`,
+    border: `1px solid ${color}`,
+    borderRadius: 8,
+    color,
+    cursor: 'pointer',
+    fontFamily: 'Consolas, monospace',
+    fontSize: 9,
+    letterSpacing: 0.5,
     whiteSpace: 'nowrap',
   };
 }
+
+const helpStyle: React.CSSProperties = {
+  padding: '1px 8px',
+  color: '#7a8592',
+  fontSize: 9,
+  letterSpacing: 0.3,
+  whiteSpace: 'nowrap',
+  fontStyle: 'italic',
+};

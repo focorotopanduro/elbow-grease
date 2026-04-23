@@ -2,155 +2,322 @@
  * LiveRoutePreview — shows a solid pipe growing in real-time as the
  * user drags to create a route.
  *
- * Subscribes to EV.PIPE_ROUTE_UPDATE (emitted by SpatialPipeInteraction
- * during every pinch-move) and renders a semi-transparent TubeGeometry
- * that extends with each new waypoint.
+ * Phase 14.Q rewrite:
  *
- * Clears on EV.PIPE_CANCEL or when HILO takes over (HILO_EV.ROUTES_GENERATED).
+ *   Before: single CatmullRomCurve3 through all waypoints → splined
+ *   curves that smoothly rounded every corner. Visually misleading
+ *   for plumbing, which is always *segmented* (elbows + straight
+ *   lengths). Fixed 2" diameter regardless of what diameter the user
+ *   had selected.
  *
- * This is the key UX improvement: the user sees the pipe forming in
- * real-time under their hand/cursor, not just after commit. The pipe
- * "grows" as a translucent cyan tube with pulsing emissive.
+ *   After: segment-based cylinders, one per polyline edge, with the
+ *   currently-selected diameter driving the radius. Matches what
+ *   the committed PipeRenderer produces, so the live preview and
+ *   the final geometry agree visually. Real pitch (drop-per-foot)
+ *   shows up as actual Y delta between segment endpoints because
+ *   the tube is now axis-aligned rather than splined.
+ *
+ * Subscribes to EV.PIPE_ROUTE_UPDATE (emitted during drag).
+ * Clears on EV.PIPE_CANCEL or HILO_EV.ROUTES_GENERATED.
  */
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { Billboard, Text } from '@react-three/drei';
 import { useEvent } from '@hooks/useEventBus';
+import { useRafEvent } from '@hooks/useRafEvent';
 import { EV, type Vec3, type PipeRouteUpdatePayload } from '@core/events';
 import { HILO_EV } from '@core/hilo/HILOCoordinator';
-import { getPreviewMaterial } from '@ui/pipe/PipeMaterial';
+import { useReducedMotion } from '@core/a11y/useReducedMotion';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
+import {
+  buildRouteSegments,
+  totalLength,
+  classifySlope,
+  type RouteSegment,
+} from '@core/pipe/liveRouteBuild';
+import { getOuterRadiusFt } from '@core/pipe/PipeSizeSpec';
+import { getColorForDiameter } from '@store/pipeStore';
+import type { PipeMaterial } from '../../engine/graph/GraphEdge';
 
-// ── Default preview diameter (2" pipe) ──────────────────────────
+// Cylinder orientation helper — applies the rotation that maps
+// Three.js's default cylinder (Y-axis) to an arbitrary world-space
+// direction. Reused across every segment; one scratch vector.
+const SCRATCH_Q = new THREE.Quaternion();
+const UP = new THREE.Vector3(0, 1, 0);
+const SCRATCH_DIR = new THREE.Vector3();
 
-const PREVIEW_RADIUS = 2 / 24; // 2 inches → feet
+function segmentQuaternion(seg: RouteSegment): THREE.Quaternion {
+  SCRATCH_DIR.set(seg.direction[0], seg.direction[1], seg.direction[2]);
+  SCRATCH_Q.setFromUnitVectors(UP, SCRATCH_DIR);
+  return SCRATCH_Q.clone();
+}
+
+// Slope verdict → color (matches committed PitchIndicators palette)
+const SLOPE_COLOR = {
+  compliant: '#00e676',
+  marginal:  '#ffc107',
+  undershot: '#ff1744',
+  flat:      '#888888',
+} as const;
+
+// ── Main component ─────────────────────────────────────────────
 
 export function LiveRoutePreview() {
   const [points, setPoints] = useState<Vec3[]>([]);
   const [active, setActive] = useState(false);
-  const meshRef = useRef<THREE.Mesh>(null!);
 
-  // Route update → extend the preview
-  useEvent<PipeRouteUpdatePayload>(EV.PIPE_ROUTE_UPDATE, (payload) => {
+  // Live diameter + material from the interaction store so the
+  // preview reflects the user's current pipe choice exactly.
+  const diameter = usePlumbingDrawStore((s) => s.drawDiameter);
+  const material = usePlumbingDrawStore((s) => s.drawMaterial);
+
+  const reducedMotion = useReducedMotion();
+
+  // rAF-coalesced — React setState on every pointermove churns the
+  // fiber tree and cascades into the segment useMemo below. Throttling
+  // to one update per frame removes that churn without changing perceived
+  // responsiveness (display refresh is the ceiling anyway). (14.AC.1)
+  useRafEvent<PipeRouteUpdatePayload>(EV.PIPE_ROUTE_UPDATE, (payload) => {
     if (payload.points.length >= 2) {
       setPoints([...payload.points]);
       setActive(true);
     }
   });
 
-  // Route started → activate
   useEvent(EV.PIPE_DRAG_START, () => {
     setActive(true);
     setPoints([]);
   });
 
-  // Route canceled → clear
   useEvent(EV.PIPE_CANCEL, () => {
     setActive(false);
     setPoints([]);
   });
 
-  // HILO takes over → clear (ghost routes replace the preview)
   useEvent(HILO_EV.ROUTES_GENERATED, () => {
     setActive(false);
     setPoints([]);
   });
 
-  // Build geometry from current points
-  const geometry = useMemo(() => {
-    if (points.length < 2) return null;
+  // Pre-compute segments from the current polyline.
+  const segments = useMemo(() => buildRouteSegments(points), [points]);
 
-    const vectors = points.map((p) => new THREE.Vector3(p[0], p[1], p[2]));
-    const curve = new THREE.CatmullRomCurve3(vectors, false, 'catmullrom', 0.2);
-    const segments = Math.max(8, points.length * 4);
+  const radiusFt = useMemo(
+    () => getOuterRadiusFt(material as PipeMaterial, diameter),
+    [material, diameter],
+  );
 
-    return new THREE.TubeGeometry(curve, segments, PREVIEW_RADIUS, 8, false);
-  }, [points]);
+  // Color the preview in the user's selected-diameter palette so
+  // "3" waste" reads as green even in preview mode (consistent with
+  // committed pipes' DIAMETER_COLORS).
+  const baseColor = useMemo(() => getColorForDiameter(diameter), [diameter]);
 
-  // Dispose old geometry
-  useEffect(() => {
-    return () => geometry?.dispose();
-  }, [geometry]);
-
-  // Pulse the emissive intensity for "live drawing" feel
-  useFrame(({ clock }) => {
-    if (!meshRef.current) return;
-    const mat = meshRef.current.material as THREE.MeshStandardMaterial;
-    mat.emissiveIntensity = 0.4 + Math.sin(clock.elapsedTime * 4) * 0.2;
-    mat.opacity = 0.35 + Math.sin(clock.elapsedTime * 3) * 0.1;
-  });
-
-  if (!active || !geometry) return null;
-
-  const material = getPreviewMaterial();
+  if (!active || segments.length === 0) return null;
 
   return (
     <group>
-      {/* Growing tube */}
-      <mesh ref={meshRef} geometry={geometry} material={material} />
+      {/* ── Straight segments — one cylinder per polyline edge ── */}
+      {segments.map((seg, i) => (
+        <LiveSegment
+          key={i}
+          seg={seg}
+          radiusFt={radiusFt}
+          baseColor={baseColor}
+          reducedMotion={reducedMotion}
+        />
+      ))}
 
-      {/* Head indicator (sphere at the latest point) */}
+      {/* Start + head indicators — gold cap at the first point,
+          cyan sphere at the last (the "drawing pen" tip). */}
       {points.length > 0 && (
-        <mesh position={points[points.length - 1]!}>
-          <sphereGeometry args={[PREVIEW_RADIUS * 1.5, 12, 12]} />
-          <meshStandardMaterial
-            color="#00e5ff"
-            transparent
-            opacity={0.7}
-            emissive="#00e5ff"
-            emissiveIntensity={1.2}
-            toneMapped={false}
-          />
-        </mesh>
+        <StartRing point={points[0]!} radiusFt={radiusFt} />
       )}
-
-      {/* Start indicator (ring at first point) */}
       {points.length > 0 && (
-        <mesh position={points[0]!} rotation-x={Math.PI / 2}>
-          <torusGeometry args={[PREVIEW_RADIUS * 2, PREVIEW_RADIUS * 0.3, 8, 24]} />
-          <meshStandardMaterial
-            color="#00e5ff"
-            transparent
-            opacity={0.6}
-            emissive="#00e5ff"
-            emissiveIntensity={0.8}
-            toneMapped={false}
-          />
-        </mesh>
+        <HeadSphere point={points[points.length - 1]!} radiusFt={radiusFt} />
       )}
 
-      {/* Length label at midpoint */}
-      {points.length >= 2 && (
-        <LengthIndicator points={points} />
-      )}
+      {/* Pitch labels per segment — only for DWV (waste/storm)
+          contexts. Supply pipes don't have a code-minimum slope,
+          so labeling every segment would be noise. */}
+      {segments.map((seg, i) => (
+        <SegmentInfo
+          key={`info-${i}`}
+          seg={seg}
+          diameter={diameter}
+          material={material}
+        />
+      ))}
+
+      {/* Running total length — floats at the live cursor. */}
+      <TotalLengthBadge points={points} />
     </group>
   );
 }
 
-// ── Real-time length display ────────────────────────────────────
+// ── Single segment cylinder ───────────────────────────────────
 
-function LengthIndicator({ points }: { points: Vec3[] }) {
-  const totalLength = useMemo(() => {
-    let len = 0;
-    for (let i = 1; i < points.length; i++) {
-      const dx = points[i]![0] - points[i - 1]![0];
-      const dy = points[i]![1] - points[i - 1]![1];
-      const dz = points[i]![2] - points[i - 1]![2];
-      len += Math.sqrt(dx * dx + dy * dy + dz * dz);
+function LiveSegment({
+  seg,
+  radiusFt,
+  baseColor,
+  reducedMotion,
+}: {
+  seg: RouteSegment;
+  radiusFt: number;
+  baseColor: string;
+  reducedMotion: boolean;
+}) {
+  const meshRef = useRef<THREE.Mesh>(null!);
+  const quat = useMemo(() => segmentQuaternion(seg), [seg.direction]);
+
+  // Soft pulse on opacity only — emissiveIntensity is kept static
+  // so the color reading isn't washed out at peak pulse.
+  useFrame(({ clock }) => {
+    if (!meshRef.current) return;
+    const m = meshRef.current.material as THREE.MeshStandardMaterial;
+    if (reducedMotion) {
+      m.opacity = 0.55;
+      return;
     }
-    return len;
-  }, [points]);
+    m.opacity = 0.5 + Math.sin(clock.elapsedTime * 2.5) * 0.07;
+  });
 
-  const midIdx = Math.floor(points.length / 2);
-  const midPoint = points[midIdx];
-  if (!midPoint) return null;
-
-  // Render as a simple floating sphere with text via HTML overlay
-  // (drei's <Text> would be cleaner but keeping it lightweight here)
   return (
-    <mesh position={[midPoint[0], midPoint[1] + 0.4, midPoint[2]]}>
-      <sphereGeometry args={[0.03, 6, 6]} />
-      <meshBasicMaterial color="#00e5ff" transparent opacity={0.5} />
+    <mesh
+      ref={meshRef}
+      position={[seg.mid[0], seg.mid[1], seg.mid[2]]}
+      quaternion={quat}
+    >
+      <cylinderGeometry args={[radiusFt, radiusFt, seg.length, 16, 1, false]} />
+      <meshStandardMaterial
+        color={baseColor}
+        transparent
+        opacity={0.55}
+        metalness={0.3}
+        roughness={0.45}
+        emissive={baseColor}
+        emissiveIntensity={0.35}
+        toneMapped={false}
+        depthWrite={false}
+      />
     </mesh>
+  );
+}
+
+// ── Per-segment info label (pitch + length) ───────────────────
+
+function SegmentInfo({
+  seg,
+  diameter,
+  material,
+}: {
+  seg: RouteSegment;
+  diameter: number;
+  material: string;
+}) {
+  // Only show pitch for DWV-relevant materials; supply pipe slope
+  // is not a meaningful spec so leave supply lines unannotated to
+  // reduce clutter.
+  const isDWVMaterial = material === 'pvc_sch40'
+    || material === 'pvc_sch80'
+    || material === 'abs'
+    || material === 'cast_iron';
+
+  const verdict = classifySlope(seg.slopeInchesPerFoot, diameter);
+  const color = SLOPE_COLOR[verdict];
+  const label =
+    seg.isVertical ? `${seg.length.toFixed(1)} ft · VERT`
+    : isDWVMaterial && verdict !== 'flat'
+      ? `${seg.length.toFixed(1)} ft · ${seg.slopeInchesPerFoot.toFixed(2)}"/ft`
+      : `${seg.length.toFixed(1)} ft`;
+
+  return (
+    <Billboard position={[seg.mid[0], seg.mid[1] + 0.35, seg.mid[2]]}>
+      {/* Pill background */}
+      <mesh position={[0, 0, -0.005]}>
+        <planeGeometry args={[Math.max(0.55, label.length * 0.07), 0.22]} />
+        <meshBasicMaterial color="#0a0a0f" transparent opacity={0.85} />
+      </mesh>
+      <Text
+        fontSize={0.11}
+        color={color}
+        outlineWidth={0.006}
+        outlineColor="#000"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {label}
+      </Text>
+    </Billboard>
+  );
+}
+
+// ── Start ring ─────────────────────────────────────────────────
+
+function StartRing({ point, radiusFt }: { point: Vec3; radiusFt: number }) {
+  return (
+    <mesh position={[point[0], point[1], point[2]]} rotation-x={Math.PI / 2}>
+      <torusGeometry args={[radiusFt * 2.2, radiusFt * 0.3, 8, 24]} />
+      <meshStandardMaterial
+        color="#ffd54f"
+        transparent
+        opacity={0.75}
+        emissive="#ffd54f"
+        emissiveIntensity={0.9}
+        toneMapped={false}
+      />
+    </mesh>
+  );
+}
+
+// ── Head sphere (drawing pen tip) ──────────────────────────────
+
+function HeadSphere({ point, radiusFt }: { point: Vec3; radiusFt: number }) {
+  const ref = useRef<THREE.Mesh>(null!);
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const s = 1 + Math.sin(clock.elapsedTime * 6) * 0.15;
+    ref.current.scale.set(s, s, s);
+  });
+  return (
+    <mesh ref={ref} position={[point[0], point[1], point[2]]}>
+      <sphereGeometry args={[radiusFt * 1.6, 14, 14]} />
+      <meshStandardMaterial
+        color="#00e5ff"
+        transparent
+        opacity={0.85}
+        emissive="#00e5ff"
+        emissiveIntensity={1.4}
+        toneMapped={false}
+      />
+    </mesh>
+  );
+}
+
+// ── Running total length ───────────────────────────────────────
+
+function TotalLengthBadge({ points }: { points: Vec3[] }) {
+  const t = totalLength(points);
+  if (t < 0.1) return null;
+  const tail = points[points.length - 1]!;
+  return (
+    <Billboard position={[tail[0], tail[1] + 0.85, tail[2]]}>
+      <mesh position={[0, 0, -0.005]}>
+        <planeGeometry args={[1.1, 0.3]} />
+        <meshBasicMaterial color="#0a0a0f" transparent opacity={0.92} />
+      </mesh>
+      <Text
+        fontSize={0.15}
+        color="#00e5ff"
+        outlineWidth={0.008}
+        outlineColor="#000"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {`Σ ${t.toFixed(2)} ft`}
+      </Text>
+    </Billboard>
   );
 }

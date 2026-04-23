@@ -1,86 +1,29 @@
 /**
- * WallRenderer — 3D box per wall segment + click-click draw tool.
+ * WallRenderer — batched wall rendering + click-click draw tool.
  *
- * Each wall is an extruded box oriented along its segment direction,
- * with thickness orthogonal. Colors come from WALL_TYPE_META.
+ * Wall rendering delegates to `<InstancedWallMeshes />` which batches
+ * every non-selected wall into at most 2 InstancedMesh draw calls + 2
+ * merged-edge LineSegments. See `docs/adr/026-wall-instancing.md`.
  *
- * Uses the same floor-visibility and select-highlight logic as pipes:
- *   - Ghosted when off-floor (floor filter)
- *   - Selection glow when picked
+ * This outer component owns:
+ *   • `showWallsGlobal` gating (skip all rendering when off).
+ *   • `<DrawCatcher />` — ground-plane raycaster + click handler that
+ *     captures the two points defining a new wall. This stays per-
+ *     session state (no instancing relevant), so it keeps its own
+ *     imperative implementation.
  *
- * Drawing:
- *   - If wallStore.drawSession is active, an invisible ground plane
- *     catches pointer moves + clicks to add wall points
- *   - Live preview line from firstPoint → cursor
- *   - Escape cancels the chain
- *   - Right-click ends chain at the last point
+ * The pre-instancing implementation rendered each wall as a separate
+ * mesh + lineSegments pair (~2N draw calls for N walls). The new path
+ * holds at ~2–5 draw calls regardless of wall count.
  */
 
 import { useEffect, useMemo, useRef } from 'react';
-import { useThree, useFrame, type ThreeEvent } from '@react-three/fiber';
+import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useWallStore, WALL_TYPE_META, type Wall, snapPointToWall } from '@store/wallStore';
-import { useFloorStore, useFloorParams } from '@store/floorStore';
-import { useInteractionStore } from '@store/interactionStore';
-
-// ── Individual wall mesh ───────────────────────────────────────
-
-function WallMesh({ wall, selected, onSelect }: { wall: Wall; selected: boolean; onSelect: () => void }) {
-  const meta = WALL_TYPE_META[wall.type];
-  const opacity = useWallStore((s) => s.wallOpacity);
-  const getFloorParams = useFloorParams();
-
-  const geom = useMemo(() => {
-    const dx = wall.end[0] - wall.start[0];
-    const dz = wall.end[1] - wall.start[1];
-    const length = Math.sqrt(dx * dx + dz * dz);
-    const g = new THREE.BoxGeometry(length, wall.height, wall.thickness);
-    return g;
-  }, [wall.start, wall.end, wall.thickness, wall.height]);
-
-  const mid = useMemo(() => [
-    (wall.start[0] + wall.end[0]) / 2,
-    wall.floorY + wall.height / 2,
-    (wall.start[1] + wall.end[1]) / 2,
-  ] as [number, number, number], [wall.start, wall.end, wall.floorY, wall.height]);
-
-  const dx = wall.end[0] - wall.start[0];
-  const dz = wall.end[1] - wall.start[1];
-  const angle = Math.atan2(dz, dx);
-
-  const fp = getFloorParams(wall.floorY, wall.floorY + wall.height);
-  if (!fp.visible || wall.hidden) return null;
-  const ghost = fp.opacity < 1;
-  const effectiveOpacity = Math.max(0.06, opacity * (ghost ? 0.4 : 1));
-
-  return (
-    <group position={mid} rotation={[0, -angle, 0]}>
-      <mesh
-        geometry={geom}
-        onClick={(e: ThreeEvent<MouseEvent>) => { e.stopPropagation(); onSelect(); }}
-      >
-        <meshStandardMaterial
-          color={meta.color}
-          transparent
-          opacity={effectiveOpacity}
-          metalness={0.05}
-          roughness={0.8}
-          depthWrite={false}
-        />
-      </mesh>
-      {/* Edge lines for clarity */}
-      <lineSegments>
-        <edgesGeometry args={[geom]} />
-        <lineBasicMaterial
-          color={selected ? '#ffd54f' : meta.color}
-          transparent
-          opacity={selected ? 0.95 : 0.55}
-          depthWrite={false}
-        />
-      </lineSegments>
-    </group>
-  );
-}
+import { useWallStore, WALL_TYPE_META, snapPointToWall } from '@store/wallStore';
+import { useFloorStore } from '@store/floorStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
+import { InstancedWallMeshes } from './InstancedWallMeshes';
 
 // ── Draw-session preview + ground catcher ──────────────────────
 
@@ -126,8 +69,8 @@ function DrawCatcher() {
 
     // Prevent pipe-draw mode from ALSO consuming the click — force
     // navigate mode while wall-draw is active.
-    const prevMode = useInteractionStore.getState().mode;
-    if (prevMode === 'draw') useInteractionStore.getState().setMode('navigate');
+    const prevMode = usePlumbingDrawStore.getState().mode;
+    if (prevMode === 'draw') usePlumbingDrawStore.getState().setMode('navigate');
 
     const computePt = (): [number, number] | null => {
       raycaster.setFromCamera(pointer, camera);
@@ -231,10 +174,12 @@ function snapGrid(p: [number, number], step: number): [number, number] {
 // ── Main component ────────────────────────────────────────────
 
 export function WallRenderer() {
-  const walls = useWallStore((s) => s.walls);
-  const selectedId = useWallStore((s) => s.selectedWallId);
-  const selectWall = useWallStore((s) => s.selectWall);
   const show = useWallStore((s) => s.showWallsGlobal);
+
+  // Note: the instanced meshes subscribe to wall + render-mode + cutaway
+  // state internally. Keeping those subscriptions inside <InstancedWallMeshes>
+  // means the outer WallRenderer only re-renders on the single cheap
+  // showWallsGlobal toggle, not on every wall edit.
 
   if (!show) return (
     <>
@@ -242,18 +187,9 @@ export function WallRenderer() {
     </>
   );
 
-  const list = Object.values(walls);
-
   return (
     <group>
-      {list.map((w) => (
-        <WallMesh
-          key={w.id}
-          wall={w}
-          selected={w.id === selectedId}
-          onSelect={() => selectWall(w.id)}
-        />
-      ))}
+      <InstancedWallMeshes />
       <DrawCatcher />
     </group>
   );

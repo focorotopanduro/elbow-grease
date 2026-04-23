@@ -27,3 +27,14 @@ tauri-plugin-log = "2"
 # restart itself cleanly once the installer finishes.
 tauri-plugin-updater = "2"
 tauri-plugin-process = "2"
+# Phase 2: the ComplianceDebugger uses the shell plugin to open IPC
+# deep-links (up.codes) in the system browser instead of in-webview.
+tauri-plugin-shell = "2"
+# Phase 4: crash-safe project bundles require real filesystem access
+# (atomic rename, fsync, directory listing). localStorage alone can't
+# provide durability guarantees.
+tauri-plugin-fs = "2"
+# Phase 11.D: native open/save dialogs for .elbow bundles. The browser
+# fallback (Blob download + hidden file input) still works, but in
+# Tauri we get OS-native path-based persistence + "Recent Files".
+tauri-plugin-dialog = "2"

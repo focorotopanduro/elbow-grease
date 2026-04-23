@@ -56,8 +56,9 @@ const FIXTURE_CATEGORIES: FixtureSectorDef[] = [
     icon: '🧺',
     color: '#b39ddb',
     subtypes: [
-      { id: 'laundry_standpipe', label: 'Standpipe', icon: '🧺' },
-      { id: 'mop_sink',          label: 'Laundry Tub', icon: '🧺' },
+      { id: 'laundry_standpipe', label: 'Standpipe',    icon: '🧺' },
+      { id: 'laundry_tub',       label: 'Laundry Tub',  icon: '🧺' },
+      { id: 'utility_sink',      label: 'Utility Sink', icon: '🪣' },
     ],
   },
   {
@@ -69,6 +70,9 @@ const FIXTURE_CATEGORIES: FixtureSectorDef[] = [
       { id: 'hose_bibb',         label: 'Hose Bibb',         icon: '🚿' },
       { id: 'floor_drain',       label: 'Floor Drain',       icon: '⚫' },
       { id: 'drinking_fountain', label: 'Drinking Fountain', icon: '🚰' },
+      // Phase 14.Y.2 — DWV access + specialty fixtures
+      { id: 'cleanout_access',   label: 'Cleanout',          icon: '🔧' },
+      { id: 'bidet',             label: 'Bidet',             icon: '🚻' },
     ],
   },
   {
@@ -87,8 +91,21 @@ const FIXTURE_CATEGORIES: FixtureSectorDef[] = [
     icon: '🔥',
     color: '#ff7043',
     subtypes: [
-      { id: 'water_closet', label: 'Tank',     icon: '🔥' }, // placeholder — need WH subtype
-      { id: 'water_closet', label: 'Tankless', icon: '⚡' },
+      // Phase 14.Y.2 — real water heater subtypes (no more WC placeholder)
+      { id: 'water_heater',          label: 'Tank 50gal', icon: '🔥' },
+      { id: 'tankless_water_heater', label: 'Tankless',   icon: '⚡' },
+      { id: 'expansion_tank',        label: 'Expansion',  icon: '🫧' },
+    ],
+  },
+  {
+    id: 'valves',
+    label: 'Valves',
+    icon: '⚙',
+    color: '#ffb74d',
+    subtypes: [
+      // Phase 14.Y.2 — inline valves
+      { id: 'backflow_preventer',      label: 'Backflow', icon: '⛔' },
+      { id: 'pressure_reducing_valve', label: 'PRV',      icon: '⚙' },
     ],
   },
   {

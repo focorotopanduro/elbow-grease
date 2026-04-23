@@ -23,6 +23,9 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
+import { logger } from '@core/logger/Logger';
+
+const log = logger('UpdateManager');
 
 type Phase =
   | 'idle'
@@ -82,7 +85,7 @@ export function UpdateManager() {
         setPhase('idle');
       }
     } catch (err) {
-      console.error('[UpdateManager] check failed:', err);
+      log.info('check failed (network/offline is OK)', err);
       // Silent on check failure — no network is fine, user keeps working.
       setPhase('idle');
     }
@@ -125,7 +128,7 @@ export function UpdateManager() {
       const { relaunch } = await import('@tauri-apps/plugin-process');
       await relaunch();
     } catch (err) {
-      console.error('[UpdateManager] install failed:', err);
+      log.error('install failed', err);
       setErrorMsg(err instanceof Error ? err.message : String(err));
       setPhase('error');
     }

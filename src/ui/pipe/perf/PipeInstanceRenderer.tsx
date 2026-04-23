@@ -15,78 +15,24 @@
  */
 
 import { useRef, useMemo, useEffect } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { usePipeStore, type CommittedPipe, getColorForDiameter } from '@store/pipeStore';
-import { useLayerStore } from '@store/layerStore';
-import { useFloorParams, type FloorRenderParams } from '@store/floorStore';
-import { usePhaseFilter } from '@store/phaseStore';
-import { shouldPhaseRender, PHASE_META } from '@core/phases/PhaseTypes';
-import { classifyPipe } from '@core/phases/PhaseClassifier';
+import { usePipeStore } from '@store/pipeStore';
+import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
+import { useFloorParams } from '@store/floorStore';
+import { usePhaseFilter } from '@store/plumbingPhaseStore';
 import { getPipeMaterial } from '../PipeMaterial';
 import { getOuterRadiusFt } from '@core/pipe/PipeSizeSpec';
 import type { PipeMaterial } from '../../../engine/graph/GraphEdge';
+import { SegmentExtractCache, type SegmentInstance as CachedSegmentInstance } from './segmentExtractCache';
+import { computeJunctionHints } from '../junctionRetraction';
 
 // ── Segment instance data ───────────────────────────────────────
+// Keep a local alias so the rest of this file doesn't need to be
+// rewritten when we pull the extract logic out into a cache module.
+// Phase 14.AC.2 moved the walk to SegmentExtractCache — see
+// `./segmentExtractCache` for the cached implementation.
 
-interface SegmentInstance {
-  pipeId: string;
-  start: THREE.Vector3;
-  end: THREE.Vector3;
-  diameter: number;
-  material: string;
-  opacity: number;
-  colorOverride: string | null;
-}
-
-function pipeYBoundsLocal(pipe: CommittedPipe): { min: number; max: number } {
-  if (pipe.points.length === 0) return { min: 0, max: 0 };
-  let min = pipe.points[0]![1], max = pipe.points[0]![1];
-  for (const p of pipe.points) {
-    if (p[1] < min) min = p[1];
-    if (p[1] > max) max = p[1];
-  }
-  return { min, max };
-}
-
-function extractSegments(
-  pipes: CommittedPipe[],
-  getFloorParams: (yMin: number, yMax: number) => FloorRenderParams,
-): Map<string, SegmentInstance[]> {
-  // Bucket by diameter+ghost-state so ghosted pipes share a cloned material
-  const buckets = new Map<string, SegmentInstance[]>();
-
-  for (const pipe of pipes) {
-    if (pipe.selected) continue;
-
-    const { min, max } = pipeYBoundsLocal(pipe);
-    const fp = getFloorParams(min, max);
-    if (!fp.visible) continue;
-
-    const ghostKey = fp.opacity < 1 || fp.colorOverride ? `g${fp.opacity.toFixed(2)}_${fp.colorOverride ?? ''}` : 'full';
-    const bucketKey = `${pipe.diameter}__${pipe.material}__${ghostKey}`;
-
-    if (!buckets.has(bucketKey)) buckets.set(bucketKey, []);
-    const bucket = buckets.get(bucketKey)!;
-
-    for (let i = 1; i < pipe.points.length; i++) {
-      const start = new THREE.Vector3(...pipe.points[i - 1]!);
-      const end = new THREE.Vector3(...pipe.points[i]!);
-
-      bucket.push({
-        pipeId: pipe.id,
-        start,
-        end,
-        diameter: pipe.diameter,
-        material: pipe.material,
-        opacity: fp.opacity,
-        colorOverride: fp.colorOverride,
-      });
-    }
-  }
-
-  return buckets;
-}
+type SegmentInstance = CachedSegmentInstance;
 
 // ── Unit cylinder geometry (shared) ─────────────────────────────
 
@@ -170,19 +116,36 @@ function InstancedBucket({
 
 export function PipeInstanceRenderer() {
   const pipes = usePipeStore((s) => s.pipes);
-  const systemVisibility = useLayerStore((s) => s.systems);
+  const systemVisibility = usePlumbingLayerStore((s) => s.systems);
   const getFloorParams = useFloorParams();
   const phaseFilter = usePhaseFilter();
 
+  // Cache persists across re-renders; useMemo still re-runs on dep
+  // change, but the cache's per-pipe identity check means unchanged
+  // pipes keep their pre-built segments. Single-pipe mutations now
+  // do O(1) work instead of O(N) regardless of total pipe count.
+  // (Phase 14.AC.2.)
+  const cacheRef = useRef<SegmentExtractCache | null>(null);
+  if (cacheRef.current === null) cacheRef.current = new SegmentExtractCache();
+
+  // Phase 14.AD.8/21 — per-endpoint retraction hints. Classification
+  // logic lives in `junctionRetraction.ts` and produces numeric
+  // distances per endpoint based on the specific fitting (coupling,
+  // elbow, tee, reducer, bushing, mid-branch). Same helper is used
+  // by the 3D-mode PipeRenderer so the two render paths stay in sync.
+  const junctionHints = useMemo(
+    () => computeJunctionHints(Object.values(pipes)),
+    [pipes],
+  );
+
   const buckets = useMemo(() => {
-    const visiblePipes = Object.values(pipes).filter((p) => {
-      if (!p.visible || p.selected || !systemVisibility[p.system]) return false;
-      const autoPhase = classifyPipe(p);
-      const effectivePhase = phaseFilter.pipeOverride(p.id) ?? autoPhase;
-      return shouldPhaseRender(effectivePhase, phaseFilter.activePhase, phaseFilter.mode);
+    return cacheRef.current!.extract(pipes, {
+      systemVisibility,
+      getFloorParams,
+      phaseFilter,
+      junctionHints,
     });
-    return extractSegments(visiblePipes, getFloorParams);
-  }, [pipes, systemVisibility, getFloorParams, phaseFilter]);
+  }, [pipes, systemVisibility, getFloorParams, phaseFilter, junctionHints]);
 
   if (buckets.size === 0) return null;
 

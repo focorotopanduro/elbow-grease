@@ -1,0 +1,2381 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`getFittingGeometryByType — PEX-specific > pex_elbow_90 · pex · 0.75" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.005563,
+    "indexCount": 4848,
+    "spanX": 0.170324,
+    "spanY": 0.358341,
+    "spanZ": 0.091146,
+    "vertexCount": 1267,
+  },
+  "hash": "f752d97005d5f922",
+}
+`;
+
+exports[`getFittingGeometryByType — PEX-specific > pex_elbow_90 · pex · 1" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.011823,
+    "indexCount": 4848,
+    "spanX": 0.218988,
+    "spanY": 0.460724,
+    "spanZ": 0.117188,
+    "vertexCount": 1267,
+  },
+  "hash": "5eeed6643513e812",
+}
+`;
+
+exports[`getFittingGeometryByType — PEX-specific > pex_elbow_90 · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.035633,
+    "indexCount": 4848,
+    "spanX": 0.316317,
+    "spanY": 0.665491,
+    "spanZ": 0.169271,
+    "vertexCount": 1267,
+  },
+  "hash": "739852739e4f5a79",
+}
+`;
+
+exports[`getFittingGeometryByType — bushings > bushing · pvc_sch40 · 2"→1" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.012404,
+    "indexCount": 1152,
+    "spanX": 0.316667,
+    "spanY": 0.197917,
+    "spanZ": 0.197917,
+    "vertexCount": 592,
+  },
+  "hash": "6bc8361bf1dacac2",
+}
+`;
+
+exports[`getFittingGeometryByType — bushings > bushing · pvc_sch40 · 2"→1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.01322,
+    "indexCount": 1152,
+    "spanX": 0.3375,
+    "spanY": 0.197917,
+    "spanZ": 0.197917,
+    "vertexCount": 592,
+  },
+  "hash": "9be3db943dd68e18",
+}
+`;
+
+exports[`getFittingGeometryByType — bushings > bushing · pvc_sch40 · 3"→2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.041471,
+    "indexCount": 1152,
+    "spanX": 0.4875,
+    "spanY": 0.291667,
+    "spanZ": 0.291667,
+    "vertexCount": 592,
+  },
+  "hash": "1b2d0b0fad3db588",
+}
+`;
+
+exports[`getFittingGeometryByType — cast iron spot check > bend_45 · cast_iron · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.140398,
+    "indexCount": 2424,
+    "spanX": 0.445975,
+    "spanY": 0.830273,
+    "spanZ": 0.379167,
+    "vertexCount": 641,
+  },
+  "hash": "ff0745c18ef9f995",
+}
+`;
+
+exports[`getFittingGeometryByType — cast iron spot check > bend_45 · cast_iron · 4" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.277403,
+    "indexCount": 2424,
+    "spanX": 0.562007,
+    "spanY": 1.012501,
+    "spanZ": 0.4875,
+    "vertexCount": 641,
+  },
+  "hash": "0991127fe9ac17bf",
+}
+`;
+
+exports[`getFittingGeometryByType — cast iron spot check > bend_90 · cast_iron · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.275041,
+    "indexCount": 4272,
+    "spanX": 0.584806,
+    "spanY": 1.240383,
+    "spanZ": 0.379167,
+    "vertexCount": 971,
+  },
+  "hash": "51e9023974819cdb",
+}
+`;
+
+exports[`getFittingGeometryByType — cast iron spot check > bend_90 · cast_iron · 4" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.553206,
+    "indexCount": 4272,
+    "spanX": 0.730849,
+    "spanY": 1.552689,
+    "spanZ": 0.4875,
+    "vertexCount": 971,
+  },
+  "hash": "72efd047a12d09b3",
+}
+`;
+
+exports[`getFittingGeometryByType — cast iron spot check > p_trap · cast_iron · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.403194,
+    "indexCount": 7968,
+    "spanX": 1.895833,
+    "spanY": 0.729167,
+    "spanZ": 0.291667,
+    "vertexCount": 1631,
+  },
+  "hash": "83cf46f67711ddf8",
+}
+`;
+
+exports[`getFittingGeometryByType — cast iron spot check > p_trap · cast_iron · 4" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.856934,
+    "indexCount": 7968,
+    "spanX": 2.4375,
+    "spanY": 0.9375,
+    "spanZ": 0.375,
+    "vertexCount": 1631,
+  },
+  "hash": "8f817d5619234262",
+}
+`;
+
+exports[`getFittingGeometryByType — cast iron spot check > sanitary_tee · cast_iron · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.304615,
+    "indexCount": 6720,
+    "spanX": 0.898333,
+    "spanY": 0.805583,
+    "spanZ": 0.420924,
+    "vertexCount": 2243,
+  },
+  "hash": "1ab0c7cda56f4617",
+}
+`;
+
+exports[`getFittingGeometryByType — cast iron spot check > sanitary_tee · cast_iron · 4" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.64742,
+    "indexCount": 6720,
+    "spanX": 1.155,
+    "spanY": 1.03575,
+    "spanZ": 0.541189,
+    "vertexCount": 2243,
+  },
+  "hash": "59785103ab34366f",
+}
+`;
+
+exports[`getFittingGeometryByType — cast iron spot check > wye · cast_iron · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.323938,
+    "indexCount": 3024,
+    "spanX": 1.061667,
+    "spanY": 0.724886,
+    "spanZ": 0.420924,
+    "vertexCount": 1568,
+  },
+  "hash": "c41127c3b339b0b4",
+}
+`;
+
+exports[`getFittingGeometryByType — cast iron spot check > wye · cast_iron · 4" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.688487,
+    "indexCount": 3024,
+    "spanX": 1.365,
+    "spanY": 0.931996,
+    "spanZ": 0.541189,
+    "vertexCount": 1568,
+  },
+  "hash": "1b3af21c5bd1a0bc",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_22_5 · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.005176,
+    "indexCount": 1500,
+    "spanX": 0.156173,
+    "spanY": 0.235339,
+    "spanZ": 0.140833,
+    "vertexCount": 476,
+  },
+  "hash": "476f6356fef866b3",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_22_5 · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.011037,
+    "indexCount": 1500,
+    "spanX": 0.202982,
+    "spanY": 0.29524,
+    "spanZ": 0.184167,
+    "vertexCount": 476,
+  },
+  "hash": "db076b202db18c3f",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_22_5 · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.050582,
+    "indexCount": 1500,
+    "spanX": 0.314402,
+    "spanY": 0.594034,
+    "spanZ": 0.270833,
+    "vertexCount": 476,
+  },
+  "hash": "b8c9398f7786ae25",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_22_5 · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.007909,
+    "indexCount": 1500,
+    "spanX": 0.173139,
+    "spanY": 0.301203,
+    "spanZ": 0.151667,
+    "vertexCount": 476,
+  },
+  "hash": "aad4132f344b54bf",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_22_5 · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.018019,
+    "indexCount": 1500,
+    "spanX": 0.227037,
+    "spanY": 0.400169,
+    "spanZ": 0.198333,
+    "vertexCount": 476,
+  },
+  "hash": "789132f78136aef3",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_22_5 · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.058411,
+    "indexCount": 1500,
+    "spanX": 0.334835,
+    "spanY": 0.598099,
+    "spanZ": 0.291667,
+    "vertexCount": 476,
+  },
+  "hash": "ac46f1a6e2199aa5",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_22_5 · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.009134,
+    "indexCount": 1500,
+    "spanX": 0.198427,
+    "spanY": 0.250618,
+    "spanZ": 0.183667,
+    "vertexCount": 476,
+  },
+  "hash": "ba77749704188f83",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_22_5 · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.018827,
+    "indexCount": 1500,
+    "spanX": 0.249558,
+    "spanY": 0.328597,
+    "spanZ": 0.229583,
+    "vertexCount": 476,
+  },
+  "hash": "0042188d8daaf0c1",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_22_5 · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.061164,
+    "indexCount": 1500,
+    "spanX": 0.368412,
+    "spanY": 0.490701,
+    "spanZ": 0.338333,
+    "vertexCount": 476,
+  },
+  "hash": "1cab599bd6370625",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_45 · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.007345,
+    "indexCount": 2424,
+    "spanX": 0.175379,
+    "spanY": 0.297363,
+    "spanZ": 0.140833,
+    "vertexCount": 641,
+  },
+  "hash": "e4f53101856256dc",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_45 · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.015757,
+    "indexCount": 2424,
+    "spanX": 0.2269,
+    "spanY": 0.377074,
+    "spanZ": 0.184167,
+    "vertexCount": 641,
+  },
+  "hash": "fcce89d9ecc57a18",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_45 · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.069676,
+    "indexCount": 2424,
+    "spanX": 0.364864,
+    "spanY": 0.705103,
+    "spanZ": 0.270833,
+    "vertexCount": 641,
+  },
+  "hash": "6b2846f5f6340fc0",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_45 · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.011667,
+    "indexCount": 2424,
+    "spanX": 0.195913,
+    "spanY": 0.392654,
+    "spanZ": 0.151667,
+    "vertexCount": 641,
+  },
+  "hash": "2057bde0ecbc55f2",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_45 · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.026517,
+    "indexCount": 2424,
+    "spanX": 0.25742,
+    "spanY": 0.519392,
+    "spanZ": 0.198333,
+    "vertexCount": 641,
+  },
+  "hash": "1e4735f52c125a0f",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_45 · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.085758,
+    "indexCount": 2424,
+    "spanX": 0.380435,
+    "spanY": 0.77287,
+    "spanZ": 0.291667,
+    "vertexCount": 641,
+  },
+  "hash": "f46b6234968d18fa",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_45 · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.014196,
+    "indexCount": 2424,
+    "spanX": 0.211939,
+    "spanY": 0.364697,
+    "spanZ": 0.183667,
+    "vertexCount": 641,
+  },
+  "hash": "5c31612a7011ece6",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_45 · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.028928,
+    "indexCount": 2424,
+    "spanX": 0.267913,
+    "spanY": 0.470306,
+    "spanZ": 0.229583,
+    "vertexCount": 641,
+  },
+  "hash": "126fd4dccd2f02a3",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_45 · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.093692,
+    "indexCount": 2424,
+    "spanX": 0.396078,
+    "spanY": 0.699161,
+    "spanZ": 0.338333,
+    "vertexCount": 641,
+  },
+  "hash": "4838b684fc9d6da5",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90 · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.013225,
+    "indexCount": 4272,
+    "spanX": 0.22257,
+    "spanY": 0.421907,
+    "spanZ": 0.140833,
+    "vertexCount": 971,
+  },
+  "hash": "8a9c5f02706a0d56",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90 · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.02864,
+    "indexCount": 4272,
+    "spanX": 0.286544,
+    "spanY": 0.542704,
+    "spanZ": 0.184167,
+    "vertexCount": 971,
+  },
+  "hash": "c5504fc79a0c72cf",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90 · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.118491,
+    "indexCount": 4272,
+    "spanX": 0.479013,
+    "spanY": 0.913346,
+    "spanZ": 0.270833,
+    "vertexCount": 971,
+  },
+  "hash": "083e0153d684fcfa",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90 · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.023326,
+    "indexCount": 4272,
+    "spanX": 0.269213,
+    "spanY": 0.571283,
+    "spanZ": 0.151667,
+    "vertexCount": 971,
+  },
+  "hash": "3cf7de43b8730505",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90 · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.052816,
+    "indexCount": 4272,
+    "spanX": 0.354314,
+    "spanY": 0.751596,
+    "spanZ": 0.198333,
+    "vertexCount": 971,
+  },
+  "hash": "a41c98e792894582",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90 · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.170152,
+    "indexCount": 4272,
+    "spanX": 0.524516,
+    "spanY": 1.11222,
+    "spanZ": 0.291667,
+    "vertexCount": 971,
+  },
+  "hash": "357977102b22d64e",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90 · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.030765,
+    "indexCount": 4272,
+    "spanX": 0.279956,
+    "spanY": 0.59833,
+    "spanZ": 0.183667,
+    "vertexCount": 971,
+  },
+  "hash": "ae24e3c1182da901",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90 · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.061939,
+    "indexCount": 4272,
+    "spanX": 0.355469,
+    "spanY": 0.758961,
+    "spanZ": 0.229583,
+    "vertexCount": 971,
+  },
+  "hash": "4b29ac289cae62e6",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90 · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.199941,
+    "indexCount": 4272,
+    "spanX": 0.526176,
+    "spanY": 1.123121,
+    "spanZ": 0.338333,
+    "vertexCount": 971,
+  },
+  "hash": "863ce95acc14ec67",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90_ls · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.022654,
+    "indexCount": 4272,
+    "spanX": 0.262233,
+    "spanY": 0.613415,
+    "spanZ": 0.140833,
+    "vertexCount": 971,
+  },
+  "hash": "d1a86aecceb4bbdf",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90_ls · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.049431,
+    "indexCount": 4272,
+    "spanX": 0.33841,
+    "spanY": 0.793138,
+    "spanZ": 0.184167,
+    "vertexCount": 971,
+  },
+  "hash": "c16b10e7b471d778",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90_ls · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.192745,
+    "indexCount": 4272,
+    "spanX": 0.555288,
+    "spanY": 1.281631,
+    "spanZ": 0.270833,
+    "vertexCount": 971,
+  },
+  "hash": "d0ca04c3ad0b36cf",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90_ls · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.042802,
+    "indexCount": 4272,
+    "spanX": 0.328707,
+    "spanY": 0.858545,
+    "spanZ": 0.151667,
+    "vertexCount": 971,
+  },
+  "hash": "d1e376254bc007c5",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90_ls · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.096608,
+    "indexCount": 4272,
+    "spanX": 0.432114,
+    "spanY": 1.127246,
+    "spanZ": 0.198333,
+    "vertexCount": 971,
+  },
+  "hash": "78b604279497202f",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90_ls · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.310214,
+    "indexCount": 4272,
+    "spanX": 0.638928,
+    "spanY": 1.664647,
+    "spanZ": 0.291667,
+    "vertexCount": 971,
+  },
+  "hash": "08ccc02ba40744b4",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90_ls · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.059971,
+    "indexCount": 4272,
+    "spanX": 0.349518,
+    "spanY": 0.934206,
+    "spanZ": 0.183667,
+    "vertexCount": 971,
+  },
+  "hash": "89be1e546f49bee3",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90_ls · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.119734,
+    "indexCount": 4272,
+    "spanX": 0.442422,
+    "spanY": 1.178806,
+    "spanZ": 0.229583,
+    "vertexCount": 971,
+  },
+  "hash": "eb3b62c3370a8309",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > bend_90_ls · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.385603,
+    "indexCount": 4272,
+    "spanX": 0.654316,
+    "spanY": 1.74184,
+    "spanZ": 0.338333,
+    "vertexCount": 971,
+  },
+  "hash": "9729a585314268ae",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cap · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.00264,
+    "indexCount": 864,
+    "spanX": 0.133125,
+    "spanY": 0.140833,
+    "spanZ": 0.140833,
+    "vertexCount": 444,
+  },
+  "hash": "4a0fd3ffabc9e832",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cap · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.005688,
+    "indexCount": 864,
+    "spanX": 0.167708,
+    "spanY": 0.184167,
+    "spanZ": 0.184167,
+    "vertexCount": 444,
+  },
+  "hash": "da5476b6f424ffba",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cap · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.024068,
+    "indexCount": 864,
+    "spanX": 0.328125,
+    "spanY": 0.270833,
+    "spanZ": 0.270833,
+    "vertexCount": 444,
+  },
+  "hash": "ad2cef5aa2e95984",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cap · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.00381,
+    "indexCount": 864,
+    "spanX": 0.165625,
+    "spanY": 0.151667,
+    "spanZ": 0.151667,
+    "vertexCount": 444,
+  },
+  "hash": "67200eb8a743e94a",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cap · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.008646,
+    "indexCount": 864,
+    "spanX": 0.219792,
+    "spanY": 0.198333,
+    "spanZ": 0.198333,
+    "vertexCount": 444,
+  },
+  "hash": "29664a3faa3725c2",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cap · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.027913,
+    "indexCount": 864,
+    "spanX": 0.328125,
+    "spanY": 0.291667,
+    "spanZ": 0.291667,
+    "vertexCount": 444,
+  },
+  "hash": "737696e4038b5580",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cap · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.004765,
+    "indexCount": 864,
+    "spanX": 0.14125,
+    "spanY": 0.183667,
+    "spanZ": 0.183667,
+    "vertexCount": 444,
+  },
+  "hash": "8cb5984396cd3bd6",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cap · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.009718,
+    "indexCount": 864,
+    "spanX": 0.184375,
+    "spanY": 0.229583,
+    "spanZ": 0.229583,
+    "vertexCount": 444,
+  },
+  "hash": "ced521dda78e3714",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cap · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.031479,
+    "indexCount": 864,
+    "spanX": 0.275,
+    "spanY": 0.338333,
+    "spanZ": 0.338333,
+    "vertexCount": 444,
+  },
+  "hash": "1812badb465af8b8",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cleanout_adapter · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.005794,
+    "indexCount": 1224,
+    "spanX": 0.149283,
+    "spanY": 0.250521,
+    "spanZ": 0.154917,
+    "vertexCount": 632,
+  },
+  "hash": "b2b71016957ef4f5",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cleanout_adapter · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.012956,
+    "indexCount": 1224,
+    "spanX": 0.195217,
+    "spanY": 0.327604,
+    "spanZ": 0.202583,
+    "vertexCount": 632,
+  },
+  "hash": "1e4f5378e7b0efc5",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cleanout_adapter · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.041204,
+    "indexCount": 1224,
+    "spanX": 0.287083,
+    "spanY": 0.481771,
+    "spanZ": 0.297917,
+    "vertexCount": 632,
+  },
+  "hash": "bbeb06698d583951",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cleanout_adapter · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.006592,
+    "indexCount": 1224,
+    "spanX": 0.157733,
+    "spanY": 0.250521,
+    "spanZ": 0.166833,
+    "vertexCount": 632,
+  },
+  "hash": "1d1d230c601b39eb",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cleanout_adapter · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.014742,
+    "indexCount": 1224,
+    "spanX": 0.206267,
+    "spanY": 0.327604,
+    "spanZ": 0.218167,
+    "vertexCount": 632,
+  },
+  "hash": "4986c3403d159c49",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cleanout_adapter · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.046886,
+    "indexCount": 1224,
+    "spanX": 0.303333,
+    "spanY": 0.481771,
+    "spanZ": 0.320833,
+    "vertexCount": 632,
+  },
+  "hash": "41607526958e751b",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cleanout_adapter · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.010978,
+    "indexCount": 1224,
+    "spanX": 0.185503,
+    "spanY": 0.292917,
+    "spanZ": 0.202033,
+    "vertexCount": 632,
+  },
+  "hash": "7824fc4a07d60ae5",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cleanout_adapter · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.021441,
+    "indexCount": 1224,
+    "spanX": 0.231879,
+    "spanY": 0.366146,
+    "spanZ": 0.252542,
+    "vertexCount": 632,
+  },
+  "hash": "e672225dc3c43553",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cleanout_adapter · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.068622,
+    "indexCount": 1224,
+    "spanX": 0.341717,
+    "spanY": 0.539583,
+    "spanZ": 0.372167,
+    "vertexCount": 632,
+  },
+  "hash": "27d49c5ca0cee3df",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > closet_flange · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.017416,
+    "indexCount": 1632,
+    "spanX": 0.352083,
+    "spanY": 0.140495,
+    "spanZ": 0.352083,
+    "vertexCount": 848,
+  },
+  "hash": "57be2041df228b9b",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > closet_flange · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.038947,
+    "indexCount": 1632,
+    "spanX": 0.460417,
+    "spanY": 0.183724,
+    "spanZ": 0.460417,
+    "vertexCount": 848,
+  },
+  "hash": "41ba6af0a513da95",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > closet_flange · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.123863,
+    "indexCount": 1632,
+    "spanX": 0.677083,
+    "spanY": 0.270182,
+    "spanZ": 0.677083,
+    "vertexCount": 848,
+  },
+  "hash": "71f8b92833a09af1",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > closet_flange · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.017416,
+    "indexCount": 1632,
+    "spanX": 0.352083,
+    "spanY": 0.140495,
+    "spanZ": 0.352083,
+    "vertexCount": 848,
+  },
+  "hash": "4df7c47ec335e6ad",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > closet_flange · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.038947,
+    "indexCount": 1632,
+    "spanX": 0.460417,
+    "spanY": 0.183724,
+    "spanZ": 0.460417,
+    "vertexCount": 848,
+  },
+  "hash": "3e0b753f4a368483",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > closet_flange · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.123863,
+    "indexCount": 1632,
+    "spanX": 0.677083,
+    "spanY": 0.270182,
+    "spanZ": 0.677083,
+    "vertexCount": 848,
+  },
+  "hash": "5c773e05ccb15a11",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > closet_flange · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.027839,
+    "indexCount": 1632,
+    "spanX": 0.411667,
+    "spanY": 0.164271,
+    "spanZ": 0.411667,
+    "vertexCount": 848,
+  },
+  "hash": "93e4ea7efdddeccd",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > closet_flange · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.054373,
+    "indexCount": 1632,
+    "spanX": 0.514583,
+    "spanY": 0.205339,
+    "spanZ": 0.514583,
+    "vertexCount": 848,
+  },
+  "hash": "410623dfef9fff9b",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > closet_flange · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.174018,
+    "indexCount": 1632,
+    "spanX": 0.758333,
+    "spanY": 0.302604,
+    "spanZ": 0.758333,
+    "vertexCount": 848,
+  },
+  "hash": "b19a8cb98b2ac08f",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > combo_wye_eighth · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.023614,
+    "indexCount": 4440,
+    "spanX": 0.603897,
+    "spanY": 0.261937,
+    "spanZ": 0.149283,
+    "vertexCount": 1677,
+  },
+  "hash": "0cfd899eee52902e",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > combo_wye_eighth · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.052807,
+    "indexCount": 4440,
+    "spanX": 0.789712,
+    "spanY": 0.342532,
+    "spanZ": 0.195217,
+    "vertexCount": 1677,
+  },
+  "hash": "91cd0575be433658",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > combo_wye_eighth · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.167942,
+    "indexCount": 4440,
+    "spanX": 1.161341,
+    "spanY": 0.503724,
+    "spanZ": 0.287083,
+    "vertexCount": 1677,
+  },
+  "hash": "7b01d6edf269d4fd",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > combo_wye_eighth · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.027059,
+    "indexCount": 4440,
+    "spanX": 0.644522,
+    "spanY": 0.266162,
+    "spanZ": 0.157733,
+    "vertexCount": 1677,
+  },
+  "hash": "ab8dcf697d79fe7b",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > combo_wye_eighth · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.06051,
+    "indexCount": 4440,
+    "spanX": 0.842837,
+    "spanY": 0.348057,
+    "spanZ": 0.206267,
+    "vertexCount": 1677,
+  },
+  "hash": "1120fc845659c2f8",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > combo_wye_eighth · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.19244,
+    "indexCount": 4440,
+    "spanX": 1.239466,
+    "spanY": 0.511849,
+    "spanZ": 0.303333,
+    "vertexCount": 1677,
+  },
+  "hash": "79d1472603f4a76b",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > combo_wye_eighth · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.04358,
+    "indexCount": 4440,
+    "spanX": 0.753595,
+    "spanY": 0.311743,
+    "spanZ": 0.185503,
+    "vertexCount": 1677,
+  },
+  "hash": "54394bed2b93573a",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > combo_wye_eighth · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.085117,
+    "indexCount": 4440,
+    "spanX": 0.941994,
+    "spanY": 0.389678,
+    "spanZ": 0.231879,
+    "vertexCount": 1677,
+  },
+  "hash": "5105b1cfffd13ae7",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > combo_wye_eighth · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.272414,
+    "indexCount": 4440,
+    "spanX": 1.388201,
+    "spanY": 0.574263,
+    "spanZ": 0.341717,
+    "vertexCount": 1677,
+  },
+  "hash": "d6c6b8a63a5a8476",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > coupling · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.004206,
+    "indexCount": 576,
+    "spanX": 0.212083,
+    "spanY": 0.140833,
+    "spanZ": 0.140833,
+    "vertexCount": 296,
+  },
+  "hash": "54047001f667c891",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > coupling · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.008974,
+    "indexCount": 576,
+    "spanX": 0.264583,
+    "spanY": 0.184167,
+    "spanZ": 0.184167,
+    "vertexCount": 296,
+  },
+  "hash": "f76f1b185432f841",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > coupling · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.040496,
+    "indexCount": 576,
+    "spanX": 0.552083,
+    "spanY": 0.270833,
+    "spanZ": 0.270833,
+    "vertexCount": 296,
+  },
+  "hash": "943aa72e61588abd",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > coupling · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.006374,
+    "indexCount": 576,
+    "spanX": 0.277083,
+    "spanY": 0.151667,
+    "spanZ": 0.151667,
+    "vertexCount": 296,
+  },
+  "hash": "fee9d677ff94d061",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > coupling · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.014505,
+    "indexCount": 576,
+    "spanX": 0.36875,
+    "spanY": 0.198333,
+    "spanZ": 0.198333,
+    "vertexCount": 296,
+  },
+  "hash": "d384b40b677e1ab1",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > coupling · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.046966,
+    "indexCount": 576,
+    "spanX": 0.552083,
+    "spanY": 0.291667,
+    "spanZ": 0.291667,
+    "vertexCount": 296,
+  },
+  "hash": "d46cc33872614dfd",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > coupling · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.007393,
+    "indexCount": 576,
+    "spanX": 0.219167,
+    "spanY": 0.183667,
+    "spanZ": 0.183667,
+    "vertexCount": 296,
+  },
+  "hash": "65b92d1e457bb505",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > coupling · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.015263,
+    "indexCount": 576,
+    "spanX": 0.289583,
+    "spanY": 0.229583,
+    "spanZ": 0.229583,
+    "vertexCount": 296,
+  },
+  "hash": "43d756fd8c37c1ed",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > coupling · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.049603,
+    "indexCount": 576,
+    "spanX": 0.433333,
+    "spanY": 0.338333,
+    "spanZ": 0.338333,
+    "vertexCount": 296,
+  },
+  "hash": "dc3a7006a1949661",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cross · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.044825,
+    "indexCount": 3168,
+    "spanX": 0.564167,
+    "spanY": 0.140833,
+    "spanZ": 0.564167,
+    "vertexCount": 1628,
+  },
+  "hash": "423ffd220a5187df",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cross · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.096803,
+    "indexCount": 3168,
+    "spanX": 0.725,
+    "spanY": 0.184167,
+    "spanZ": 0.725,
+    "vertexCount": 1628,
+  },
+  "hash": "c1df06f16061a567",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cross · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.409188,
+    "indexCount": 3168,
+    "spanX": 1.229167,
+    "spanY": 0.270833,
+    "spanZ": 1.229167,
+    "vertexCount": 1628,
+  },
+  "hash": "3a39db2d58409fbb",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cross · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.060038,
+    "indexCount": 3168,
+    "spanX": 0.629167,
+    "spanY": 0.151667,
+    "spanZ": 0.629167,
+    "vertexCount": 1628,
+  },
+  "hash": "7e2536cb54c2ccb7",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cross · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.136357,
+    "indexCount": 3168,
+    "spanX": 0.829167,
+    "spanY": 0.198333,
+    "spanZ": 0.829167,
+    "vertexCount": 1628,
+  },
+  "hash": "ded16bf3721cf90f",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cross · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.440666,
+    "indexCount": 3168,
+    "spanX": 1.229167,
+    "spanY": 0.291667,
+    "spanZ": 1.229167,
+    "vertexCount": 1628,
+  },
+  "hash": "37410699ebb8de3b",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cross · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.07309,
+    "indexCount": 3168,
+    "spanX": 0.630833,
+    "spanY": 0.183667,
+    "spanZ": 0.630833,
+    "vertexCount": 1628,
+  },
+  "hash": "863adbf19ccaa103",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cross · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.148468,
+    "indexCount": 3168,
+    "spanX": 0.804167,
+    "spanY": 0.229583,
+    "spanZ": 0.804167,
+    "vertexCount": 1628,
+  },
+  "hash": "d5308c84b18b561f",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > cross · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.480457,
+    "indexCount": 3168,
+    "spanX": 1.191667,
+    "spanY": 0.338333,
+    "spanZ": 1.191667,
+    "vertexCount": 1628,
+  },
+  "hash": "ab316e956c44fe07",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_45 · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.007345,
+    "indexCount": 2424,
+    "spanX": 0.175379,
+    "spanY": 0.297363,
+    "spanZ": 0.140833,
+    "vertexCount": 641,
+  },
+  "hash": "e4f53101856256dc",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_45 · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.015757,
+    "indexCount": 2424,
+    "spanX": 0.2269,
+    "spanY": 0.377074,
+    "spanZ": 0.184167,
+    "vertexCount": 641,
+  },
+  "hash": "fcce89d9ecc57a18",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_45 · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.069676,
+    "indexCount": 2424,
+    "spanX": 0.364864,
+    "spanY": 0.705103,
+    "spanZ": 0.270833,
+    "vertexCount": 641,
+  },
+  "hash": "6b2846f5f6340fc0",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_45 · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.011667,
+    "indexCount": 2424,
+    "spanX": 0.195913,
+    "spanY": 0.392654,
+    "spanZ": 0.151667,
+    "vertexCount": 641,
+  },
+  "hash": "2057bde0ecbc55f2",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_45 · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.026517,
+    "indexCount": 2424,
+    "spanX": 0.25742,
+    "spanY": 0.519392,
+    "spanZ": 0.198333,
+    "vertexCount": 641,
+  },
+  "hash": "1e4735f52c125a0f",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_45 · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.085758,
+    "indexCount": 2424,
+    "spanX": 0.380435,
+    "spanY": 0.77287,
+    "spanZ": 0.291667,
+    "vertexCount": 641,
+  },
+  "hash": "f46b6234968d18fa",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_45 · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.014196,
+    "indexCount": 2424,
+    "spanX": 0.211939,
+    "spanY": 0.364697,
+    "spanZ": 0.183667,
+    "vertexCount": 641,
+  },
+  "hash": "5c31612a7011ece6",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_45 · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.028928,
+    "indexCount": 2424,
+    "spanX": 0.267913,
+    "spanY": 0.470306,
+    "spanZ": 0.229583,
+    "vertexCount": 641,
+  },
+  "hash": "126fd4dccd2f02a3",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_45 · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.093692,
+    "indexCount": 2424,
+    "spanX": 0.396078,
+    "spanY": 0.699161,
+    "spanZ": 0.338333,
+    "vertexCount": 641,
+  },
+  "hash": "4838b684fc9d6da5",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_90 · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.013225,
+    "indexCount": 4272,
+    "spanX": 0.22257,
+    "spanY": 0.421907,
+    "spanZ": 0.140833,
+    "vertexCount": 971,
+  },
+  "hash": "8a9c5f02706a0d56",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_90 · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.02864,
+    "indexCount": 4272,
+    "spanX": 0.286544,
+    "spanY": 0.542704,
+    "spanZ": 0.184167,
+    "vertexCount": 971,
+  },
+  "hash": "c5504fc79a0c72cf",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_90 · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.118491,
+    "indexCount": 4272,
+    "spanX": 0.479013,
+    "spanY": 0.913346,
+    "spanZ": 0.270833,
+    "vertexCount": 971,
+  },
+  "hash": "083e0153d684fcfa",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_90 · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.023326,
+    "indexCount": 4272,
+    "spanX": 0.269213,
+    "spanY": 0.571283,
+    "spanZ": 0.151667,
+    "vertexCount": 971,
+  },
+  "hash": "3cf7de43b8730505",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_90 · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.052816,
+    "indexCount": 4272,
+    "spanX": 0.354314,
+    "spanY": 0.751596,
+    "spanZ": 0.198333,
+    "vertexCount": 971,
+  },
+  "hash": "a41c98e792894582",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_90 · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.170152,
+    "indexCount": 4272,
+    "spanX": 0.524516,
+    "spanY": 1.11222,
+    "spanZ": 0.291667,
+    "vertexCount": 971,
+  },
+  "hash": "357977102b22d64e",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_90 · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.030765,
+    "indexCount": 4272,
+    "spanX": 0.279956,
+    "spanY": 0.59833,
+    "spanZ": 0.183667,
+    "vertexCount": 971,
+  },
+  "hash": "ae24e3c1182da901",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_90 · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.061939,
+    "indexCount": 4272,
+    "spanX": 0.355469,
+    "spanY": 0.758961,
+    "spanZ": 0.229583,
+    "vertexCount": 971,
+  },
+  "hash": "4b29ac289cae62e6",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > elbow_90 · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.199941,
+    "indexCount": 4272,
+    "spanX": 0.526176,
+    "spanY": 1.123121,
+    "spanZ": 0.338333,
+    "vertexCount": 971,
+  },
+  "hash": "863ce95acc14ec67",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > p_trap · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.03467,
+    "indexCount": 7968,
+    "spanX": 0.744792,
+    "spanY": 0.34375,
+    "spanZ": 0.135417,
+    "vertexCount": 1631,
+  },
+  "hash": "4c5b0fff465b710f",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > p_trap · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.066473,
+    "indexCount": 7968,
+    "spanX": 0.973958,
+    "spanY": 0.385417,
+    "spanZ": 0.177083,
+    "vertexCount": 1631,
+  },
+  "hash": "d69799526dcf9170",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > p_trap · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.194267,
+    "indexCount": 7968,
+    "spanX": 1.432292,
+    "spanY": 0.520833,
+    "spanZ": 0.260417,
+    "vertexCount": 1631,
+  },
+  "hash": "b6c8f28dbb88c7ff",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > p_trap · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.040973,
+    "indexCount": 7968,
+    "spanX": 0.880208,
+    "spanY": 0.34375,
+    "spanZ": 0.135417,
+    "vertexCount": 1631,
+  },
+  "hash": "c0a612da2bb4faaa",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > p_trap · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.090237,
+    "indexCount": 7968,
+    "spanX": 1.151042,
+    "spanY": 0.442708,
+    "spanZ": 0.177083,
+    "vertexCount": 1631,
+  },
+  "hash": "dc1fa80b82ceb953",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > p_trap · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.286986,
+    "indexCount": 7968,
+    "spanX": 1.692708,
+    "spanY": 0.651042,
+    "spanZ": 0.260417,
+    "vertexCount": 1631,
+  },
+  "hash": "0ba4da657ca7b021",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > p_trap · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.064501,
+    "indexCount": 7968,
+    "spanX": 1.029167,
+    "spanY": 0.395833,
+    "spanZ": 0.158333,
+    "vertexCount": 1631,
+  },
+  "hash": "50c7ea429434cbee",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > p_trap · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.12598,
+    "indexCount": 7968,
+    "spanX": 1.286458,
+    "spanY": 0.494792,
+    "spanZ": 0.197917,
+    "vertexCount": 1631,
+  },
+  "hash": "2833d5722513f385",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > p_trap · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.403194,
+    "indexCount": 7968,
+    "spanX": 1.895833,
+    "spanY": 0.729167,
+    "spanZ": 0.291667,
+    "vertexCount": 1631,
+  },
+  "hash": "83cf46f67711ddf8",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > sanitary_tee · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.017801,
+    "indexCount": 6000,
+    "spanX": 0.417083,
+    "spanY": 0.285892,
+    "spanZ": 0.149283,
+    "vertexCount": 1859,
+  },
+  "hash": "7f224fea97f43f6c",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > sanitary_tee · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.039806,
+    "indexCount": 6000,
+    "spanX": 0.545417,
+    "spanY": 0.373858,
+    "spanZ": 0.195217,
+    "vertexCount": 1859,
+  },
+  "hash": "07cb47c92054c352",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > sanitary_tee · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.126598,
+    "indexCount": 6000,
+    "spanX": 0.802083,
+    "spanY": 0.549792,
+    "spanZ": 0.287083,
+    "vertexCount": 1859,
+  },
+  "hash": "18fc714c651a80e8",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > sanitary_tee · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.023541,
+    "indexCount": 6000,
+    "spanX": 0.417083,
+    "spanY": 0.357825,
+    "spanZ": 0.157733,
+    "vertexCount": 1859,
+  },
+  "hash": "ebe360f390f82cb0",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > sanitary_tee · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.052642,
+    "indexCount": 6000,
+    "spanX": 0.545417,
+    "spanY": 0.467925,
+    "spanZ": 0.206267,
+    "vertexCount": 1859,
+  },
+  "hash": "c07e97f1a844ddd6",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > sanitary_tee · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.16742,
+    "indexCount": 6000,
+    "spanX": 0.802083,
+    "spanY": 0.688125,
+    "spanZ": 0.303333,
+    "vertexCount": 1859,
+  },
+  "hash": "fe0053534967dcfc",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > sanitary_tee · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.037897,
+    "indexCount": 6000,
+    "spanX": 0.487667,
+    "spanY": 0.418918,
+    "spanZ": 0.185503,
+    "vertexCount": 1859,
+  },
+  "hash": "aca09928b03cd4ac",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > sanitary_tee · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.074017,
+    "indexCount": 6000,
+    "spanX": 0.609583,
+    "spanY": 0.523648,
+    "spanZ": 0.231879,
+    "vertexCount": 1859,
+  },
+  "hash": "b17dab93b8b5cc1a",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > sanitary_tee · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.236891,
+    "indexCount": 6000,
+    "spanX": 0.898333,
+    "spanY": 0.771692,
+    "spanZ": 0.341717,
+    "vertexCount": 1859,
+  },
+  "hash": "0eb439f22c2479ac",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > tee · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.013189,
+    "indexCount": 2592,
+    "spanX": 0.360208,
+    "spanY": 0.245267,
+    "spanZ": 0.149283,
+    "vertexCount": 1332,
+  },
+  "hash": "c113a1da5ab2eeee",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > tee · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.029493,
+    "indexCount": 2592,
+    "spanX": 0.471042,
+    "spanY": 0.320733,
+    "spanZ": 0.195217,
+    "vertexCount": 1332,
+  },
+  "hash": "d668cb129d28c436",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > tee · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.093798,
+    "indexCount": 2592,
+    "spanX": 0.692708,
+    "spanY": 0.471667,
+    "spanZ": 0.287083,
+    "vertexCount": 1332,
+  },
+  "hash": "9502fb447cf65a36",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > tee · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.014175,
+    "indexCount": 2592,
+    "spanX": 0.360208,
+    "spanY": 0.249492,
+    "spanZ": 0.157733,
+    "vertexCount": 1332,
+  },
+  "hash": "fe5707af3ed85cce",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > tee · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.031699,
+    "indexCount": 2592,
+    "spanX": 0.471042,
+    "spanY": 0.326258,
+    "spanZ": 0.206267,
+    "vertexCount": 1332,
+  },
+  "hash": "41246e4ceb5eba9a",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > tee · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.100814,
+    "indexCount": 2592,
+    "spanX": 0.692708,
+    "spanY": 0.479792,
+    "spanZ": 0.303333,
+    "vertexCount": 1332,
+  },
+  "hash": "b9e5eafa06d7212e",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > tee · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.022833,
+    "indexCount": 2592,
+    "spanX": 0.421167,
+    "spanY": 0.292252,
+    "spanZ": 0.185503,
+    "vertexCount": 1332,
+  },
+  "hash": "f80ffbb6fba1bd38",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > tee · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.044596,
+    "indexCount": 2592,
+    "spanX": 0.526458,
+    "spanY": 0.365315,
+    "spanZ": 0.231879,
+    "vertexCount": 1332,
+  },
+  "hash": "4fc2e008c7fdf930",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > tee · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.142727,
+    "indexCount": 2592,
+    "spanX": 0.775833,
+    "spanY": 0.538358,
+    "spanZ": 0.341717,
+    "vertexCount": 1332,
+  },
+  "hash": "086d450651fb5716",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > wye · copper_type_l · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.0222,
+    "indexCount": 2304,
+    "spanX": 0.492917,
+    "spanY": 0.301694,
+    "spanZ": 0.149283,
+    "vertexCount": 1184,
+  },
+  "hash": "43623605e84c70aa",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > wye · copper_type_l · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.049644,
+    "indexCount": 2304,
+    "spanX": 0.644583,
+    "spanY": 0.394522,
+    "spanZ": 0.195217,
+    "vertexCount": 1184,
+  },
+  "hash": "50fa31e61ec701ee",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > wye · copper_type_l · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.157885,
+    "indexCount": 2304,
+    "spanX": 0.947917,
+    "spanY": 0.58018,
+    "spanZ": 0.287083,
+    "vertexCount": 1184,
+  },
+  "hash": "42f0ee7b96697a86",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > wye · pex · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.02385,
+    "indexCount": 2304,
+    "spanX": 0.492917,
+    "spanY": 0.306761,
+    "spanZ": 0.157733,
+    "vertexCount": 1184,
+  },
+  "hash": "6f78486943587152",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > wye · pex · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.053335,
+    "indexCount": 2304,
+    "spanX": 0.644583,
+    "spanY": 0.401149,
+    "spanZ": 0.206267,
+    "vertexCount": 1184,
+  },
+  "hash": "21c417b947e341d6",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > wye · pex · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.169624,
+    "indexCount": 2304,
+    "spanX": 0.947917,
+    "spanY": 0.589926,
+    "spanZ": 0.303333,
+    "vertexCount": 1184,
+  },
+  "hash": "8f627bb244d063ae",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > wye · pvc_sch40 · 1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.038713,
+    "indexCount": 2304,
+    "spanX": 0.576333,
+    "spanY": 0.362102,
+    "spanZ": 0.185503,
+    "vertexCount": 1184,
+  },
+  "hash": "85e543b83de42d66",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > wye · pvc_sch40 · 2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.075611,
+    "indexCount": 2304,
+    "spanX": 0.720417,
+    "spanY": 0.452627,
+    "spanZ": 0.231879,
+    "vertexCount": 1184,
+  },
+  "hash": "ebff1434ef17ad6a",
+}
+`;
+
+exports[`getFittingGeometryByType — general fittings × materials × diameters > wye · pvc_sch40 · 3" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.241991,
+    "indexCount": 2304,
+    "spanX": 1.061667,
+    "spanY": 0.667029,
+    "spanZ": 0.341717,
+    "vertexCount": 1184,
+  },
+  "hash": "c1e371dadeae514e",
+}
+`;
+
+exports[`getFittingGeometryByType — manifolds > manifold_2 · pex · 1" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.045146,
+    "indexCount": 3408,
+    "spanX": 0.418125,
+    "spanY": 0.457031,
+    "spanZ": 0.23625,
+    "vertexCount": 1756,
+  },
+  "hash": "9948906c1fe218be",
+}
+`;
+
+exports[`getFittingGeometryByType — manifolds > manifold_4 · pex · 1" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.077559,
+    "indexCount": 5376,
+    "spanX": 0.418125,
+    "spanY": 0.785156,
+    "spanZ": 0.23625,
+    "vertexCount": 2772,
+  },
+  "hash": "a6bffab32c137d60",
+}
+`;
+
+exports[`getFittingGeometryByType — manifolds > manifold_6 · pex · 1" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.109972,
+    "indexCount": 7344,
+    "spanX": 0.418125,
+    "spanY": 1.113281,
+    "spanZ": 0.23625,
+    "vertexCount": 3788,
+  },
+  "hash": "83e53235c5b811d0",
+}
+`;
+
+exports[`getFittingGeometryByType — manifolds > manifold_8 · pex · 1" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.142385,
+    "indexCount": 9312,
+    "spanX": 0.418125,
+    "spanY": 1.441406,
+    "spanZ": 0.23625,
+    "vertexCount": 4804,
+  },
+  "hash": "f66048de34aca75d",
+}
+`;
+
+exports[`getFittingGeometryByType — reducers > reducer · copper_type_l · 1.5"→1" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.007334,
+    "indexCount": 864,
+    "spanX": 0.369792,
+    "spanY": 0.140833,
+    "spanZ": 0.140833,
+    "vertexCount": 444,
+  },
+  "hash": "84754d6158f0e348",
+}
+`;
+
+exports[`getFittingGeometryByType — reducers > reducer · copper_type_l · 2"→1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.016033,
+    "indexCount": 864,
+    "spanX": 0.472708,
+    "spanY": 0.184167,
+    "spanZ": 0.184167,
+    "vertexCount": 444,
+  },
+  "hash": "62cb4f9de4365bae",
+}
+`;
+
+exports[`getFittingGeometryByType — reducers > reducer · copper_type_l · 3"→2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.055395,
+    "indexCount": 864,
+    "spanX": 0.755208,
+    "spanY": 0.270833,
+    "spanZ": 0.270833,
+    "vertexCount": 444,
+  },
+  "hash": "8b4dabbb3cba2d94",
+}
+`;
+
+exports[`getFittingGeometryByType — reducers > reducer · pvc_sch40 · 1.5"→1" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.013634,
+    "indexCount": 864,
+    "spanX": 0.404167,
+    "spanY": 0.183667,
+    "spanZ": 0.183667,
+    "vertexCount": 444,
+  },
+  "hash": "6cc8ec58068ec234",
+}
+`;
+
+exports[`getFittingGeometryByType — reducers > reducer · pvc_sch40 · 2"→1.5" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.027178,
+    "indexCount": 864,
+    "spanX": 0.515625,
+    "spanY": 0.229583,
+    "spanZ": 0.229583,
+    "vertexCount": 444,
+  },
+  "hash": "500c2d452b7417c6",
+}
+`;
+
+exports[`getFittingGeometryByType — reducers > reducer · pvc_sch40 · 3"→2" 1`] = `
+{
+  "dim": {
+    "aabbVolume": 0.085852,
+    "indexCount": 864,
+    "spanX": 0.75,
+    "spanY": 0.338333,
+    "spanZ": 0.338333,
+    "vertexCount": 444,
+  },
+  "hash": "630b41ee3e1d0484",
+}
+`;

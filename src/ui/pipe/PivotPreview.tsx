@@ -26,7 +26,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Line, Text, Billboard } from '@react-three/drei';
 import * as THREE from 'three';
 import { usePipeStore } from '@store/pipeStore';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import {
   computePivotDelta,
   applyPivot,
@@ -35,6 +35,8 @@ import {
 } from '@core/geometry/PivotController';
 import { eventBus } from '@core/EventBus';
 import { EV } from '@core/events';
+import { useReducedMotion } from '@core/a11y/useReducedMotion';
+import { pointsKey } from './perf/pointsKey';
 import type { Vec3 } from '@core/events';
 
 // ── Component ───────────────────────────────────────────────────
@@ -287,11 +289,19 @@ function GhostPipe({
 }: {
   points: Vec3[]; radius: number; color: string; emissive: string; emissiveIntensity: number;
 }) {
+  // Keyed on VALUE, not identity: the caller rebuilds `points` from live
+  // pivot math every frame, but when the snapped angle hasn't changed
+  // the array contents are identical. Without this stabilizer we'd
+  // rebuild TubeGeometry + CatmullRomCurve3 60 times a second during
+  // any stationary pivot grip — burning GC + driver upload bandwidth.
+  // (Phase 14.AC.1.)
+  const key = pointsKey(points);
   const geometry = useMemo(() => {
     const vecs = points.map((p) => new THREE.Vector3(p[0], p[1], p[2]));
     const curve = new THREE.CatmullRomCurve3(vecs, false, 'catmullrom', 0.2);
     return new THREE.TubeGeometry(curve, Math.max(16, points.length * 8), radius, 10, false);
-  }, [points, radius]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, radius]);
 
   useEffect(() => () => geometry.dispose(), [geometry]);
 
@@ -313,9 +323,16 @@ function GhostPipe({
 
 function IllegalHalo({ position, radius }: { position: Vec3; radius: number }) {
   const ref = useRef<THREE.Mesh>(null!);
+  const reducedMotion = useReducedMotion();
 
   useFrame(({ clock }) => {
     if (!ref.current) return;
+    if (reducedMotion) {
+      // Static red ring — meaning ("illegal") carried by color alone.
+      ref.current.scale.setScalar(1);
+      (ref.current.material as THREE.MeshBasicMaterial).opacity = 0.65;
+      return;
+    }
     const t = clock.elapsedTime;
     const pulse = 1 + Math.sin(t * 8) * 0.15;
     ref.current.scale.setScalar(pulse);
