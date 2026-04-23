@@ -17,10 +17,7 @@ import { eventBus } from '@core/EventBus';
 import { EV, type Vec3 } from '@core/events';
 import { bootPipeStore, usePipeStore } from '@store/pipeStore';
 import { useFloorStore } from '@store/floorStore';
-import {
-  undo as undoLastCommand,
-  redo as redoLastCommand,
-} from '@core/commands/UndoManager';
+// Phase 2a — undo/redo now live inside @ui/KeyboardHandler (extracted).
 // Phase 9 — unified pipe drawing feedback
 import { useDrawFeedbackStore } from '@store/drawFeedbackStore';
 import { nearestPipeSnap } from '@core/pipe/nearestPipeSnap';
@@ -34,10 +31,8 @@ import { logger } from '@core/logger/Logger';
 import { bootLogger } from '@core/logger/boot';
 const appLog = logger('App');
 import { useFixtureStore } from '@store/fixtureStore';
-// Phase 14.I — multi-select store. Used by the global keydown handler
-// for Ctrl+A (select all), Delete/Backspace (mass delete), and Escape
-// (clear selection before deselecting single-select).
-import { useMultiSelectStore } from '@store/multiSelectStore';
+// Phase 14.I — multi-select store moved into @ui/KeyboardHandler
+// in Phase 2a; App.tsx no longer imports it directly.
 import { FixtureLayerFromStore } from '@ui/fixtures/FixtureModels';
 import { FixtureParamWindow } from '@ui/fixtures/FixtureParamWindow';
 // Phase 14.F — compact fixture inspector; default surface when a
@@ -58,6 +53,9 @@ import { PerfSampler } from '@ui/perf/PerfSampler';
 import { SpringArmController } from '@ui/cameras/SpringArmController';
 import { PerfHUD } from '@ui/debug/PerfHUD';
 import { NavStatusChip } from '@ui/NavStatusChip';
+// Phase 2a — extracted window-level keyboard dispatcher with the
+// ARCHITECTURE.md §4.1 plumbing-mode guard.
+import { KeyboardHandler } from '@ui/KeyboardHandler';
 import { UpdateManager } from '@ui/UpdateManager';
 import { ErrorBoundary } from '@ui/ErrorBoundary';
 import { HelpOverlay } from '@ui/HelpOverlay';
@@ -138,8 +136,9 @@ import { EndpointExtender } from '@ui/pipe/EndpointExtender';
 import { ManifoldRenderer } from '@ui/manifold/ManifoldRenderer';
 import {
   ManifoldPlacement,
-  beginManifoldPlacement,
-  isManifoldPlacementActive,
+  // Phase 2a — `beginManifoldPlacement` / `isManifoldPlacementActive`
+  // moved into @ui/KeyboardHandler along with the extracted keydown
+  // switch; App.tsx only needs the placement component now.
 } from '@ui/manifold/ManifoldPlacement';
 import { CappedEndpoints } from '@ui/pipe/CappedEndpoints';
 import { bootConnectivityManager } from '@core/pipe/ConnectivityManager';
@@ -147,7 +146,8 @@ import { bootHotSupplyPropagation } from '@core/fixtures/bootHotSupplyPropagatio
 import { bootSpatialAudio } from '@core/spatial/SpatialAudio';
 import { useFeatureFlagStore } from '@store/featureFlagStore';
 // Phase 12.A — Sims-style wall visibility cycle.
-import { useRenderModeStore } from '@store/renderModeStore';
+// Phase 2a — `useRenderModeStore` moved into @ui/KeyboardHandler
+// with the Shift+W cycle. App.tsx no longer imports it.
 // Phase 14.R.3 — Plumbing ⇄ Roofing workspace switch. The mode store
 // is a peer of plumbingDrawStore; it controls WHICH workspace is active
 // (plumbing vs roofing) while plumbingDrawStore continues to drive the
@@ -980,180 +980,12 @@ function computeNextAction(args: {
 
 // ── Keyboard ────────────────────────────────────────────────────
 
-function KeyboardHandler() {
-  const mode = usePlumbingDrawStore((s) => s.mode);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      // Phase 8.B — universal undo/redo via the CommandBus log.
-      // Replaces the old pipeStore-only undo/redo: now any command
-      // whose handler defines snapshot+undo is reversible (pipes,
-      // fixtures, manifolds, connectivity side-effects).
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
-        e.preventDefault(); undoLastCommand(); return;
-      }
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
-        e.preventDefault(); redoLastCommand(); return;
-      }
-
-      // Phase 12.A — Sims-style wall render-mode cycle. Shift+W stands
-      // alone (no Ctrl) so it doesn't collide with the existing 'w'
-      // layer-waste toggle (which is bare w).
-      if (e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey && (e.key === 'W' || e.key === 'w')) {
-        const t = e.target as HTMLElement | null;
-        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-        e.preventDefault();
-        useRenderModeStore.getState().cycle();
-        return;
-      }
-
-      // Phase 14.R.3 — Shift+M toggles between Plumbing and Roofing
-      // workspaces. Handled BEFORE the modifier guard below so the
-      // combo never falls through to the bare-M manifold-placement
-      // handler further down the switch.
-      if (e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey && (e.key === 'M' || e.key === 'm')) {
-        const t = e.target as HTMLElement | null;
-        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-        e.preventDefault();
-        useAppModeStore.getState().toggle();
-        return;
-      }
-
-      if (e.ctrlKey || e.metaKey || e.altKey) return;
-
-      const st = usePlumbingDrawStore.getState();
-      switch (e.key) {
-        case 'n': st.setMode('navigate'); break;
-        case 'd': if (st.mode !== 'draw') st.setMode('draw'); break;
-        case 's':
-          // Phase 14.M: toggle Select mode (lasso) from any non-draw
-          // mode. Pressing S while in select returns to navigate so
-          // the same key enters + exits the lasso.
-          if (st.mode === 'draw') break;
-          st.setMode(st.mode === 'select' ? 'navigate' : 'select');
-          break;
-        case 'q': st.togglePipeQuality(); break;
-        case 'v': if (st.mode === 'draw') st.setDrawPlane('vertical'); break;
-        case 'h': if (st.mode === 'draw') st.setDrawPlane('horizontal'); break;
-        case 'O': if (e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
-          // Phase 14.AD.23 — Shift+O toggles the ortho click-drag draw mode.
-          st.toggleOrthoClickDragMode();
-          e.preventDefault();
-        } break;
-        case 'Escape': {
-          // Universal cancel chain — ONE key users can hit reflexively
-          // when something feels wrong, with a predictable order:
-          //
-          //   1. Radial wheel open?       → close it
-          //   2. Pending fixture placement? → cancel it
-          //   3. Mid-draw with points?    → clear points, STAY in Draw
-          //      (so the user can immediately re-draw without hitting D)
-          //   4. A pipe or fixture selected? → deselect (dismiss inspector)
-          //   5. Otherwise                 → drop back to Navigate mode
-          //
-          // Each branch short-circuits so one Escape never performs more
-          // than one step. Hit Escape again to continue up the chain.
-          const wheelOpen = useRadialMenuStore.getState().activeWheelId !== null;
-          if (wheelOpen) {
-            useRadialMenuStore.getState().closeWheel();
-            break;
-          }
-          const pending = useCustomerStore.getState().pendingFixture;
-          if (pending) {
-            useCustomerStore.getState().setPendingFixture(null);
-            break;
-          }
-          if (st.mode === 'draw' && st.isDrawing) {
-            usePlumbingDrawStore.setState({ drawPoints: [], isDrawing: false });
-            break;
-          }
-          // Phase 14.I — multi-select clears first (before single-select),
-          // because it represents the user's most-recent building-up
-          // action. Two Escape presses: first clears the group, second
-          // deselects any remaining single-select.
-          if (!useMultiSelectStore.getState().isEmpty()) {
-            useMultiSelectStore.getState().clear();
-            break;
-          }
-          if (usePipeStore.getState().selectedId) {
-            usePipeStore.getState().selectPipe(null);
-            break;
-          }
-          if (useFixtureStore.getState().selectedFixtureId) {
-            useFixtureStore.getState().selectFixture(null);
-            break;
-          }
-          st.setMode('navigate');
-          break;
-        }
-        case 'Enter':
-          if (st.mode === 'draw') {
-            const pts = st.finishDraw();
-            if (pts && pts.length >= 2) {
-              eventBus.emit(EV.PIPE_COMPLETE, {
-                id: `pipe-${Date.now()}`, points: pts,
-                diameter: st.drawDiameter, material: st.drawMaterial,
-              });
-            }
-          }
-          break;
-        case 'Delete': case 'Backspace': {
-          // Phase 14.I — multi-select takes priority. Mass-delete all
-          // selected pipes + fixtures if any are in the set. This is
-          // keyed off the store rather than piping through the single-
-          // select store so the user can shift-click a handful of
-          // items and nuke them in one stroke.
-          const ms = useMultiSelectStore.getState();
-          if (!ms.isEmpty()) {
-            const pipeIdsToRemove = ms.selectedPipeIds();
-            const fixtureIdsToRemove = ms.selectedFixtureIds();
-            for (const id of pipeIdsToRemove) usePipeStore.getState().removePipe(id);
-            for (const id of fixtureIdsToRemove) useFixtureStore.getState().removeFixture(id);
-            ms.clear();
-            break;
-          }
-          const sel = usePipeStore.getState().selectedId;
-          if (sel) usePipeStore.getState().removePipe(sel);
-          break;
-        }
-        case 'a': case 'A': {
-          // Phase 14.I — Ctrl+A selects every visible pipe + fixture
-          // into the multi-select set. Bypasses if the user is typing
-          // (isEditableTarget already gates the outer handler).
-          if (!e.ctrlKey || e.shiftKey || e.metaKey) break;
-          if (st.mode === 'draw') break; // reserve for draw-mode semantics
-          e.preventDefault();
-          const allPipeIds = usePipeStore.getState().pipeOrder;
-          const allFixtureIds = Object.keys(useFixtureStore.getState().fixtures);
-          useMultiSelectStore.getState().setSelection(allPipeIds, allFixtureIds);
-          break;
-        }
-        case '1': if (st.mode === 'draw') st.setDrawDiameter(0.5); break;
-        case '2': if (st.mode === 'draw') st.setDrawDiameter(1); break;
-        case '3': if (st.mode === 'draw') st.setDrawDiameter(1.5); break;
-        case '4': if (st.mode === 'draw') st.setDrawDiameter(2); break;
-        case '5': if (st.mode === 'draw') st.setDrawDiameter(3); break;
-        case '6': if (st.mode === 'draw') st.setDrawDiameter(4); break;
-
-        // Phase 7.C.ii: M enters manifold-placement mode. A translucent
-        // ghost follows the cursor; click to drop, Escape to cancel,
-        // R to rotate 90°. Re-pressing M while a session is active is a
-        // no-op (handled inside beginManifoldPlacement).
-        case 'm':
-        case 'M': {
-          if (st.mode === 'draw') break;
-          if (isManifoldPlacementActive()) break;
-          beginManifoldPlacement();
-          break;
-        }
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [mode]);
-
-  return null;
-}
+// KeyboardHandler extracted to `src/ui/KeyboardHandler.tsx` in
+// Phase 2a of the hybrid-architecture refactor. That file owns the
+// single window-level `keydown` listener for the shared shell,
+// plus the mode-guard that short-circuits plumbing-scoped keys in
+// roofing mode (ARCHITECTURE.md §4.1). Imported at the top of
+// this module and rendered below in <App />.
 
 // currentGroundHit removed — Phase 7.C.ii replaced the M-key "drop at
 // origin" flow with the ManifoldPlacement session (cursor ghost).
