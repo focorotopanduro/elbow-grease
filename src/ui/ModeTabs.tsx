@@ -25,12 +25,28 @@
  *   • **Accessibility** — `role="tablist"` / `role="tab"` /
  *     `aria-selected` / roving `tabindex`, plus arrow-key
  *     navigation when a tab has focus. Home / End jump to first
- *     and last.
+ *     and last. Respects `prefers-reduced-motion`.
  *
  * Shift+M still toggles from anywhere (handled in KeyboardHandler).
+ *
+ * ─── Edge cases handled ──────────────────────────────────────
+ *
+ * Hover / focus state is tracked via React state (`hoveredIdx` /
+ * `focusedIdx`) rather than direct DOM mutation, so rapid mode
+ * flips, external store changes (Shift+M), and interleaved
+ * hover/focus events can't leave the tab's style drifted out of
+ * sync with its logical state.
+ *
+ * `activeIdx` is clamped to 0 when `mode` somehow isn't in
+ * `MODES` (e.g. corrupt localStorage value) — the pill stays
+ * visually on-screen instead of sliding off to the left.
+ *
+ * Clicking the already-active tab is a no-op instead of a
+ * redundant `setMode` that would re-persist the same value to
+ * localStorage.
  */
 
-import { useRef } from 'react';
+import { useState } from 'react';
 import {
   useAppModeStore,
   APP_MODE_LABELS,
@@ -38,6 +54,7 @@ import {
   APP_MODE_ACCENTS,
   type AppMode,
 } from '@store/appModeStore';
+import { useReducedMotion } from '@core/a11y/useReducedMotion';
 
 const MODES: AppMode[] = ['plumbing', 'roofing'];
 const TAB_WIDTH_PX = 150;
@@ -48,26 +65,48 @@ const CONTAINER_WIDTH_PX = TAB_WIDTH_PX * MODES.length + CONTAINER_PAD_PX * 2;
 export function ModeTabs() {
   const mode = useAppModeStore((s) => s.mode);
   const setMode = useAppModeStore((s) => s.setMode);
-  const buttonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const reducedMotion = useReducedMotion();
 
-  const activeIdx = MODES.indexOf(mode);
-  const activeAccent = APP_MODE_ACCENTS[mode];
+  // React state for visual-only local interaction. Kept out of
+  // appModeStore because it's purely ephemeral — hover and focus
+  // don't survive unmount and shouldn't touch global state.
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [focusedIdx, setFocusedIdx] = useState<number | null>(null);
 
-  /** Pointer/keyboard: move focus to `idx` and activate that mode.
-   *  "Automatic activation" is conventional for tablists where
-   *  selection is cheap — here the workspace flip is effectively
-   *  free. */
+  // Defensive clamp: if `mode` somehow isn't in MODES (rare but
+  // possible with a stale / corrupted localStorage value), keep
+  // the pill on-screen at index 0 rather than animating off-canvas.
+  const rawActiveIdx = MODES.indexOf(mode);
+  const activeIdx = rawActiveIdx >= 0 ? rawActiveIdx : 0;
+  const resolvedMode = MODES[activeIdx]!;
+  const activeAccent = APP_MODE_ACCENTS[resolvedMode];
+
+  // Transition strings honour prefers-reduced-motion. Users with
+  // vestibular disorders see instantaneous state flips.
+  const pillTransition = reducedMotion
+    ? 'none'
+    : 'transform 280ms cubic-bezier(0.4, 0, 0.2, 1), background 280ms ease, box-shadow 280ms ease';
+  const tabTextTransition = reducedMotion ? 'none' : 'color 200ms ease';
+  const containerGlowTransition = reducedMotion ? 'none' : 'box-shadow 280ms ease';
+
+  /** Pointer / keyboard: move focus to `idx` and activate that
+   *  mode. Wraps at both ends. No-ops if the target mode is
+   *  already active so we don't burn a localStorage write on
+   *  clicking the tab that's already selected. */
   const focusAndSet = (idx: number) => {
     const clamped = (idx + MODES.length) % MODES.length;
     const nextMode = MODES[clamped];
     if (!nextMode) return;
-    setMode(nextMode);
-    buttonRefs.current[clamped]?.focus();
+    if (nextMode !== mode) setMode(nextMode);
+    // Focus the target tab regardless of mode change so arrow
+    // nav feels responsive when pressed repeatedly on the end tab.
+    const btn = document.querySelector<HTMLButtonElement>(
+      `[data-mode-tab="${nextMode}"]`,
+    );
+    btn?.focus();
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, idx: number) => {
-    // Let the outer window-level KeyboardHandler keep its bindings;
-    // we only intercept navigation within the tablist.
     switch (e.key) {
       case 'ArrowRight':
       case 'ArrowDown':
@@ -91,6 +130,8 @@ export function ModeTabs() {
         e.stopPropagation();
         focusAndSet(MODES.length - 1);
         break;
+      // Space + Enter handled natively by <button> — they fire
+      // onClick, which routes through the no-op guard below.
     }
   };
 
@@ -126,13 +167,14 @@ export function ModeTabs() {
           // into the chrome around the tabs. Drops intensity on the
           // way out so it's atmospheric, not loud.
           boxShadow: `0 2px 14px rgba(0,0,0,0.5), 0 0 16px ${activeAccent}33`,
-          transition: 'box-shadow 280ms ease',
+          transition: containerGlowTransition,
           boxSizing: 'content-box',
         }}
       >
         {/* Sliding-pill indicator behind the active tab. */}
         <div
           aria-hidden="true"
+          data-testid="mode-pill"
           style={{
             position: 'absolute',
             top: CONTAINER_PAD_PX,
@@ -142,23 +184,35 @@ export function ModeTabs() {
             borderRadius: 8,
             background: activeAccent,
             transform: `translateX(${activeIdx * TAB_WIDTH_PX}px)`,
-            transition: 'transform 280ms cubic-bezier(0.4, 0, 0.2, 1), background 280ms ease',
+            transition: pillTransition,
             boxShadow: `0 1px 6px ${activeAccent}66`,
             pointerEvents: 'none',
           }}
         />
 
         {MODES.map((m, idx) => {
-          const active = mode === m;
+          const active = resolvedMode === m;
+          const hovered = hoveredIdx === idx;
+          const focused = focusedIdx === idx;
+          const color = active ? '#0a0a0f' : hovered ? '#ccc' : '#777';
+          const boxShadow = focused
+            ? '0 0 0 2px rgba(255,255,255,0.7)'
+            : 'none';
           return (
             <button
               key={m}
-              ref={(el) => { buttonRefs.current[idx] = el; }}
+              data-mode-tab={m}
               role="tab"
               aria-selected={active}
               tabIndex={active ? 0 : -1}
-              onClick={() => setMode(m)}
+              onClick={() => {
+                if (m !== mode) setMode(m);
+              }}
               onKeyDown={(e) => onKeyDown(e, idx)}
+              onMouseEnter={() => setHoveredIdx(idx)}
+              onMouseLeave={() => setHoveredIdx((h) => (h === idx ? null : h))}
+              onFocus={() => setFocusedIdx(idx)}
+              onBlur={() => setFocusedIdx((f) => (f === idx ? null : f))}
               title={`${APP_MODE_LABELS[m]} workspace — Shift+M to toggle, ← / → to navigate`}
               style={{
                 position: 'relative',
@@ -174,29 +228,16 @@ export function ModeTabs() {
                 borderRadius: 8,
                 fontSize: 14,
                 fontWeight: active ? 700 : 500,
-                // Dark text on the accent pill reads WCAG AA on both
-                // cyan and orange; inactive text is deliberately
-                // low-contrast so the active tab pops.
-                color: active ? '#0a0a0f' : '#777',
+                color,
+                boxShadow,
                 cursor: 'pointer',
                 letterSpacing: active ? 0.3 : 0,
-                transition: 'color 200ms ease, font-weight 200ms ease',
+                // `font-weight` removed from the transition list —
+                // CSS doesn't interpolate discrete font-weights, so
+                // listing it was a lie that didn't animate anything.
+                transition: tabTextTransition,
                 outline: 'none',
                 fontFamily: 'inherit',
-              }}
-              onMouseEnter={(e) => {
-                if (!active) e.currentTarget.style.color = '#ccc';
-              }}
-              onMouseLeave={(e) => {
-                if (!active) e.currentTarget.style.color = '#777';
-              }}
-              onFocus={(e) => {
-                // Visible focus ring that doesn't compete with the
-                // accent pill — thin white halo around the button.
-                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255,255,255,0.4)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.boxShadow = 'none';
               }}
             >
               <span style={{ fontSize: 18, lineHeight: 1 }}>
