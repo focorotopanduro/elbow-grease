@@ -1411,6 +1411,18 @@ export function App() {
   // the listener lives as long as the app window.
   useBundleHotkeys();
 
+  // Mode-aware draw cursor (workspace-accent-tinted crosshair).
+  // Cyan while plumbing is in `'draw'`, orange while roofing is in
+  // `'draw-rect'`/`'draw-polygon'`/`'place-penetration'`, native
+  // cursor otherwise. Carries the workspace identity onto the
+  // pointer itself — see `src/ui/cursors/modeCursor.ts`.
+  //
+  // MUST be called here, BEFORE the `!ready` / error early-returns
+  // below. React's Rules of Hooks forbids calling a hook only on
+  // some renders — doing so throws "Rendered more hooks than during
+  // the previous render" (error #310) when the conditional flips.
+  const canvasCursor = useCanvasCursor();
+
   useEffect(() => {
     try {
       bootFeedbackLoop();
@@ -1614,13 +1626,6 @@ export function App() {
   // the DPR cap.
   const gpuProbe = probeGpuAtBoot();
   const lowSpec = isLowSpecGpu();
-
-  // Mode-aware draw cursor (workspace-accent-tinted crosshair).
-  // Cyan while plumbing is in `'draw'`, orange while roofing is in
-  // `'draw-rect'`/`'draw-polygon'`/`'place-penetration'`, native
-  // cursor otherwise. Carries the workspace identity onto the
-  // pointer itself — see `src/ui/cursors/modeCursor.ts`.
-  const canvasCursor = useCanvasCursor();
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative', cursor: canvasCursor }}>
