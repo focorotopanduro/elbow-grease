@@ -23,6 +23,12 @@ import { usePrintStore } from '@core/print/printProposal';
 import type { ChangeOrderPrintData } from '@core/print/printChangeOrder';
 import type { LineItemDelta, TotalsDelta } from '@core/print/proposalRevision';
 import { PLACEHOLDER_COMPANY } from '@store/contractorProfileStore';
+// Phase 5 (ARCHITECTURE.md §4.8) — change orders follow the
+// same domain-presence rule as proposals: a CO touching only
+// plumbing contains no roofing section, and vice versa.
+// Reference + summary + change-table + totals-delta are all
+// plumbing line-item delta content today and gate accordingly.
+import { getDomainPresence } from '@core/proposal/domainPresence';
 
 export function PrintableChangeOrder() {
   const changeOrder = usePrintStore((s) => s.changeOrder);
@@ -40,14 +46,19 @@ export function PrintableChangeOrder() {
 // ── Root document ─────────────────────────────────────────────
 
 function ChangeOrderDocument({ data }: { data: ChangeOrderPrintData }) {
+  // Phase 5 (§4.8) — gate the plumbing-side delta sections on
+  // presence. Header, parties, signatures, and terms remain
+  // unconditional. Roofing-delta content is future work; when
+  // it lands it gates on `presence.roofing`.
+  const presence = getDomainPresence();
   return (
     <article className="co-doc">
       <TitleBlock data={data} />
-      <ReferenceBlock data={data} />
+      {presence.plumbing && <ReferenceBlock data={data} />}
       <PartiesBlock data={data} />
-      <SummarySection summary={data.summary} />
-      <ChangeTable deltas={data.diff.deltas} />
-      <TotalsDeltaSection totals={data.diff.totals} />
+      {presence.plumbing && <SummarySection summary={data.summary} />}
+      {presence.plumbing && <ChangeTable deltas={data.diff.deltas} />}
+      {presence.plumbing && <TotalsDeltaSection totals={data.diff.totals} />}
       <SignatureBlock data={data} />
       <TermsFooter />
     </article>

@@ -20,6 +20,11 @@
 import { usePrintBidPackageStore } from '@core/print/printBidPackage';
 import type { BidPackageData, BidComplianceRow } from '@core/print/bidPackageData';
 import type { ProposalData, ProposalLineItem } from '@core/print/proposalData';
+// Phase 5 (ARCHITECTURE.md §4.8) — gate per-domain pages on
+// entity presence. Cover + terms pages remain unconditional;
+// Scope, LineItems, Compliance are plumbing-only content today
+// and skip cleanly when the project has no plumbing entities.
+import { getDomainPresence } from '@core/proposal/domainPresence';
 
 export function PrintableBidPackage() {
   const data = usePrintBidPackageStore((s) => s.bidPackage);
@@ -36,12 +41,19 @@ export function PrintableBidPackage() {
 // ── Document ──────────────────────────────────────────────────
 
 function Document({ data }: { data: BidPackageData }) {
+  // Phase 5 (§4.8) — Scope totals, LineItems, and Compliance
+  // are plumbing-scoped pages today. Gate them on plumbing
+  // presence so a roofing-only bid package prints Cover + Terms
+  // without empty plumbing tables or "N/A" code-compliance
+  // seals. When the roofing line-item pipeline lands, it adds
+  // its own page set gated on `presence.roofing`.
+  const presence = getDomainPresence();
   return (
     <article className="bid-doc">
       <CoverPage data={data} />
-      <ScopePage data={data} />
-      <LineItemsPage proposal={data.proposal} />
-      <CompliancePage data={data} />
+      {presence.plumbing && <ScopePage data={data} />}
+      {presence.plumbing && <LineItemsPage proposal={data.proposal} />}
+      {presence.plumbing && <CompliancePage data={data} />}
       <TermsPage proposal={data.proposal} />
     </article>
   );

@@ -25,6 +25,12 @@
 import { usePrintStore } from '@core/print/printProposal';
 import type { ProposalData, ProposalLineItem } from '@core/print/proposalData';
 import { PLACEHOLDER_COMPANY } from '@store/contractorProfileStore';
+// Phase 5 (ARCHITECTURE.md §4.8) — domain-presence gating so
+// roofing-only jobs don't render an empty plumbing BOM table
+// and plumbing-only jobs don't render a placeholder roofing
+// section. Always-on sections (header, customer block, scope,
+// signatures, terms) remain unconditional.
+import { getDomainPresence, type DomainPresence } from '@core/proposal/domainPresence';
 
 export function PrintableProposal() {
   const proposal = usePrintStore((s) => s.proposal);
@@ -45,14 +51,30 @@ export function PrintableProposal() {
 // ── Root document ─────────────────────────────────────────────
 
 function ProposalDocument({ proposal }: { proposal: ProposalData }) {
+  // Phase 5 — gate domain-specific sections on entity presence.
+  // Header / customer / scope / signatures / terms remain
+  // unconditional per §4.8.
+  const presence = getDomainPresence();
+
   return (
     <article className="proposal-doc">
       <TitleBlock proposal={proposal} />
       {proposal.project.scopeDescription && (
         <ScopeSection text={proposal.project.scopeDescription} />
       )}
-      <LineItemsTable proposal={proposal} />
-      <TotalsSection proposal={proposal} />
+      {presence.plumbing && <LineItemsTable proposal={proposal} />}
+      {/*
+        Phase 5 — roofing line-item rendering is feature work (see
+        §4.8: "must accept line items from both engines"). When
+        that lands, its section imports `presence.roofing` and
+        slots in here. Until then, roofing-only jobs render header
+        + customer + scope + signatures + terms — and that is the
+        correct output per the presence rule: "no header, no empty
+        table, no placeholder".
+      */}
+      {(presence.plumbing || presence.roofing) && (
+        <TotalsSection proposal={proposal} presence={presence} />
+      )}
       <SignatureBlock proposal={proposal} />
       {proposal.contractor.proposalTerms && (
         <FooterTerms text={proposal.contractor.proposalTerms} />
@@ -193,21 +215,48 @@ function LineItemRow({
 }
 
 // ── Totals ────────────────────────────────────────────────────
+//
+// Phase 5 (ARCHITECTURE.md §4.8) — receives the `DomainPresence`
+// object so the grand-total row can sum ONLY the domains that
+// are present. Today `ProposalData.totals` carries a single
+// plumbing-derived figure; when the roofing line-item pipeline
+// lands, this component will combine per-domain subtotals,
+// skipping absent ones (no `$0.00` filler rows per §4.8).
+// Until then the sole visible difference is that the totals
+// block renders `$0.00` cleanly for a roofing-only job and
+// stays hidden entirely when BOTH domains are absent.
 
-function TotalsSection({ proposal }: { proposal: ProposalData }) {
+function TotalsSection({
+  proposal, presence,
+}: {
+  proposal: ProposalData;
+  presence: DomainPresence;
+}) {
   const { totals, hints } = proposal;
+
+  // When plumbing is absent, the totals we were handed are
+  // stale (derived from an empty plumbing BOM). Show zeros
+  // rather than a misleading non-zero subtotal. This path
+  // becomes a real sum once roofing totals flow in.
+  const plumbingTotals = presence.plumbing ? totals : {
+    customerSubtotal: 0,
+    customerTax: 0,
+    customerTotal: 0,
+    internal: totals.internal,
+  };
+
   return (
     <section className="pp-totals">
-      {hints.showInternalBreakdown && totals.internal && (
+      {hints.showInternalBreakdown && plumbingTotals.internal && presence.plumbing && (
         <div className="pp-internal-breakdown">
           <h3 className="pp-section-heading">Internal Breakdown</h3>
           <table className="pp-kv-table">
             <tbody>
-              <tr><th>Raw material</th><td>{usd(totals.internal.rawMaterial)}</td></tr>
-              <tr><th>Raw labor ({totals.internal.rawLaborHours.toFixed(2)} hrs)</th>
-                  <td>{usd(totals.internal.rawLaborCost)}</td></tr>
-              <tr><th>Overhead</th><td>{usd(totals.internal.overhead)}</td></tr>
-              <tr><th>Margin</th><td>{usd(totals.internal.margin)}</td></tr>
+              <tr><th>Raw material</th><td>{usd(plumbingTotals.internal.rawMaterial)}</td></tr>
+              <tr><th>Raw labor ({plumbingTotals.internal.rawLaborHours.toFixed(2)} hrs)</th>
+                  <td>{usd(plumbingTotals.internal.rawLaborCost)}</td></tr>
+              <tr><th>Overhead</th><td>{usd(plumbingTotals.internal.overhead)}</td></tr>
+              <tr><th>Margin</th><td>{usd(plumbingTotals.internal.margin)}</td></tr>
             </tbody>
           </table>
         </div>
@@ -215,13 +264,13 @@ function TotalsSection({ proposal }: { proposal: ProposalData }) {
 
       <table className="pp-kv-table pp-bid-table">
         <tbody>
-          <tr><th>Subtotal</th><td>{usd(totals.customerSubtotal)}</td></tr>
-          {totals.customerTax > 0 && (
-            <tr><th>Sales Tax</th><td>{usd(totals.customerTax)}</td></tr>
+          <tr><th>Subtotal</th><td>{usd(plumbingTotals.customerSubtotal)}</td></tr>
+          {plumbingTotals.customerTax > 0 && (
+            <tr><th>Sales Tax</th><td>{usd(plumbingTotals.customerTax)}</td></tr>
           )}
           <tr className="pp-grand-total">
             <th>TOTAL</th>
-            <td>{usd(totals.customerTotal)}</td>
+            <td>{usd(plumbingTotals.customerTotal)}</td>
           </tr>
         </tbody>
       </table>
