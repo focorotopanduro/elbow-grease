@@ -13,7 +13,7 @@ import { usePipeStore, type CommittedPipe } from '@store/pipeStore';
 import { usePlumbingLayerStore } from '@store/plumbingLayerStore';
 // Phase 14.I — multi-select layer. Bare click = single-select (existing
 // behavior). Shift+click = toggle into the multi-select set.
-import { useMultiSelectStore } from '@store/multiSelectStore';
+import { usePlumbingMultiSelectStore } from '@store/plumbingMultiSelectStore';
 import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { useFloorParams, type FloorRenderParams } from '@store/floorStore';
 import { usePhaseFilter } from '@store/plumbingPhaseStore';
@@ -56,7 +56,7 @@ function dispatchPipeClick(
 ): void {
   e.stopPropagation();
   const ne = e.nativeEvent;
-  const multi = useMultiSelectStore.getState();
+  const multi = usePlumbingMultiSelectStore.getState();
 
   if (ne.altKey) {
     // Subtract from selection.
@@ -233,7 +233,7 @@ function FullPipe({
   // Phase 14.I — multi-select highlighting. Subscribe per-pipe so only
   // pipes whose membership changes re-render, not every pipe when any
   // selection changes.
-  const inMultiSelect = useMultiSelectStore((s) => s.pipeIds[pipe.id] === true);
+  const inMultiSelect = usePlumbingMultiSelectStore((s) => s.pipeIds[pipe.id] === true);
   if (!geometries) return null;
   if (!floorParams.visible) return null;
 
@@ -391,7 +391,7 @@ export function PipeRenderer() {
   const phaseFilter = usePhaseFilter();
   // Phase 14.I — subscribe so merged-run highlighting re-evaluates on
   // multi-select changes. The actual read is in the merged-run branch.
-  const multiSelectPipeIds = useMultiSelectStore((s) => s.pipeIds);
+  const multiSelectPipeIds = usePlumbingMultiSelectStore((s) => s.pipeIds);
 
   const visible = useMemo(
     () => Object.values(pipes).filter((p) => {
@@ -418,7 +418,7 @@ export function PipeRenderer() {
 
   if (quality === '3d') {
     return (
-      <group onPointerMissed={() => { selectPipe(null); useMultiSelectStore.getState().clear(); }}>
+      <group onPointerMissed={() => { selectPipe(null); usePlumbingMultiSelectStore.getState().clear(); }}>
         {visible.map((pipe) => {
           const group = merge.byPipeId.get(pipe.id);
           // Merged-group member that is NOT the lead — skip rendering

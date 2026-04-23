@@ -6,7 +6,7 @@
  * interaction model (drag the ring in XZ, optional snap modifiers),
  * different scope (group of pipes + fixtures instead of one fixture).
  *
- * Rendered only when `useMultiSelectStore.count() >= 2`. The single-
+ * Rendered only when `usePlumbingMultiSelectStore.count() >= 2`. The single-
  * item case keeps its existing per-fixture gizmo for continuity.
  *
  * Fractal extras (Phase 14.M polish):
@@ -19,7 +19,7 @@
 import { useMemo, useRef, useState, useCallback } from 'react';
 import type { ThreeEvent } from '@react-three/fiber';
 import type { Vec3 } from '@core/events';
-import { useMultiSelectStore } from '@store/multiSelectStore';
+import { usePlumbingMultiSelectStore } from '@store/plumbingMultiSelectStore';
 import { usePipeStore } from '@store/pipeStore';
 import { useFixtureStore } from '@store/fixtureStore';
 import {
@@ -38,8 +38,8 @@ export function GroupRotationGizmo() {
   // Per-entity subscriptions would over-render; one subscription to
   // the whole store keyed on .count() is cheaper and activates only
   // when multi-select actually changes.
-  const pipeIdsMap = useMultiSelectStore((s) => s.pipeIds);
-  const fixtureIdsMap = useMultiSelectStore((s) => s.fixtureIds);
+  const pipeIdsMap = usePlumbingMultiSelectStore((s) => s.pipeIds);
+  const fixtureIdsMap = usePlumbingMultiSelectStore((s) => s.fixtureIds);
 
   // Live reads of the actual geometry. Subscribe to both stores so
   // the gizmo moves when the selected entities move.

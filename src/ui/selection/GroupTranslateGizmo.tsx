@@ -27,7 +27,7 @@ import { useThree, type ThreeEvent } from '@react-three/fiber';
 import { Billboard, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import type { Vec3 } from '@core/events';
-import { useMultiSelectStore } from '@store/multiSelectStore';
+import { usePlumbingMultiSelectStore } from '@store/plumbingMultiSelectStore';
 import { usePipeStore } from '@store/pipeStore';
 import { useFixtureStore } from '@store/fixtureStore';
 import {
@@ -42,8 +42,8 @@ const GRID_STEP_FT = 1; // Ctrl snap step — matches the world grid.
 const HANDLE_Y_OFFSET = 0.12; // how far above the rotation ring the handle sits
 
 export function GroupTranslateGizmo() {
-  const pipeIdsMap = useMultiSelectStore((s) => s.pipeIds);
-  const fixtureIdsMap = useMultiSelectStore((s) => s.fixtureIds);
+  const pipeIdsMap = usePlumbingMultiSelectStore((s) => s.pipeIds);
+  const fixtureIdsMap = usePlumbingMultiSelectStore((s) => s.fixtureIds);
   const pipes = usePipeStore((s) => s.pipes);
   const fixtures = useFixtureStore((s) => s.fixtures);
   const { raycaster, camera, gl } = useThree();

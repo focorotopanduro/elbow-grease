@@ -34,7 +34,7 @@
  */
 
 import { useEffect } from 'react';
-import { useMultiSelectStore } from '@store/multiSelectStore';
+import { usePlumbingMultiSelectStore } from '@store/plumbingMultiSelectStore';
 import { usePlumbingClipboardStore } from '@store/plumbingClipboardStore';
 import { usePipeStore } from '@store/pipeStore';
 import { useFixtureStore } from '@store/fixtureStore';
@@ -73,7 +73,7 @@ function mintId(kind: 'p' | 'f'): string {
  * to match the rest of the 14.I contract.
  */
 function currentSelectionIds(): { pipeIds: string[]; fixtureIds: string[] } {
-  const ms = useMultiSelectStore.getState();
+  const ms = usePlumbingMultiSelectStore.getState();
   const msPipes = ms.selectedPipeIds();
   const msFixtures = ms.selectedFixtureIds();
   if (msPipes.length + msFixtures.length > 0) {
@@ -208,7 +208,7 @@ export function pasteFromClipboard(): boolean {
   const { newPipeIds, newFixtureIds } = applyPaste(payload, DEFAULT_DUPLICATE_OFFSET);
   // Auto-select the pasted items so Ctrl+V → arrow-keys immediately
   // moves them without an extra "click to select" step.
-  useMultiSelectStore.getState().setSelection(newPipeIds, newFixtureIds);
+  usePlumbingMultiSelectStore.getState().setSelection(newPipeIds, newFixtureIds);
   return true;
 }
 
@@ -223,7 +223,7 @@ export function duplicateSelection(): boolean {
     return false;
   }
   const { newPipeIds, newFixtureIds } = applyPaste(payload, DEFAULT_DUPLICATE_OFFSET);
-  useMultiSelectStore.getState().setSelection(newPipeIds, newFixtureIds);
+  usePlumbingMultiSelectStore.getState().setSelection(newPipeIds, newFixtureIds);
   return true;
 }
 

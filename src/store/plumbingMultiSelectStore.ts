@@ -1,5 +1,15 @@
 /**
- * multiSelectStore — Phase 14.I
+ * plumbingMultiSelectStore — Phase 14.I
+ *
+ * Renamed from `multiSelectStore` in Phase 7 of the
+ * hybrid-architecture refactor (ARCHITECTURE.md §3). The state
+ * shape is `pipeIds` + `fixtureIds` and the API is
+ * `addPipe` / `addFixture` / `togglePipe` / `toggleFixture` /
+ * `selectedPipeIds()` / `selectedFixtureIds()` — every method
+ * names a plumbing entity. Generalising to `{ domain, ids[] }`
+ * would flip every call site's API surface; prefixing keeps
+ * the plumbing-scoped API clean and lets a future roofing
+ * multi-select flow ship with its own store + shape.
  *
  * Unifying selection layer that spans pipes + fixtures. Layers on
  * top of the existing single-select stores (`pipeStore.selectedId`
@@ -64,7 +74,7 @@ interface MultiSelectState {
   selectedFixtureIds: () => string[];
 }
 
-export const useMultiSelectStore = create<MultiSelectState>((set, get) => ({
+export const usePlumbingMultiSelectStore = create<MultiSelectState>((set, get) => ({
   pipeIds: {},
   fixtureIds: {},
 

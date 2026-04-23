@@ -42,7 +42,7 @@ import {
 import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { usePipeStore } from '@store/pipeStore';
 import { useFixtureStore } from '@store/fixtureStore';
-import { useMultiSelectStore } from '@store/multiSelectStore';
+import { usePlumbingMultiSelectStore } from '@store/plumbingMultiSelectStore';
 import { useCustomerStore } from '@store/customerStore';
 import { useRadialMenuStore } from '@store/radialMenuStore';
 import { useRenderModeStore } from '@store/renderModeStore';
@@ -158,8 +158,8 @@ export function handleKeyboardEvent(e: KeyboardEvent): void {
       // because it represents the user's most-recent building-up
       // action. Two Escape presses: first clears the group, second
       // deselects any remaining single-select.
-      if (!useMultiSelectStore.getState().isEmpty()) {
-        useMultiSelectStore.getState().clear();
+      if (!usePlumbingMultiSelectStore.getState().isEmpty()) {
+        usePlumbingMultiSelectStore.getState().clear();
         break;
       }
       if (usePipeStore.getState().selectedId) {
@@ -190,7 +190,7 @@ export function handleKeyboardEvent(e: KeyboardEvent): void {
       // keyed off the store rather than piping through the single-
       // select store so the user can shift-click a handful of
       // items and nuke them in one stroke.
-      const ms = useMultiSelectStore.getState();
+      const ms = usePlumbingMultiSelectStore.getState();
       if (!ms.isEmpty()) {
         const pipeIdsToRemove = ms.selectedPipeIds();
         const fixtureIdsToRemove = ms.selectedFixtureIds();
@@ -212,7 +212,7 @@ export function handleKeyboardEvent(e: KeyboardEvent): void {
       e.preventDefault();
       const allPipeIds = usePipeStore.getState().pipeOrder;
       const allFixtureIds = Object.keys(useFixtureStore.getState().fixtures);
-      useMultiSelectStore.getState().setSelection(allPipeIds, allFixtureIds);
+      usePlumbingMultiSelectStore.getState().setSelection(allPipeIds, allFixtureIds);
       break;
     }
     case '1': if (st.mode === 'draw') st.setDrawDiameter(0.5); break;

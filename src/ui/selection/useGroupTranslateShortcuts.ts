@@ -24,7 +24,7 @@
  */
 
 import { useEffect } from 'react';
-import { useMultiSelectStore } from '@store/multiSelectStore';
+import { usePlumbingMultiSelectStore } from '@store/plumbingMultiSelectStore';
 import { usePipeStore } from '@store/pipeStore';
 import { useFixtureStore } from '@store/fixtureStore';
 import { translateGroup, translateVec } from '@core/selection/groupTranslate';
@@ -61,7 +61,7 @@ export function useGroupTranslateShortcuts(): void {
       const delta = arrowKeyToDelta(e.key, e.shiftKey, e.ctrlKey, e.metaKey);
       if (!delta) return;
 
-      const multi = useMultiSelectStore.getState();
+      const multi = usePlumbingMultiSelectStore.getState();
       const msPipeIds = multi.selectedPipeIds();
       const msFixtureIds = multi.selectedFixtureIds();
       const msCount = msPipeIds.length + msFixtureIds.length;

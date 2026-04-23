@@ -23,7 +23,7 @@ import { usePlumbingAssemblyTemplateStore } from '@store/plumbingAssemblyTemplat
 import { usePipeStore } from '@store/pipeStore';
 import { useFixtureStore } from '@store/fixtureStore';
 // Phase 14.I — "save selection only" option, driven by multi-select.
-import { useMultiSelectStore } from '@store/multiSelectStore';
+import { usePlumbingMultiSelectStore } from '@store/plumbingMultiSelectStore';
 
 type Mode = 'browse' | 'save';
 
@@ -48,8 +48,8 @@ export function AssemblyTemplatesPanel() {
   const [renameValue, setRenameValue] = useState('');
   // Phase 14.I — track multi-select counts for the "save selection only"
   // toggle. Defaults on when multi-select is non-empty at save time.
-  const multiPipeIds = useMultiSelectStore((s) => s.pipeIds);
-  const multiFixtureIds = useMultiSelectStore((s) => s.fixtureIds);
+  const multiPipeIds = usePlumbingMultiSelectStore((s) => s.pipeIds);
+  const multiFixtureIds = usePlumbingMultiSelectStore((s) => s.fixtureIds);
   const multiCount = Object.keys(multiPipeIds).length + Object.keys(multiFixtureIds).length;
   const [saveSelectedOnly, setSaveSelectedOnly] = useState(false);
 

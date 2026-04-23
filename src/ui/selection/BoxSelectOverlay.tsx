@@ -17,7 +17,7 @@
  *     • On pointer-down → pointer-move: renders an SVG rectangle.
  *     • On pointer-up: projects every pipe point + fixture position
  *       through cameraSnapshot, collects IDs within the rect,
- *       adds them to multiSelectStore (Shift = additive; bare = replace).
+ *       adds them to plumbingMultiSelectStore (Shift = additive; bare = replace).
  *     • Escape during drag cancels without committing.
  *
  * Requires both pieces to be mounted: the snooper feeds the overlay.
@@ -27,7 +27,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
-import { useMultiSelectStore } from '@store/multiSelectStore';
+import { usePlumbingMultiSelectStore } from '@store/plumbingMultiSelectStore';
 import { usePipeStore } from '@store/pipeStore';
 import { useFixtureStore } from '@store/fixtureStore';
 import {
@@ -205,7 +205,7 @@ function commitDragSelection(rect: DragRect): void {
     fixtures,
   });
 
-  const multi = useMultiSelectStore.getState();
+  const multi = usePlumbingMultiSelectStore.getState();
   if (rect.additive) {
     multi.addMany(pipeIds, fixtureIds);
   } else {

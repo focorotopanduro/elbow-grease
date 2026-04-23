@@ -6,17 +6,17 @@
  * shows the current Select-mode indicator so the user knows when
  * they're in lasso mode.
  *
- * Subscribes to multiSelectStore.count() AND plumbingDrawStore.mode.
+ * Subscribes to plumbingMultiSelectStore.count() AND plumbingDrawStore.mode.
  * Returns null when neither is active — no screen noise otherwise.
  */
 
-import { useMultiSelectStore } from '@store/multiSelectStore';
+import { usePlumbingMultiSelectStore } from '@store/plumbingMultiSelectStore';
 import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 
 export function SelectionCountBadge() {
-  const pipeIds = useMultiSelectStore((s) => s.pipeIds);
-  const fixtureIds = useMultiSelectStore((s) => s.fixtureIds);
-  const clear = useMultiSelectStore((s) => s.clear);
+  const pipeIds = usePlumbingMultiSelectStore((s) => s.pipeIds);
+  const fixtureIds = usePlumbingMultiSelectStore((s) => s.fixtureIds);
+  const clear = usePlumbingMultiSelectStore((s) => s.clear);
   const mode = usePlumbingDrawStore((s) => s.mode);
   const setMode = usePlumbingDrawStore((s) => s.setMode);
 

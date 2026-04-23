@@ -29,7 +29,7 @@ import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 // Phase 14.F — in-scene rotation gizmo for the selected fixture.
 import { FixtureRotationGizmo } from '@ui/fixtures/FixtureRotationGizmo';
 // Phase 14.I — multi-select layer (Shift+click toggles membership).
-import { useMultiSelectStore } from '@store/multiSelectStore';
+import { usePlumbingMultiSelectStore } from '@store/plumbingMultiSelectStore';
 // Bug-fix pass: fixture hitbox goes click-transparent while a
 // pendingFixture is being placed, so the drop click reaches the
 // FixturePlacementPreview's catcher plane instead of being swallowed
@@ -1937,7 +1937,7 @@ export const FixtureWithSelection = memo(function FixtureWithSelection({
 }: FixtureWithSelectionProps) {
   // Phase 14.I — multi-select highlight. Per-fixture subscription so
   // only fixtures whose membership flips re-render.
-  const inMultiSelect = useMultiSelectStore((s) => s.fixtureIds[fixture.id] === true);
+  const inMultiSelect = usePlumbingMultiSelectStore((s) => s.fixtureIds[fixture.id] === true);
   const isHighlighted = selected || inMultiSelect;
   const rotDeg = (fixture.params.rotationDeg as number | undefined) ?? 0;
   // Stable rotation tuple — avoids R3F resetting rotation every render.
@@ -1957,7 +1957,7 @@ export const FixtureWithSelection = memo(function FixtureWithSelection({
       if (!interactive) return;
       e.stopPropagation();
       const ne = e.nativeEvent;
-      const multi = useMultiSelectStore.getState();
+      const multi = usePlumbingMultiSelectStore.getState();
       if (ne.altKey) {
         multi.removeFixture(fixture.id);
         return;

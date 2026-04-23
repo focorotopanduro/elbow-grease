@@ -20,7 +20,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useFocusTrap } from '@core/a11y/useFocusTrap';
-import { useMultiSelectStore } from '@store/multiSelectStore';
+import { usePlumbingMultiSelectStore } from '@store/plumbingMultiSelectStore';
 import { usePipeStore } from '@store/pipeStore';
 import { useFixtureStore } from '@store/fixtureStore';
 import {
@@ -43,8 +43,8 @@ const ALL_SYSTEMS: SystemType[] = ['waste', 'vent', 'cold_supply', 'hot_supply',
 const COMMON_DIAMETERS: number[] = [0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4, 6];
 
 export function MassEditPanel() {
-  const pipeIdsMap = useMultiSelectStore((s) => s.pipeIds);
-  const fixtureIdsMap = useMultiSelectStore((s) => s.fixtureIds);
+  const pipeIdsMap = usePlumbingMultiSelectStore((s) => s.pipeIds);
+  const fixtureIdsMap = usePlumbingMultiSelectStore((s) => s.fixtureIds);
   const pipesState = usePipeStore((s) => s.pipes);
   const fixturesState = useFixtureStore((s) => s.fixtures);
 

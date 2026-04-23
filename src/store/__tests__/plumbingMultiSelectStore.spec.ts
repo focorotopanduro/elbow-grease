@@ -1,5 +1,5 @@
 /**
- * multiSelectStore — Phase 14.I tests.
+ * plumbingMultiSelectStore — Phase 14.I tests.
  *
  * Covers:
  *   • addPipe / addFixture / removePipe / removeFixture (idempotent)
@@ -11,10 +11,10 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useMultiSelectStore } from '../multiSelectStore';
+import { usePlumbingMultiSelectStore } from '../plumbingMultiSelectStore';
 
 function reset(): void {
-  useMultiSelectStore.setState({ pipeIds: {}, fixtureIds: {} });
+  usePlumbingMultiSelectStore.setState({ pipeIds: {}, fixtureIds: {} });
 }
 
 beforeEach(reset);
@@ -23,34 +23,34 @@ beforeEach(reset);
 
 describe('add / remove', () => {
   it('addPipe puts a pipe in the selection', () => {
-    useMultiSelectStore.getState().addPipe('p1');
-    expect(useMultiSelectStore.getState().isPipeSelected('p1')).toBe(true);
+    usePlumbingMultiSelectStore.getState().addPipe('p1');
+    expect(usePlumbingMultiSelectStore.getState().isPipeSelected('p1')).toBe(true);
   });
 
   it('addPipe is idempotent (no double-add)', () => {
-    useMultiSelectStore.getState().addPipe('p1');
-    useMultiSelectStore.getState().addPipe('p1');
-    expect(useMultiSelectStore.getState().count()).toBe(1);
+    usePlumbingMultiSelectStore.getState().addPipe('p1');
+    usePlumbingMultiSelectStore.getState().addPipe('p1');
+    expect(usePlumbingMultiSelectStore.getState().count()).toBe(1);
   });
 
   it('removePipe removes an item', () => {
-    useMultiSelectStore.getState().addPipe('p1');
-    useMultiSelectStore.getState().addPipe('p2');
-    useMultiSelectStore.getState().removePipe('p1');
-    expect(useMultiSelectStore.getState().isPipeSelected('p1')).toBe(false);
-    expect(useMultiSelectStore.getState().isPipeSelected('p2')).toBe(true);
+    usePlumbingMultiSelectStore.getState().addPipe('p1');
+    usePlumbingMultiSelectStore.getState().addPipe('p2');
+    usePlumbingMultiSelectStore.getState().removePipe('p1');
+    expect(usePlumbingMultiSelectStore.getState().isPipeSelected('p1')).toBe(false);
+    expect(usePlumbingMultiSelectStore.getState().isPipeSelected('p2')).toBe(true);
   });
 
   it('removePipe is no-op if absent', () => {
-    useMultiSelectStore.getState().removePipe('p-missing');
-    expect(useMultiSelectStore.getState().count()).toBe(0);
+    usePlumbingMultiSelectStore.getState().removePipe('p-missing');
+    expect(usePlumbingMultiSelectStore.getState().count()).toBe(0);
   });
 
   it('addFixture and removeFixture are symmetric to the pipe variants', () => {
-    useMultiSelectStore.getState().addFixture('f1');
-    expect(useMultiSelectStore.getState().isFixtureSelected('f1')).toBe(true);
-    useMultiSelectStore.getState().removeFixture('f1');
-    expect(useMultiSelectStore.getState().isFixtureSelected('f1')).toBe(false);
+    usePlumbingMultiSelectStore.getState().addFixture('f1');
+    expect(usePlumbingMultiSelectStore.getState().isFixtureSelected('f1')).toBe(true);
+    usePlumbingMultiSelectStore.getState().removeFixture('f1');
+    expect(usePlumbingMultiSelectStore.getState().isFixtureSelected('f1')).toBe(false);
   });
 });
 
@@ -58,7 +58,7 @@ describe('add / remove', () => {
 
 describe('toggle', () => {
   it('togglePipe flips membership', () => {
-    const s = useMultiSelectStore.getState();
+    const s = usePlumbingMultiSelectStore.getState();
     s.togglePipe('p1');
     expect(s.isPipeSelected('p1')).toBe(true);
     s.togglePipe('p1');
@@ -66,7 +66,7 @@ describe('toggle', () => {
   });
 
   it('toggleFixture flips membership', () => {
-    const s = useMultiSelectStore.getState();
+    const s = usePlumbingMultiSelectStore.getState();
     s.toggleFixture('f1');
     expect(s.isFixtureSelected('f1')).toBe(true);
     s.toggleFixture('f1');
@@ -78,7 +78,7 @@ describe('toggle', () => {
 
 describe('bulk operations', () => {
   it('clear wipes both pipe and fixture selections', () => {
-    const s = useMultiSelectStore.getState();
+    const s = usePlumbingMultiSelectStore.getState();
     s.addPipe('p1');
     s.addFixture('f1');
     s.clear();
@@ -87,7 +87,7 @@ describe('bulk operations', () => {
   });
 
   it('setSelection replaces entirely', () => {
-    const s = useMultiSelectStore.getState();
+    const s = usePlumbingMultiSelectStore.getState();
     s.addPipe('p-old');
     s.addFixture('f-old');
     s.setSelection(['p-new1', 'p-new2'], ['f-new1']);
@@ -96,7 +96,7 @@ describe('bulk operations', () => {
   });
 
   it('addMany unions with the existing selection', () => {
-    const s = useMultiSelectStore.getState();
+    const s = usePlumbingMultiSelectStore.getState();
     s.addPipe('p1');
     s.addFixture('f1');
     s.addMany(['p2', 'p3'], ['f2']);
@@ -105,7 +105,7 @@ describe('bulk operations', () => {
   });
 
   it('setSelection with empty arrays clears', () => {
-    const s = useMultiSelectStore.getState();
+    const s = usePlumbingMultiSelectStore.getState();
     s.addPipe('p1');
     s.setSelection([], []);
     expect(s.isEmpty()).toBe(true);
@@ -116,7 +116,7 @@ describe('bulk operations', () => {
 
 describe('queries', () => {
   it('count sums pipes + fixtures', () => {
-    const s = useMultiSelectStore.getState();
+    const s = usePlumbingMultiSelectStore.getState();
     s.addPipe('p1');
     s.addPipe('p2');
     s.addFixture('f1');
@@ -124,7 +124,7 @@ describe('queries', () => {
   });
 
   it('isEmpty reflects total', () => {
-    const s = useMultiSelectStore.getState();
+    const s = usePlumbingMultiSelectStore.getState();
     expect(s.isEmpty()).toBe(true);
     s.addPipe('p1');
     expect(s.isEmpty()).toBe(false);
@@ -133,7 +133,7 @@ describe('queries', () => {
   });
 
   it('selectedPipeIds returns only pipes, not fixtures', () => {
-    const s = useMultiSelectStore.getState();
+    const s = usePlumbingMultiSelectStore.getState();
     s.addPipe('p1');
     s.addFixture('f1');
     const ids = s.selectedPipeIds();
@@ -141,7 +141,7 @@ describe('queries', () => {
   });
 
   it('selectedFixtureIds returns only fixtures, not pipes', () => {
-    const s = useMultiSelectStore.getState();
+    const s = usePlumbingMultiSelectStore.getState();
     s.addPipe('p1');
     s.addFixture('f1');
     expect(s.selectedFixtureIds()).toEqual(['f1']);
@@ -152,14 +152,14 @@ describe('queries', () => {
 
 describe('pipe ↔ fixture independence', () => {
   it('adding a pipe does not add a fixture with the same id', () => {
-    const s = useMultiSelectStore.getState();
+    const s = usePlumbingMultiSelectStore.getState();
     s.addPipe('shared-id');
     expect(s.isPipeSelected('shared-id')).toBe(true);
     expect(s.isFixtureSelected('shared-id')).toBe(false);
   });
 
   it('removing a pipe does not affect fixture state', () => {
-    const s = useMultiSelectStore.getState();
+    const s = usePlumbingMultiSelectStore.getState();
     s.addPipe('x');
     s.addFixture('x');
     s.removePipe('x');
@@ -168,7 +168,7 @@ describe('pipe ↔ fixture independence', () => {
   });
 
   it('toggling a fixture leaves pipes alone', () => {
-    const s = useMultiSelectStore.getState();
+    const s = usePlumbingMultiSelectStore.getState();
     s.addPipe('p1');
     s.toggleFixture('p1');
     expect(s.isPipeSelected('p1')).toBe(true);

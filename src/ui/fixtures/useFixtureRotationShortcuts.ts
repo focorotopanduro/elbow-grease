@@ -31,7 +31,7 @@ import { useFixtureStore } from '@store/fixtureStore';
 // Phase 14.M — group-rotate path. When multi-select has ≥ 2 items, the
 // same bracket chords rotate the group around its centroid instead of
 // mutating a single fixture's rotationDeg.
-import { useMultiSelectStore } from '@store/multiSelectStore';
+import { usePlumbingMultiSelectStore } from '@store/plumbingMultiSelectStore';
 import { usePipeStore } from '@store/pipeStore';
 import {
   computeGroupCentroid,
@@ -103,7 +103,7 @@ export function useFixtureRotationShortcuts(): void {
       // probe of 360 − step, e.g. `[` alone = 360 − 15 = 345.
       const deltaDeg = probeDeg > 180 ? probeDeg - 360 : probeDeg;
 
-      const multi = useMultiSelectStore.getState();
+      const multi = usePlumbingMultiSelectStore.getState();
       const selectedFixtureIds = multi.selectedFixtureIds();
       const selectedPipeIds = multi.selectedPipeIds();
       const groupSize = selectedFixtureIds.length + selectedPipeIds.length;
