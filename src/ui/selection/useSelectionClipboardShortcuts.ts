@@ -6,7 +6,7 @@
  *
  * Behavior:
  *
- *   Ctrl + C  → extract the current selection into `clipboardStore`.
+ *   Ctrl + C  → extract the current selection into `plumbingClipboardStore`.
  *               No-op on empty selection. Doesn't clear existing
  *               clipboard on empty copy (so accidental Ctrl+C in
  *               empty scene doesn't wipe a useful clipboard).
@@ -19,7 +19,7 @@
  *
  *   Ctrl + D  → same as "copy current selection + paste at default
  *               offset" in one keystroke. Doesn't touch the
- *               clipboard (clipboardStore.payload is unchanged).
+ *               clipboard (plumbingClipboardStore.payload is unchanged).
  *               Standard "duplicate in place" shortcut — avoids the
  *               Ctrl+C/Ctrl+V two-step for the most common flow.
  *
@@ -35,7 +35,7 @@
 
 import { useEffect } from 'react';
 import { useMultiSelectStore } from '@store/multiSelectStore';
-import { useClipboardStore } from '@store/clipboardStore';
+import { usePlumbingClipboardStore } from '@store/plumbingClipboardStore';
 import { usePipeStore } from '@store/pipeStore';
 import { useFixtureStore } from '@store/fixtureStore';
 import {
@@ -100,7 +100,7 @@ export function copySelectionToClipboard(): boolean {
     log.debug('copy: nothing selected, no-op');
     return false;
   }
-  useClipboardStore.getState().setPayload(payload);
+  usePlumbingClipboardStore.getState().setPayload(payload);
   log.info('copied to clipboard', {
     pipes: payload.pipes.length,
     fixtures: payload.fixtures.length,
@@ -200,7 +200,7 @@ function applyPaste(payload: ClipboardPayload, delta: [number, number, number]):
 
 /** Ctrl+V — paste the current clipboard at the default offset. */
 export function pasteFromClipboard(): boolean {
-  const payload = useClipboardStore.getState().payload;
+  const payload = usePlumbingClipboardStore.getState().payload;
   if (!payload) {
     log.debug('paste: clipboard empty, no-op');
     return false;

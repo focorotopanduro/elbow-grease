@@ -1,5 +1,15 @@
 /**
- * clipboardStore — Phase 14.P
+ * plumbingClipboardStore — Phase 14.P
+ *
+ * Renamed from `clipboardStore` in Phase 7 of the
+ * hybrid-architecture refactor (ARCHITECTURE.md §3). The
+ * `ClipboardPayload` shape is
+ * `{ pipes: ClipboardPipe[]; fixtures: ClipboardFixture[]; anchor }`
+ * — strictly plumbing entities, with no slot for roof sections.
+ * A future roofing copy/paste flow would need its own clipboard
+ * shape (section polygons, slope, material); with single-slot
+ * semantics here, overlaying both domains in one store would let
+ * a plumbing copy stomp on a roofing paste or vice-versa.
  *
  * Session-lived holder for the last multi-select copy. The payload
  * shape + semantics are defined in `selectionClipboard.ts`; this
@@ -39,7 +49,7 @@ interface ClipboardState {
   itemCount: () => number;
 }
 
-export const useClipboardStore = create<ClipboardState>((set, get) => ({
+export const usePlumbingClipboardStore = create<ClipboardState>((set, get) => ({
   payload: null,
 
   setPayload: (payload) => set({ payload }),
