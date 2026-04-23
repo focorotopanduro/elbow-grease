@@ -101,7 +101,7 @@ import { CursorTracker } from '@ui/draw/CursorTracker';
 import { GodModeConsole } from '@ui/debug/GodModeConsole';
 import { ComplianceDebugger } from '@ui/debug/ComplianceDebugger';
 import { bootCommandBus } from '@core/commands/boot';
-import { bootComplianceTraceStore } from '@store/complianceTraceStore';
+import { bootPlumbingComplianceStore } from '@store/plumbingComplianceStore';
 // Phase 10.E — local-only session telemetry, flag-gated + opt-in.
 import { bootSessionTelemetry } from '@core/telemetry/boot';
 // Phase 11.A — project bundle save/load + autosave.
@@ -1416,7 +1416,7 @@ export function App() {
       // Phase 2 — see docs/adr/003-compliance-trace.md.
       // Must boot AFTER the bus so any trace-populate dispatches flow
       // through the command log.
-      bootComplianceTraceStore();
+      bootPlumbingComplianceStore();
       // Phase 7.D — connectivity tracker (ADR 011). Must boot AFTER the
       // CommandBus so the pipe.add/remove subscriptions receive every event.
       bootConnectivityManager();

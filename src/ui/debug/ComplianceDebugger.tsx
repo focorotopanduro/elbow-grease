@@ -25,7 +25,7 @@
  *   Esc           close
  *
  * Performance:
- *   - Subscribes to useComplianceTraceStore only. No per-frame ticks.
+ *   - Subscribes to usePlumbingComplianceStore only. No per-frame ticks.
  *   - Tree rendering uses native <details>/<summary> — no JS animation.
  *   - When the trace flag is off, the store is empty and the panel
  *     shows a helpful "flag is off" message. Rendered DOM is ~100 nodes.
@@ -33,7 +33,7 @@
 
 import { useEffect, useState } from 'react';
 import { useFeatureFlagStore } from '@store/featureFlagStore';
-import { useComplianceTraceStore, type TracedViolation } from '@store/complianceTraceStore';
+import { usePlumbingComplianceStore, type TracedViolation } from '@store/plumbingComplianceStore';
 import type { Triple } from '../../engine/compliance/KnowledgeGraph';
 import { useFocusTrap } from '@core/a11y/useFocusTrap';
 
@@ -69,8 +69,8 @@ export function ComplianceDebugger() {
   // element on close. See @core/a11y/useFocusTrap.
   const trapRef = useFocusTrap<HTMLDivElement>(isOpen);
 
-  const all = useComplianceTraceStore((s) => s.all);
-  const lastSolvedAt = useComplianceTraceStore((s) => s.lastSolvedAt);
+  const all = usePlumbingComplianceStore((s) => s.all);
+  const lastSolvedAt = usePlumbingComplianceStore((s) => s.lastSolvedAt);
 
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const selected = selectedIdx !== null ? all[selectedIdx] ?? null : null;

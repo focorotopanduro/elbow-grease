@@ -1,6 +1,14 @@
 /**
- * complianceTraceStore — holds the most recent compliance traces
- * keyed by the entity (pipe or fixture) they violate against.
+ * plumbingComplianceStore — holds the most recent plumbing
+ * compliance traces keyed by the entity (pipe or fixture) they
+ * violate against.
+ *
+ * Renamed from `complianceTraceStore` in Phase 6b of the
+ * hybrid-architecture refactor (ARCHITECTURE.md §7.8): the
+ * store is plumbing-scoped (IPC / PCSP violations against
+ * pipes + fixtures), so the domain prefix makes that explicit.
+ * A future `roofingComplianceStore` would cover FL wind-zone
+ * compliance for drawn roof sections.
  *
  * Phase 2 data flow:
  *
@@ -11,7 +19,7 @@
  *     └─ buildReport() attaches `trace` ─► SIM_MSG.SIMULATION_COMPLETE
  *        to each ComplianceViolation               │
  *                                                  ▼
- *                                          bootComplianceTraceStore()
+ *                                          bootPlumbingComplianceStore()
  *                                          subscribes, populates this store,
  *                                          keyed by violation.entityId.
  *                                                  │
@@ -66,7 +74,7 @@ interface ComplianceTraceState {
   clear: () => void;
 }
 
-export const useComplianceTraceStore = create<ComplianceTraceState>((set) => ({
+export const usePlumbingComplianceStore = create<ComplianceTraceState>((set) => ({
   byEntity: {},
   all: [],
   lastSolvedAt: 0,
@@ -118,7 +126,7 @@ let booted = false;
  *      TRACE_ENABLED static. Re-mirrors on every flag change so a user
  *      flipping the flag in God Mode takes effect on the NEXT solve.
  */
-export function bootComplianceTraceStore(): void {
+export function bootPlumbingComplianceStore(): void {
   if (booted) return;
   booted = true;
 
@@ -133,7 +141,7 @@ export function bootComplianceTraceStore(): void {
       if (!state.complianceTrace) {
         // User just turned traces off — prune the panel so it doesn't
         // show stale data from when they were on.
-        useComplianceTraceStore.getState().clear();
+        usePlumbingComplianceStore.getState().clear();
       }
     }
   });
@@ -142,6 +150,6 @@ export function bootComplianceTraceStore(): void {
   simBus.on(SIM_MSG.SIMULATION_COMPLETE, (msg: SimMessage) => {
     const p = msg.payload as { complianceReport?: ComplianceReport } | undefined;
     if (!p?.complianceReport) return;
-    useComplianceTraceStore.getState().populate(p.complianceReport);
+    usePlumbingComplianceStore.getState().populate(p.complianceReport);
   });
 }

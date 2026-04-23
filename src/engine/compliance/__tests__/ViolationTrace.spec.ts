@@ -148,14 +148,14 @@ describe('ViolationTrace — structure', () => {
 describe('ViolationTrace — live store integration', () => {
   it('populating the store from a real report produces expected count', async () => {
     setComplianceTraceEnabled(true);
-    const { useComplianceTraceStore } = await import('@store/complianceTraceStore');
-    useComplianceTraceStore.getState().clear();
+    const { usePlumbingComplianceStore } = await import('@store/plumbingComplianceStore');
+    usePlumbingComplianceStore.getState().clear();
 
     const engine = new ComplianceEngine();
     const report = engine.check(seedFailingDag());
-    useComplianceTraceStore.getState().populate(report);
+    usePlumbingComplianceStore.getState().populate(report);
 
-    const state = useComplianceTraceStore.getState();
+    const state = usePlumbingComplianceStore.getState();
     expect(state.count).toBeGreaterThan(0);
     expect(state.all.length).toBe(state.count);
 
@@ -169,13 +169,13 @@ describe('ViolationTrace — live store integration', () => {
 
   it('store clear() empties byEntity + all + count', async () => {
     setComplianceTraceEnabled(true);
-    const { useComplianceTraceStore } = await import('@store/complianceTraceStore');
+    const { usePlumbingComplianceStore } = await import('@store/plumbingComplianceStore');
     const engine = new ComplianceEngine();
     const report = engine.check(seedFailingDag());
-    useComplianceTraceStore.getState().populate(report);
-    expect(useComplianceTraceStore.getState().count).toBeGreaterThan(0);
-    useComplianceTraceStore.getState().clear();
-    const after = useComplianceTraceStore.getState();
+    usePlumbingComplianceStore.getState().populate(report);
+    expect(usePlumbingComplianceStore.getState().count).toBeGreaterThan(0);
+    usePlumbingComplianceStore.getState().clear();
+    const after = usePlumbingComplianceStore.getState();
     expect(after.count).toBe(0);
     expect(after.all).toHaveLength(0);
     expect(Object.keys(after.byEntity)).toHaveLength(0);
@@ -183,27 +183,27 @@ describe('ViolationTrace — live store integration', () => {
 
   it('populate() with flag-OFF report yields an empty store', async () => {
     setComplianceTraceEnabled(false);
-    const { useComplianceTraceStore } = await import('@store/complianceTraceStore');
-    useComplianceTraceStore.getState().clear();
+    const { usePlumbingComplianceStore } = await import('@store/plumbingComplianceStore');
+    usePlumbingComplianceStore.getState().clear();
     const engine = new ComplianceEngine();
     const report = engine.check(seedFailingDag());
     // Report still has violations, but none carry a `trace` field
     // (flag was off during buildReport). populate() filters by trace.
     expect(report.violations.length).toBeGreaterThan(0);
-    useComplianceTraceStore.getState().populate(report);
-    expect(useComplianceTraceStore.getState().count).toBe(0);
+    usePlumbingComplianceStore.getState().populate(report);
+    expect(usePlumbingComplianceStore.getState().count).toBe(0);
   });
 
   it('populate() twice with the SAME report produces the SAME count (idempotent per solve)', async () => {
     setComplianceTraceEnabled(true);
-    const { useComplianceTraceStore } = await import('@store/complianceTraceStore');
-    useComplianceTraceStore.getState().clear();
+    const { usePlumbingComplianceStore } = await import('@store/plumbingComplianceStore');
+    usePlumbingComplianceStore.getState().clear();
     const engine = new ComplianceEngine();
     const report = engine.check(seedFailingDag());
-    useComplianceTraceStore.getState().populate(report);
-    const firstCount = useComplianceTraceStore.getState().count;
-    useComplianceTraceStore.getState().populate(report);
-    const secondCount = useComplianceTraceStore.getState().count;
+    usePlumbingComplianceStore.getState().populate(report);
+    const firstCount = usePlumbingComplianceStore.getState().count;
+    usePlumbingComplianceStore.getState().populate(report);
+    const secondCount = usePlumbingComplianceStore.getState().count;
     // Populate replaces rather than appends — two populates with the
     // same report yield the same count, not 2× the violations.
     expect(secondCount).toBe(firstCount);
