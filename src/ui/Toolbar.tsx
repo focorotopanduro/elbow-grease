@@ -7,7 +7,7 @@
  *   Status hints
  */
 
-import { useInteractionStore, type InteractionMode } from '@store/interactionStore';
+import { usePlumbingDrawStore, type InteractionMode } from '@store/plumbingDrawStore';
 import { usePipeStore } from '@store/pipeStore';
 
 // ── Mode buttons ────────────────────────────────────────────────
@@ -21,18 +21,18 @@ const MODES: { key: InteractionMode; label: string; icon: string; shortcut: stri
 const DIAMETERS = [0.5, 0.75, 1, 1.5, 2, 3, 4, 6];
 
 export function Toolbar() {
-  const mode = useInteractionStore((s) => s.mode);
-  const isDrawing = useInteractionStore((s) => s.isDrawing);
-  const pointCount = useInteractionStore((s) => s.drawPoints.length);
-  const setMode = useInteractionStore((s) => s.setMode);
-  const drawPlane = useInteractionStore((s) => s.drawPlane);
-  const togglePlane = useInteractionStore((s) => s.toggleDrawPlane);
-  const quality = useInteractionStore((s) => s.pipeQuality);
-  const toggleQuality = useInteractionStore((s) => s.togglePipeQuality);
-  const diameter = useInteractionStore((s) => s.drawDiameter);
-  const setDiameter = useInteractionStore((s) => s.setDrawDiameter);
-  const orthoClickDrag = useInteractionStore((s) => s.orthoClickDragMode);
-  const toggleOrthoClickDrag = useInteractionStore((s) => s.toggleOrthoClickDragMode);
+  const mode = usePlumbingDrawStore((s) => s.mode);
+  const isDrawing = usePlumbingDrawStore((s) => s.isDrawing);
+  const pointCount = usePlumbingDrawStore((s) => s.drawPoints.length);
+  const setMode = usePlumbingDrawStore((s) => s.setMode);
+  const drawPlane = usePlumbingDrawStore((s) => s.drawPlane);
+  const togglePlane = usePlumbingDrawStore((s) => s.toggleDrawPlane);
+  const quality = usePlumbingDrawStore((s) => s.pipeQuality);
+  const toggleQuality = usePlumbingDrawStore((s) => s.togglePipeQuality);
+  const diameter = usePlumbingDrawStore((s) => s.drawDiameter);
+  const setDiameter = usePlumbingDrawStore((s) => s.setDrawDiameter);
+  const orthoClickDrag = usePlumbingDrawStore((s) => s.orthoClickDragMode);
+  const toggleOrthoClickDrag = usePlumbingDrawStore((s) => s.toggleOrthoClickDragMode);
   const pipeCount = usePipeStore((s) => Object.keys(s.pipes).length);
 
   return (

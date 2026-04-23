@@ -25,7 +25,7 @@ import { userFSM } from '@core/UserProgressFSM';
 import { useLayerStore } from '@store/layerStore';
 import { useFloorParams } from '@store/floorStore';
 import { useFixtureStore, type FixtureInstance } from '@store/fixtureStore';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 // Phase 14.F — in-scene rotation gizmo for the selected fixture.
 import { FixtureRotationGizmo } from '@ui/fixtures/FixtureRotationGizmo';
 // Phase 14.I — multi-select layer (Shift+click toggles membership).
@@ -2047,7 +2047,7 @@ function FixtureHitbox({
   fixture: FixtureInstance;
   onClick: (e: ThreeEvent<MouseEvent>) => void;
 }) {
-  const mode = useInteractionStore((s) => s.mode);
+  const mode = usePlumbingDrawStore((s) => s.mode);
   const drawActive = mode === 'draw';
   // Phase 14-bug-fix: when a fixture is pending placement, every
   // existing fixture's hitbox becomes click-transparent so the drop

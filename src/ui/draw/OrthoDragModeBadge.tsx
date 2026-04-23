@@ -15,7 +15,7 @@
  * DOM overlay (not in Canvas) so it renders crisply at any zoom.
  */
 
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { useIsoCameraStore } from '@ui/cameras/IsoCamera';
 
 // ── View-mode accents (match IsoCamera.tsx's palette spirit) ─────
@@ -29,8 +29,8 @@ const VIEW_ACCENT: Record<string, { label: string; color: string }> = {
 
 export function OrthoDragModeBadge() {
   const cameraMode = useIsoCameraStore((s) => s.mode);
-  const orthoClickDrag = useInteractionStore((s) => s.orthoClickDragMode);
-  const toggle = useInteractionStore((s) => s.toggleOrthoClickDragMode);
+  const orthoClickDrag = usePlumbingDrawStore((s) => s.orthoClickDragMode);
+  const toggle = usePlumbingDrawStore((s) => s.toggleOrthoClickDragMode);
 
   const accent = VIEW_ACCENT[cameraMode];
   if (!accent) return null; // not an ortho view

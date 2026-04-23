@@ -12,7 +12,7 @@
  *   • This store holds VISUAL FEEDBACK state only — cursor position,
  *     what's snapped-to, what the next click will do.
  *   • The actual drawing data (drawPoints, mode, diameter, material)
- *     continues to live in interactionStore.
+ *     continues to live in plumbingDrawStore.
  *   • The pivot/extend sessions stay as module-local singletons in
  *     their respective files.
  *

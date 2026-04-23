@@ -121,7 +121,7 @@ import { BackdropLayer } from '@ui/backdrop/BackdropPlane';
 import { MeasureToolbar } from '@ui/measure/MeasureToolbar';
 import { useMeasureShortcuts } from '@ui/measure/useMeasureShortcuts';
 import { useLayerStore } from '@store/layerStore';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 
 import { GlowRing, CollisionFlash, SnapBurst, CompletePulse } from '@ui/SensoryFeedback';
 import { PipeRenderer } from '@ui/PipeRenderer';
@@ -149,8 +149,8 @@ import { useFeatureFlagStore } from '@store/featureFlagStore';
 // Phase 12.A — Sims-style wall visibility cycle.
 import { useRenderModeStore } from '@store/renderModeStore';
 // Phase 14.R.3 — Plumbing ⇄ Roofing workspace switch. The mode store
-// is a peer of interactionStore; it controls WHICH workspace is active
-// (plumbing vs roofing) while interactionStore continues to drive the
+// is a peer of plumbingDrawStore; it controls WHICH workspace is active
+// (plumbing vs roofing) while plumbingDrawStore continues to drive the
 // draw / select / navigate tool state WITHIN plumbing.
 import { useAppModeStore } from '@store/appModeStore';
 import { ModeTabs } from '@ui/ModeTabs';
@@ -283,7 +283,7 @@ function OrbitControlsGate({
   // Phase 6: hold-to-freeze navigation. When the user holds the freeze
   // key (Space), all orbit gestures stop — so a click-drag to extend a
   // pipe can't accidentally pan the camera. Released → orbit resumes.
-  const navFrozen = useInteractionStore((s) => s.navFrozen);
+  const navFrozen = usePlumbingDrawStore((s) => s.navFrozen);
   // Controls are enabled unless pivoting OR nav is frozen OR the user
   // is in Select mode (where left-drag becomes a box-select lasso,
   // not an orbit — Phase 14.M) OR an iso transition is currently
@@ -355,12 +355,12 @@ function DrawInteraction() {
   const scratchOrigin = useRef(new THREE.Vector3(0, 0, 0));
 
   // React state (only changes on point add/remove/mode)
-  const mode = useInteractionStore((s) => s.mode);
-  const drawPlane = useInteractionStore((s) => s.drawPlane);
-  const drawPoints = useInteractionStore((s) => s.drawPoints);
-  const material = useInteractionStore((s) => s.drawMaterial);
-  const gridSnap = useInteractionStore((s) => s.gridSnap);
-  const diameter = useInteractionStore((s) => s.drawDiameter);
+  const mode = usePlumbingDrawStore((s) => s.mode);
+  const drawPlane = usePlumbingDrawStore((s) => s.drawPlane);
+  const drawPoints = usePlumbingDrawStore((s) => s.drawPoints);
+  const material = usePlumbingDrawStore((s) => s.drawMaterial);
+  const gridSnap = usePlumbingDrawStore((s) => s.gridSnap);
+  const diameter = usePlumbingDrawStore((s) => s.drawDiameter);
 
   // Raycast hit
   const getHit = useCallback((): Vec3 => {
@@ -420,7 +420,7 @@ function DrawInteraction() {
       // path (addDrawPoint) will apply. Skipped when the cursor is
       // locked to a pipe-snap target (that takes priority — the
       // user's deliberately snapping to an existing endpoint).
-      const iState = useInteractionStore.getState();
+      const iState = usePlumbingDrawStore.getState();
       if (iState.drawPoints.length > 0) {
         pos = applyDrawConstraints(pos, {
           points: iState.drawPoints,
@@ -432,7 +432,7 @@ function DrawInteraction() {
     }
 
     // Update next-action based on state + snap.
-    const drawPointsLen = useInteractionStore.getState().drawPoints.length;
+    const drawPointsLen = usePlumbingDrawStore.getState().drawPoints.length;
     const nextAction = computeNextAction({
       mode: 'draw',
       drawPointsLen,
@@ -485,9 +485,9 @@ function DrawInteraction() {
         // Use raw hit (ignore the constraint-snapped cursorPos) so
         // the override actually escapes the constraint.
         const rawHit = getHit();
-        useInteractionStore.getState().addDrawPointRaw(rawHit);
+        usePlumbingDrawStore.getState().addDrawPointRaw(rawHit);
       } else {
-        useInteractionStore.getState().addDrawPoint(pos);
+        usePlumbingDrawStore.getState().addDrawPoint(pos);
       }
       lastSnapTime.current = performance.now() / 1000; // for snap flash
 
@@ -502,9 +502,9 @@ function DrawInteraction() {
     };
 
     const onDblClick = () => {
-      const pts = useInteractionStore.getState().finishDraw();
+      const pts = usePlumbingDrawStore.getState().finishDraw();
       if (pts && pts.length >= 2) {
-        const s = useInteractionStore.getState();
+        const s = usePlumbingDrawStore.getState();
         eventBus.emit(EV.PIPE_COMPLETE, {
           id: `pipe-${Date.now()}`, points: pts,
           diameter: s.drawDiameter, material: s.drawMaterial,
@@ -513,7 +513,7 @@ function DrawInteraction() {
       // Auto-return to Navigate after finishing a pipe. Feels natural
       // — you're done drawing, you want to orbit to review. Ctrl+Space
       // re-enters draw mode in one shortcut when you want to draw again.
-      useInteractionStore.getState().setMode('navigate');
+      usePlumbingDrawStore.getState().setMode('navigate');
     };
 
     // Phase 14.S — Backspace removes the most recent in-progress
@@ -528,10 +528,10 @@ function DrawInteraction() {
         const tag = t.tagName;
         if (tag === 'INPUT' || tag === 'TEXTAREA' || t.isContentEditable) return;
       }
-      const pts = useInteractionStore.getState().drawPoints;
+      const pts = usePlumbingDrawStore.getState().drawPoints;
       if (pts.length === 0) return;
       e.preventDefault();
-      useInteractionStore.getState().popDrawPoint();
+      usePlumbingDrawStore.getState().popDrawPoint();
     };
 
     // Suppress the browser context menu so it doesn't pop up over the
@@ -981,7 +981,7 @@ function computeNextAction(args: {
 // ── Keyboard ────────────────────────────────────────────────────
 
 function KeyboardHandler() {
-  const mode = useInteractionStore((s) => s.mode);
+  const mode = usePlumbingDrawStore((s) => s.mode);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -1021,7 +1021,7 @@ function KeyboardHandler() {
 
       if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-      const st = useInteractionStore.getState();
+      const st = usePlumbingDrawStore.getState();
       switch (e.key) {
         case 'n': st.setMode('navigate'); break;
         case 'd': if (st.mode !== 'draw') st.setMode('draw'); break;
@@ -1064,7 +1064,7 @@ function KeyboardHandler() {
             break;
           }
           if (st.mode === 'draw' && st.isDrawing) {
-            useInteractionStore.setState({ drawPoints: [], isDrawing: false });
+            usePlumbingDrawStore.setState({ drawPoints: [], isDrawing: false });
             break;
           }
           // Phase 14.I — multi-select clears first (before single-select),
@@ -1171,7 +1171,7 @@ function KeyboardHandler() {
 // we don't freeze when any modifier is held.
 
 function NavigationFreezeHandler() {
-  const setFrozen = useInteractionStore((s) => s.setNavFrozen);
+  const setFrozen = usePlumbingDrawStore((s) => s.setNavFrozen);
 
   useEffect(() => {
     let held = false;
@@ -1228,7 +1228,7 @@ function NavigationFreezeHandler() {
 // drags — without this, OrbitControls would flip to 'grabbing' mid-draw.
 
 function CursorStyler() {
-  const mode = useInteractionStore((s) => s.mode);
+  const mode = usePlumbingDrawStore((s) => s.mode);
   const pending = useCustomerStore((s) => s.pendingFixture);
 
   useEffect(() => {
@@ -1261,7 +1261,7 @@ function CursorStyler() {
 // pointer-up without drag, which doesn't conflict with drag gestures.
 
 function SelectBackgroundCatcher() {
-  const mode = useInteractionStore((s) => s.mode);
+  const mode = usePlumbingDrawStore((s) => s.mode);
   if (mode !== 'select') return null;
   return (
     <mesh
@@ -1287,7 +1287,7 @@ function SelectBackgroundCatcher() {
 // ── Scene ───────────────────────────────────────────────────────
 
 function Scene() {
-  const mode = useInteractionStore((s) => s.mode);
+  const mode = usePlumbingDrawStore((s) => s.mode);
   const pivoting = usePipeStore((s) => s.pivotSession !== null);
   const orbitRef = useRef<any>(null);
   // Phase 14.R.4 — workspace mode gates the roofing-specific scene layers.
@@ -1410,7 +1410,7 @@ function Scene() {
       {/* Phase 14.AD.23 — CAD-style click-drag-on-pipe interaction
           for orthographic views (top / front / side). Only active
           when the camera is in one of those presets AND the
-          interactionStore `orthoClickDragMode` flag is on (default).
+          plumbingDrawStore `orthoClickDragMode` flag is on (default).
           Click+drag from midpoint spawns a branch pipe; from an
           endpoint extends the existing pipe; plain click selects. */}
       <OrthoPipeInteraction />
@@ -1627,7 +1627,7 @@ export function App() {
       // place fixtures instead of rotating the camera.
       useCustomerStore.getState().setPendingFixture(null);
       useCustomerStore.getState().endEditFixture();
-      useInteractionStore.getState().setMode('navigate');
+      usePlumbingDrawStore.getState().setMode('navigate');
 
       // Phase 2.B: seed demo fixtures into fixtureStore (only on first boot)
       if (Object.keys(useFixtureStore.getState().fixtures).length === 0) {
@@ -1730,7 +1730,7 @@ export function App() {
               pivotSession: null,
             });
             useFixtureStore.getState().seedFromList(DEMO_FIXTURES);
-            useInteractionStore.getState().setMode('navigate');
+            usePlumbingDrawStore.getState().setMode('navigate');
             appLog.info('emergency reset complete — demo fixtures reseeded');
           } catch (err) {
             appLog.error('emergency reset failed', err);

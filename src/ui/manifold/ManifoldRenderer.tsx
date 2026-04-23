@@ -23,7 +23,7 @@ import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useThree, type ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useManifoldStore } from '@store/manifoldStore';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { commandBus } from '@core/commands/CommandBus';
 import {
   trunkLengthFt,
@@ -72,7 +72,7 @@ export function ManifoldRenderer() {
 function ManifoldBody({ manifold, isSelected }: { manifold: Manifold; isSelected: boolean }) {
   const moveManifold = useManifoldStore((s) => s.moveManifold);
   const selectManifold = useManifoldStore((s) => s.selectManifold);
-  const setNavFrozen = useInteractionStore((s) => s.setNavFrozen);
+  const setNavFrozen = usePlumbingDrawStore((s) => s.setNavFrozen);
   const { camera, raycaster, gl } = useThree();
   const groundPlane = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), -manifold.center[1]));
   const hitPoint = useRef(new THREE.Vector3());
@@ -128,7 +128,7 @@ function ManifoldBody({ manifold, isSelected }: { manifold: Manifold; isSelected
       raycaster.setFromCamera(ndc, camera);
       const p = raycaster.ray.intersectPlane(groundPlane.current, hitPoint.current);
       if (!p) return;
-      const grid = useInteractionStore.getState().gridSnap || 0.25;
+      const grid = usePlumbingDrawStore.getState().gridSnap || 0.25;
       const [offx, , offz] = dragOffsetRef.current;
       const newCenter: Vec3 = [
         Math.round((p.x - offx) / grid) * grid,

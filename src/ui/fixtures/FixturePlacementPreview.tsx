@@ -35,7 +35,7 @@ import * as THREE from 'three';
 import { Billboard, Text } from '@react-three/drei';
 import { useCustomerStore } from '@store/customerStore';
 import { useFixtureStore } from '@store/fixtureStore';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { useFloorStore } from '@store/floorStore';
 import type { Vec3 } from '@core/events';
 import { FixtureModel } from './FixtureModels';
@@ -95,7 +95,7 @@ export function FixturePlacementPreview() {
     // Left-button only.
     if (e.nativeEvent.button !== 0) return;
     // Don't drop while user is in Draw mode (pipe drawing owns clicks there).
-    const mode = useInteractionStore.getState().mode;
+    const mode = usePlumbingDrawStore.getState().mode;
     if (mode === 'draw') return;
 
     const pt = e.point;

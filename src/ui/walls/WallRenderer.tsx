@@ -22,7 +22,7 @@ import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useWallStore, WALL_TYPE_META, snapPointToWall } from '@store/wallStore';
 import { useFloorStore } from '@store/floorStore';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { InstancedWallMeshes } from './InstancedWallMeshes';
 
 // ── Draw-session preview + ground catcher ──────────────────────
@@ -69,8 +69,8 @@ function DrawCatcher() {
 
     // Prevent pipe-draw mode from ALSO consuming the click — force
     // navigate mode while wall-draw is active.
-    const prevMode = useInteractionStore.getState().mode;
-    if (prevMode === 'draw') useInteractionStore.getState().setMode('navigate');
+    const prevMode = usePlumbingDrawStore.getState().mode;
+    if (prevMode === 'draw') usePlumbingDrawStore.getState().setMode('navigate');
 
     const computePt = (): [number, number] | null => {
       raycaster.setFromCamera(pointer, camera);

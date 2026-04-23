@@ -12,10 +12,10 @@
 
 import type { CommandHandler } from '../types';
 import {
-  useInteractionStore,
+  usePlumbingDrawStore,
   type InteractionMode,
   type DrawPlane,
-} from '@store/interactionStore';
+} from '@store/plumbingDrawStore';
 import type { Vec3 } from '@core/events';
 import type { PipeMaterial } from '../../../engine/graph/GraphEdge';
 
@@ -54,7 +54,7 @@ export interface InteractionSetDrawMaterialPayload {
 export const interactionSetModeHandler: CommandHandler<InteractionSetModePayload, void> = {
   type: 'interaction.setMode',
   apply: (p) => {
-    useInteractionStore.getState().setMode(p.mode);
+    usePlumbingDrawStore.getState().setMode(p.mode);
   },
 };
 
@@ -64,13 +64,13 @@ export const interactionAddDrawPointHandler: CommandHandler<
 > = {
   type: 'interaction.addDrawPoint',
   preconditions: (_p) => {
-    if (useInteractionStore.getState().mode !== 'draw') {
+    if (usePlumbingDrawStore.getState().mode !== 'draw') {
       return 'interaction.addDrawPoint: not in draw mode';
     }
     return null;
   },
   apply: (p) => {
-    useInteractionStore.getState().addDrawPoint(p.point);
+    usePlumbingDrawStore.getState().addDrawPoint(p.point);
   },
 };
 
@@ -80,7 +80,7 @@ export const interactionClearDrawHandler: CommandHandler<
 > = {
   type: 'interaction.clearDraw',
   apply: () => {
-    useInteractionStore.getState().clearDraw();
+    usePlumbingDrawStore.getState().clearDraw();
   },
 };
 
@@ -90,7 +90,7 @@ export const interactionFinishDrawHandler: CommandHandler<
 > = {
   type: 'interaction.finishDraw',
   apply: () => {
-    return useInteractionStore.getState().finishDraw();
+    return usePlumbingDrawStore.getState().finishDraw();
   },
 };
 
@@ -100,7 +100,7 @@ export const interactionSetDrawPlaneHandler: CommandHandler<
 > = {
   type: 'interaction.setDrawPlane',
   apply: (p) => {
-    useInteractionStore.getState().setDrawPlane(p.plane);
+    usePlumbingDrawStore.getState().setDrawPlane(p.plane);
   },
 };
 
@@ -111,7 +111,7 @@ export const interactionSetDrawDiameterHandler: CommandHandler<
   type: 'interaction.setDrawDiameter',
   preconditions: (p) => (p.diameter > 0 ? null : `diameter must be > 0 (got ${p.diameter})`),
   apply: (p) => {
-    useInteractionStore.getState().setDrawDiameter(p.diameter);
+    usePlumbingDrawStore.getState().setDrawDiameter(p.diameter);
   },
 };
 
@@ -121,7 +121,7 @@ export const interactionSetDrawMaterialHandler: CommandHandler<
 > = {
   type: 'interaction.setDrawMaterial',
   apply: (p) => {
-    useInteractionStore.getState().setDrawMaterial(p.material);
+    usePlumbingDrawStore.getState().setDrawMaterial(p.material);
   },
 };
 

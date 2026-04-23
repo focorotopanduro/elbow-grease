@@ -6,7 +6,7 @@
  *
  *   1. Calls beginExtend() from the shared ExtendSession module.
  *   2. Shows a live preview tube following the cursor.
- *   3. Grid-snaps via interactionStore.gridSnap.
+ *   3. Grid-snaps via plumbingDrawStore.gridSnap.
  *   4. On pointer-up: commits a new pipe with the currently-selected
  *      diameter + material via commitExtendSession().
  *
@@ -19,7 +19,7 @@ import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { usePipeStore, type CommittedPipe } from '@store/pipeStore';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { useLayerStore } from '@store/layerStore';
 import { useFloorParams } from '@store/floorStore';
 import { useFeatureFlagStore } from '@store/featureFlagStore';
@@ -44,7 +44,7 @@ const SNAP_INCREMENT_FT = 0.5;
 
 export function EndpointExtender() {
   const pipes = usePipeStore((s) => s.pipes);
-  const mode = useInteractionStore((s) => s.mode);
+  const mode = usePlumbingDrawStore((s) => s.mode);
   const pivoting = usePipeStore((s) => s.pivotSession !== null);
   const enabled = useFeatureFlagStore((s) => s.pipeExtendDrag);
   const systemVis = useLayerStore((s) => s.systems);
@@ -190,7 +190,7 @@ function useExtendSessionListeners() {
       raycaster.setFromCamera(ndc, camera);
       const p = raycaster.ray.intersectPlane(groundPlane.current, hit.current);
       if (!p) return;
-      const grid = useInteractionStore.getState().gridSnap || SNAP_INCREMENT_FT;
+      const grid = usePlumbingDrawStore.getState().gridSnap || SNAP_INCREMENT_FT;
       const cursor: Vec3 = [
         Math.round(p.x / grid) * grid,
         s.anchor[1],
@@ -235,7 +235,7 @@ function ExtendPreview() {
   }, []);
 
   const s = getActiveExtendSession();
-  const diameter = useInteractionStore((st) => st.drawDiameter);
+  const diameter = usePlumbingDrawStore((st) => st.drawDiameter);
   if (!s) return null;
 
   const points = useMemoPoints(s.anchor, s.currentCursor);

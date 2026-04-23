@@ -15,14 +15,14 @@
  */
 
 import { useState } from 'react';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { useIsoCameraStore } from '@ui/cameras/IsoCamera';
 import { usePipeStore } from '@store/pipeStore';
 import { useCustomerStore } from '@store/customerStore';
 
 export function NavStatusChip() {
-  const mode = useInteractionStore((s) => s.mode);
-  const setMode = useInteractionStore((s) => s.setMode);
+  const mode = usePlumbingDrawStore((s) => s.mode);
+  const setMode = usePlumbingDrawStore((s) => s.setMode);
   const cameraMode = useIsoCameraStore((s) => s.mode);
   const setCameraMode = useIsoCameraStore((s) => s.setMode);
   const pivoting = usePipeStore((s) => s.pivotSession !== null);

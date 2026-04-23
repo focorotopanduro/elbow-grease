@@ -9,8 +9,8 @@
  * Mode changes persist to localStorage so the user's last-used
  * workspace reopens on next launch.
  *
- * Why a dedicated store (not a field on `interactionStore`):
- *   - `interactionStore` is pipe-specific — its `mode: 'draw'` etc.
+ * Why a dedicated store (not a field on `plumbingDrawStore`):
+ *   - `plumbingDrawStore` is pipe-specific — its `mode: 'draw'` etc.
  *     are plumbing draw-tool states. Conflating "which workspace"
  *     with "which drawing tool" would make the plumbing-specific
  *     states leak into the roofing world.

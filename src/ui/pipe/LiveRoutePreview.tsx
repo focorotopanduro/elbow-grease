@@ -30,7 +30,7 @@ import { useRafEvent } from '@hooks/useRafEvent';
 import { EV, type Vec3, type PipeRouteUpdatePayload } from '@core/events';
 import { HILO_EV } from '@core/hilo/HILOCoordinator';
 import { useReducedMotion } from '@core/a11y/useReducedMotion';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import {
   buildRouteSegments,
   totalLength,
@@ -70,8 +70,8 @@ export function LiveRoutePreview() {
 
   // Live diameter + material from the interaction store so the
   // preview reflects the user's current pipe choice exactly.
-  const diameter = useInteractionStore((s) => s.drawDiameter);
-  const material = useInteractionStore((s) => s.drawMaterial);
+  const diameter = usePlumbingDrawStore((s) => s.drawDiameter);
+  const material = usePlumbingDrawStore((s) => s.drawMaterial);
 
   const reducedMotion = useReducedMotion();
 

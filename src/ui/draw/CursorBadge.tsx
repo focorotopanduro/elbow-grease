@@ -20,7 +20,7 @@
 
 import { useMemo } from 'react';
 import { useDrawFeedbackStore } from '@store/drawFeedbackStore';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 
 // ── System / diameter colors (mirrors DIAMETER_COLORS in pipeStore) ──
 
@@ -42,10 +42,10 @@ function colorForDiameter(d: number): string {
 // ── Component ──────────────────────────────────────────────────
 
 export function CursorBadge() {
-  const mode = useInteractionStore((s) => s.mode);
-  const diameter = useInteractionStore((s) => s.drawDiameter);
-  const material = useInteractionStore((s) => s.drawMaterial);
-  const plane = useInteractionStore((s) => s.drawPlane);
+  const mode = usePlumbingDrawStore((s) => s.mode);
+  const diameter = usePlumbingDrawStore((s) => s.drawDiameter);
+  const material = usePlumbingDrawStore((s) => s.drawMaterial);
+  const plane = usePlumbingDrawStore((s) => s.drawPlane);
 
   const cursorClient = useDrawFeedbackStore((s) => s.cursorClient);
   const snapTarget = useDrawFeedbackStore((s) => s.snapTarget);

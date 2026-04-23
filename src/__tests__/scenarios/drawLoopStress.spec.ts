@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useInteractionStore } from '../../store/interactionStore';
+import { usePlumbingDrawStore } from '../../store/plumbingDrawStore';
 import { usePipeStore } from '../../store/pipeStore';
 import { useFixtureStore } from '../../store/fixtureStore';
 import { FittingCache } from '../../core/pipe/fittingCache';
@@ -23,7 +23,7 @@ import type { CommittedPipe } from '../../store/pipeStore';
 // ── Setup ─────────────────────────────────────────────────────
 
 function resetStores() {
-  useInteractionStore.setState({
+  usePlumbingDrawStore.setState({
     mode: 'draw', drawPoints: [], isDrawing: false,
     cursorPos: null, gridSnap: 0.5, drawPlane: 'horizontal',
     drawDiameter: 2, drawMaterial: 'pvc_sch40',
@@ -55,7 +55,7 @@ describe('Stress — addDrawPoint high-throughput', () => {
   beforeEach(resetStores);
 
   it('1000 constrained clicks complete in < 500 ms', () => {
-    const s = useInteractionStore.getState();
+    const s = usePlumbingDrawStore.getState();
     const t0 = performance.now();
     for (let i = 0; i < 1000; i++) {
       // Walk along +X with random micro-offsets that should snap
@@ -71,15 +71,15 @@ describe('Stress — addDrawPoint high-throughput', () => {
     expect(elapsed).toBeLessThan(500);
     // Not every click commits (near-duplicates dropped), but
     // we should at least have some points.
-    expect(useInteractionStore.getState().drawPoints.length).toBeGreaterThan(100);
+    expect(usePlumbingDrawStore.getState().drawPoints.length).toBeGreaterThan(100);
   });
 
   it('no NaN/Infinity after 1000 constrained clicks', () => {
-    const s = useInteractionStore.getState();
+    const s = usePlumbingDrawStore.getState();
     for (let i = 0; i < 1000; i++) {
       s.addDrawPoint([i * 0.01, 0, Math.random() * 10]);
     }
-    for (const p of useInteractionStore.getState().drawPoints) {
+    for (const p of usePlumbingDrawStore.getState().drawPoints) {
       expect(Number.isFinite(p[0])).toBe(true);
       expect(Number.isFinite(p[1])).toBe(true);
       expect(Number.isFinite(p[2])).toBe(true);
@@ -115,12 +115,12 @@ describe('Stress — rapid material switch', () => {
   beforeEach(resetStores);
 
   it('100 back-and-forth switches leave store in consistent state', () => {
-    const s = useInteractionStore.getState();
+    const s = usePlumbingDrawStore.getState();
     for (let i = 0; i < 100; i++) {
       s.setDrawMaterial(i % 2 === 0 ? 'pex' : 'pvc_sch40');
     }
     // End state: PVC (because i=99 is odd)
-    const end = useInteractionStore.getState();
+    const end = usePlumbingDrawStore.getState();
     expect(end.drawMaterial).toBe('pvc_sch40');
     // Diameter should be one of the well-known defaults for PVC
     expect(end.drawDiameter).toBe(2);
@@ -223,18 +223,18 @@ describe('Stress — deep draw + full backspace', () => {
   beforeEach(resetStores);
 
   it('add 50 points, backspace 50 times, store lands empty + ready', () => {
-    const s = useInteractionStore.getState();
+    const s = usePlumbingDrawStore.getState();
     for (let i = 0; i < 50; i++) {
       s.addDrawPoint([i * 2, 0, 0]);
     }
-    expect(useInteractionStore.getState().drawPoints.length).toBeGreaterThan(0);
+    expect(usePlumbingDrawStore.getState().drawPoints.length).toBeGreaterThan(0);
     for (let i = 0; i < 60; i++) {
       // Over-pops silently on empty
-      useInteractionStore.getState().popDrawPoint();
+      usePlumbingDrawStore.getState().popDrawPoint();
     }
-    expect(useInteractionStore.getState().drawPoints).toEqual([]);
-    expect(useInteractionStore.getState().isDrawing).toBe(false);
+    expect(usePlumbingDrawStore.getState().drawPoints).toEqual([]);
+    expect(usePlumbingDrawStore.getState().isDrawing).toBe(false);
     // Mode should stay 'draw' so the user can keep clicking
-    expect(useInteractionStore.getState().mode).toBe('draw');
+    expect(usePlumbingDrawStore.getState().mode).toBe('draw');
   });
 });

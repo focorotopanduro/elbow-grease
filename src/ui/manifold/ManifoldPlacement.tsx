@@ -18,7 +18,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useManifoldStore } from '@store/manifoldStore';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { commandBus } from '@core/commands/CommandBus';
 import {
   trunkLengthFt,
@@ -42,7 +42,7 @@ function notify() { for (const l of listeners) l(); }
 
 export function beginManifoldPlacement(): void {
   if (active) return;
-  useInteractionStore.getState().setNavFrozen(true);
+  usePlumbingDrawStore.getState().setNavFrozen(true);
   active = { cursor: [0, 0, 0], yawRad: 0 };
   notify();
 }
@@ -50,7 +50,7 @@ export function beginManifoldPlacement(): void {
 export function cancelManifoldPlacement(): void {
   if (!active) return;
   active = null;
-  useInteractionStore.getState().setNavFrozen(false);
+  usePlumbingDrawStore.getState().setNavFrozen(false);
   notify();
 }
 
@@ -58,7 +58,7 @@ function commitManifoldPlacement(): void {
   const s = active;
   if (!s) return;
   active = null;
-  useInteractionStore.getState().setNavFrozen(false);
+  usePlumbingDrawStore.getState().setNavFrozen(false);
   notify();
   commandBus.dispatch({
     type: 'manifold.add',
@@ -125,7 +125,7 @@ function useWindowListeners() {
       raycaster.setFromCamera(ndc(ev), camera);
       const p = raycaster.ray.intersectPlane(ground.current, hit.current);
       if (!p) return;
-      const grid = useInteractionStore.getState().gridSnap || 0.25;
+      const grid = usePlumbingDrawStore.getState().gridSnap || 0.25;
       active = {
         ...active,
         cursor: [

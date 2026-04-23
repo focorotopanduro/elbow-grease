@@ -1,5 +1,11 @@
 /**
- * Interaction Store — mode system + draw state + settings.
+ * Plumbing Draw Store — mode system + draw state + settings for the
+ * plumbing viewport.
+ *
+ * Formerly `interactionStore`; renamed in the hybrid-architecture
+ * refactor (ARCHITECTURE.md §7.2) to make the domain scope explicit.
+ * This store is read/written ONLY by plumbing workflows. Roofing has
+ * its own `roofingDrawStore`.
  *
  * Modes: Navigate (orbit) | Draw (click-to-place) | Select (inspect)
  *
@@ -97,7 +103,7 @@ function snapToGrid(pos: Vec3, grid: number): Vec3 {
   ];
 }
 
-export const useInteractionStore = create<InteractionState>((set, get) => ({
+export const usePlumbingDrawStore = create<InteractionState>((set, get) => ({
   mode: 'navigate',
   drawPoints: [],
   isDrawing: false,

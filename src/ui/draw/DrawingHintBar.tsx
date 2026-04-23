@@ -5,8 +5,8 @@
  * Reads from:
  *   • drawFeedbackStore.nextAction — the semantic intent
  *   • drawFeedbackStore.snapTarget  — the specific target (for label detail)
- *   • interactionStore.drawPoints   — running length + count for in-progress runs
- *   • interactionStore.drawPlane    — horizontal/vertical indicator
+ *   • plumbingDrawStore.drawPoints   — running length + count for in-progress runs
+ *   • plumbingDrawStore.drawPlane    — horizontal/vertical indicator
  *
  * The bar NEVER modifies state — it's pure feedback. If the user
  * wonders "what should I press / click?", one glance answers.
@@ -17,16 +17,16 @@
 
 import { useMemo } from 'react';
 import { useDrawFeedbackStore, type NextAction } from '@store/drawFeedbackStore';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 
 // ── Component ──────────────────────────────────────────────────
 
 export function DrawingHintBar() {
-  const mode = useInteractionStore((s) => s.mode);
-  const drawPoints = useInteractionStore((s) => s.drawPoints);
-  const drawPlane = useInteractionStore((s) => s.drawPlane);
-  const diameter = useInteractionStore((s) => s.drawDiameter);
-  const material = useInteractionStore((s) => s.drawMaterial);
+  const mode = usePlumbingDrawStore((s) => s.mode);
+  const drawPoints = usePlumbingDrawStore((s) => s.drawPoints);
+  const drawPlane = usePlumbingDrawStore((s) => s.drawPlane);
+  const diameter = usePlumbingDrawStore((s) => s.drawDiameter);
+  const material = usePlumbingDrawStore((s) => s.drawMaterial);
 
   const nextAction = useDrawFeedbackStore((s) => s.nextAction);
   const snapTarget = useDrawFeedbackStore((s) => s.snapTarget);

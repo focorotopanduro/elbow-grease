@@ -41,7 +41,7 @@ import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { Billboard, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { usePipeStore, type CommittedPipe } from '@store/pipeStore';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { useIsoCameraStore } from '@ui/cameras/IsoCamera';
 import { EV, type Vec3, type PipeCompletePayload } from '@core/events';
 import { eventBus } from '@core/EventBus';
@@ -205,10 +205,10 @@ function cross3(
 
 export function OrthoPipeInteraction() {
   const cameraMode = useIsoCameraStore((s) => s.mode);
-  const orthoClickDrag = useInteractionStore((s) => s.orthoClickDragMode);
-  const interactionMode = useInteractionStore((s) => s.mode);
-  const gridSnap = useInteractionStore((s) => s.gridSnap);
-  const setNavFrozen = useInteractionStore((s) => s.setNavFrozen);
+  const orthoClickDrag = usePlumbingDrawStore((s) => s.orthoClickDragMode);
+  const interactionMode = usePlumbingDrawStore((s) => s.mode);
+  const gridSnap = usePlumbingDrawStore((s) => s.gridSnap);
+  const setNavFrozen = usePlumbingDrawStore((s) => s.setNavFrozen);
   const pipes = usePipeStore((s) => s.pipes);
   const pipeOrder = usePipeStore((s) => s.pipeOrder);
   const selectPipeAction = usePipeStore((s) => s.selectPipe);

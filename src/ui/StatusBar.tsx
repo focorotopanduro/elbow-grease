@@ -2,7 +2,7 @@
  * StatusBar — bottom-of-screen bar showing current mode, shortcuts, and draw state.
  */
 
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { usePipeStore } from '@store/pipeStore';
 
 const MODE_LABELS = {
@@ -12,11 +12,11 @@ const MODE_LABELS = {
 };
 
 export function StatusBar() {
-  const mode = useInteractionStore((s) => s.mode);
-  const drawPlane = useInteractionStore((s) => s.drawPlane);
-  const isDrawing = useInteractionStore((s) => s.isDrawing);
-  const pointCount = useInteractionStore((s) => s.drawPoints.length);
-  const diameter = useInteractionStore((s) => s.drawDiameter);
+  const mode = usePlumbingDrawStore((s) => s.mode);
+  const drawPlane = usePlumbingDrawStore((s) => s.drawPlane);
+  const isDrawing = usePlumbingDrawStore((s) => s.isDrawing);
+  const pointCount = usePlumbingDrawStore((s) => s.drawPoints.length);
+  const diameter = usePlumbingDrawStore((s) => s.drawDiameter);
   const pipeCount = usePipeStore((s) => Object.keys(s.pipes).length);
 
   const modeInfo = MODE_LABELS[mode];

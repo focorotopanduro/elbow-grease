@@ -25,7 +25,7 @@ import { useMemo, useRef, useState, useCallback } from 'react';
 import { type ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import { usePipeStore, type CommittedPipe } from '@store/pipeStore';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { useLayerStore } from '@store/layerStore';
 import { useFloorParams } from '@store/floorStore';
 import { useFeatureFlagStore } from '@store/featureFlagStore';
@@ -138,7 +138,7 @@ function PipeHitbox({ pipe }: { pipe: CommittedPipe }) {
 
       // Snap the anchor to the grid — the user expects tees to land
       // on grid points, matching the rest of the drawing flow.
-      const grid = useInteractionStore.getState().gridSnap || 0.5;
+      const grid = usePlumbingDrawStore.getState().gridSnap || 0.5;
       const snappedAnchor: Vec3 = [
         Math.round(nearest.worldPoint[0] / grid) * grid,
         nearest.worldPoint[1],
@@ -288,7 +288,7 @@ function EdgeHoverRing({ position, radius }: { position: [number, number, number
 
 export function PipeHitboxes() {
   const pipes = usePipeStore((s) => s.pipes);
-  const mode = useInteractionStore((s) => s.mode);
+  const mode = usePlumbingDrawStore((s) => s.mode);
   const pivoting = usePipeStore((s) => s.pivotSession !== null);
   const systemVis = useLayerStore((s) => s.systems);
   const getFloorParams = useFloorParams();

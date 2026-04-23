@@ -12,7 +12,7 @@
  *   BoxSelectOverlay (DOM, mounts at scene root)
  *     • Fixed-position full-window div.
  *     • Off by default (pointer-events: none).
- *     • When `interactionStore.mode === 'select'`, flips to
+ *     • When `plumbingDrawStore.mode === 'select'`, flips to
  *       pointer-events: auto + cursor: crosshair.
  *     • On pointer-down → pointer-move: renders an SVG rectangle.
  *     • On pointer-up: projects every pipe point + fixture position
@@ -26,7 +26,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { useMultiSelectStore } from '@store/multiSelectStore';
 import { usePipeStore } from '@store/pipeStore';
 import { useFixtureStore } from '@store/fixtureStore';
@@ -53,7 +53,7 @@ const cameraSnapshot = {
 
 export function CameraMatrixSnooper() {
   const { camera, size } = useThree();
-  const mode = useInteractionStore((s) => s.mode);
+  const mode = usePlumbingDrawStore((s) => s.mode);
   const tmp = useRef(new THREE.Matrix4());
   useFrame(() => {
     // Phase 14.M perf: only keep the snapshot fresh while the user is
@@ -84,7 +84,7 @@ interface DragRect {
 // ── Overlay ──────────────────────────────────────────────────
 
 export function BoxSelectOverlay() {
-  const mode = useInteractionStore((s) => s.mode);
+  const mode = usePlumbingDrawStore((s) => s.mode);
   const [drag, setDrag] = useState<DragRect | null>(null);
   const draggingRef = useRef(false);
 

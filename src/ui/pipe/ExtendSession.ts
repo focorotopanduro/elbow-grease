@@ -15,7 +15,7 @@
  *     that re-renders per move.
  */
 
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { commandBus } from '@core/commands/CommandBus';
 import { newCorrelationId } from '@core/commands/correlationId';
 import { eventBus } from '@core/EventBus';
@@ -75,7 +75,7 @@ export function beginExtend(params: {
   anchor: Vec3;
   teeSegmentIdx?: number;
 }): void {
-  useInteractionStore.getState().setNavFrozen(true);
+  usePlumbingDrawStore.getState().setNavFrozen(true);
   activeSession = {
     parentPipeId: params.parentPipeId,
     origin: params.origin,
@@ -106,7 +106,7 @@ export function updateExtendCursor(cursor: Vec3): void {
 export function commitExtendSession(): void {
   const s = activeSession;
   activeSession = null;
-  useInteractionStore.getState().setNavFrozen(false);
+  usePlumbingDrawStore.getState().setNavFrozen(false);
   notify();
   if (!s) return;
 
@@ -135,7 +135,7 @@ export function commitExtendSession(): void {
   // Step 2: emit PIPE_COMPLETE for the new branch. The legacy
   // EventBus path OR the Phase 1 commandBus translator (whichever is
   // flag-active) will add it to pipeStore.
-  const ix = useInteractionStore.getState();
+  const ix = usePlumbingDrawStore.getState();
   eventBus.emit(EV.PIPE_COMPLETE, {
     id: `pipe-${Date.now()}-branch`,
     points: [s.anchor, s.currentCursor],
@@ -147,7 +147,7 @@ export function commitExtendSession(): void {
 export function cancelExtendSession(): void {
   if (!activeSession) return;
   activeSession = null;
-  useInteractionStore.getState().setNavFrozen(false);
+  usePlumbingDrawStore.getState().setNavFrozen(false);
   notify();
 }
 

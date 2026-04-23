@@ -14,7 +14,7 @@ import { useLayerStore } from '@store/layerStore';
 // Phase 14.I — multi-select layer. Bare click = single-select (existing
 // behavior). Shift+click = toggle into the multi-select set.
 import { useMultiSelectStore } from '@store/multiSelectStore';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { useFloorParams, type FloorRenderParams } from '@store/floorStore';
 import { usePhaseFilter } from '@store/phaseStore';
 import { shouldPhaseRender, PHASE_META } from '@core/phases/PhaseTypes';
@@ -385,7 +385,7 @@ export function PipeRenderer() {
   const selectPipe = usePipeStore((s) => s.selectPipe);
   const selectedId = usePipeStore((s) => s.selectedId);
   const systemVis = useLayerStore((s) => s.systems);
-  const quality = useInteractionStore((s) => s.pipeQuality);
+  const quality = usePlumbingDrawStore((s) => s.pipeQuality);
   const pivotingPipeId = usePipeStore((s) => s.pivotSession?.pipeId ?? null);
   const getFloorParams = useFloorParams();
   const phaseFilter = usePhaseFilter();

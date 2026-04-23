@@ -26,7 +26,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Line, Text, Billboard } from '@react-three/drei';
 import * as THREE from 'three';
 import { usePipeStore } from '@store/pipeStore';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import {
   computePivotDelta,
   applyPivot,

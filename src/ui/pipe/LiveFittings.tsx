@@ -31,7 +31,7 @@ import { useEvent } from '@hooks/useEventBus';
 import { useRafEvent } from '@hooks/useRafEvent';
 import { EV, type Vec3, type PipeRouteUpdatePayload } from '@core/events';
 import { HILO_EV } from '@core/hilo/HILOCoordinator';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { generateAllFittings, type FittingInstance } from '@ui/pipe/FittingGenerator';
 import {
   getElbow90Geo,
@@ -119,8 +119,8 @@ export function LiveFittings() {
   const [points, setPoints] = useState<Vec3[]>([]);
   const [active, setActive] = useState(false);
 
-  const diameter = useInteractionStore((s) => s.drawDiameter);
-  const material = useInteractionStore((s) => s.drawMaterial);
+  const diameter = usePlumbingDrawStore((s) => s.drawDiameter);
+  const material = usePlumbingDrawStore((s) => s.drawMaterial);
 
   // rAF-coalesced: generateAllFittings walks all point triples doing
   // angle math; no need to re-run at 120Hz when 60Hz already exceeds

@@ -11,7 +11,7 @@
  * Previously the DWV sector enumerated every (material × size) pair
  * producing 20 subtypes to scroll through. That was unusable. Now the
  * subtype list is JUST materials; diameter keeps the current value
- * from interactionStore (or uses a sensible default for the chosen
+ * from plumbingDrawStore (or uses a sensible default for the chosen
  * system). Per-pipe diameter can be adjusted post-draw via the
  * Toolbar / PipeInspector / wheel re-select.
  *
@@ -23,7 +23,7 @@
 
 import { useMemo } from 'react';
 import { RadialMenu, type WheelConfig } from '../RadialMenu';
-import { useInteractionStore } from '@store/interactionStore';
+import { usePlumbingDrawStore } from '@store/plumbingDrawStore';
 import { useMeasureStore } from '@store/measureStore';
 import { useWallStore, type WallType } from '@store/wallStore';
 import type { PipeMaterial } from '../../../engine/graph/GraphEdge';
@@ -86,7 +86,7 @@ const GRID_STEPS_FT = [1 / 12, 3 / 12, 6 / 12, 1, 2]; // 1", 3", 6", 1ft, 2ft
 // ── Build wheel config ──────────────────────────────────────────
 
 export function getDrawingWheelConfig(): WheelConfig {
-  const ixn = useInteractionStore.getState();
+  const ixn = usePlumbingDrawStore.getState();
   const measureStore = useMeasureStore.getState();
   const wallStore = useWallStore.getState();
 
@@ -161,10 +161,10 @@ export function getDrawingWheelConfig(): WheelConfig {
               break;
             case 'grid': {
               // Cycle grid snap through common increments
-              const current = useInteractionStore.getState().gridSnap;
+              const current = usePlumbingDrawStore.getState().gridSnap;
               const idx = GRID_STEPS_FT.findIndex((s) => Math.abs(s - current) < 0.001);
               const next = GRID_STEPS_FT[(idx + 1) % GRID_STEPS_FT.length]!;
-              useInteractionStore.setState({ gridSnap: next });
+              usePlumbingDrawStore.setState({ gridSnap: next });
               break;
             }
           }
