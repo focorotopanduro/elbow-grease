@@ -231,6 +231,7 @@ import { engagementTracker } from '@core/neuro/EngagementMetrics';
 import { cognitiveMonitor } from '@core/spatial/CognitiveLoadMonitor';
 import { fatigueGuard } from '@core/neuro/VisualFatigueGuard';
 import { getSimulationBridge } from './engine/worker/SimulationBridge';
+import { useCanvasCursor } from '@ui/cursors/useCanvasCursor';
 
 // ── Demo fixtures ───────────────────────────────────────────────
 
@@ -1614,8 +1615,15 @@ export function App() {
   const gpuProbe = probeGpuAtBoot();
   const lowSpec = isLowSpecGpu();
 
+  // Mode-aware draw cursor (workspace-accent-tinted crosshair).
+  // Cyan while plumbing is in `'draw'`, orange while roofing is in
+  // `'draw-rect'`/`'draw-polygon'`/`'place-penetration'`, native
+  // cursor otherwise. Carries the workspace identity onto the
+  // pointer itself — see `src/ui/cursors/modeCursor.ts`.
+  const canvasCursor = useCanvasCursor();
+
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+    <div style={{ width: '100%', height: '100%', position: 'relative', cursor: canvasCursor }}>
       {/* Phase 8.A — crash boundary around the 3D scene. Any throwing
           component inside <Scene /> (a bad pipe polyline, a fitting
           generator assertion, etc.) lands in the fallback UI instead
