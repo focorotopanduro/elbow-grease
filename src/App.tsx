@@ -1705,7 +1705,12 @@ export function App() {
           RoofingInspector can own the right side of the screen. The
           canvas + camera + keyboard-shortcuts stay live either way. */}
       {appMode === 'plumbing' && <Toolbar />}
-      <StatusBar />
+      {/* Phase 9 (ARCHITECTURE.md §6) — StatusBar reads
+          plumbingDrawStore + pipeStore exclusively; in roofing
+          mode it was rendering ghost plumbing state ("NAVIGATE",
+          "0 pipes"). Gated to plumbing mode until a roofing
+          status summary gets built. */}
+      {appMode === 'plumbing' && <StatusBar />}
       <FeedbackOverlay />
       <PerformanceMonitor />
       {appMode === 'plumbing' && <LayerPanel />}

@@ -14,17 +14,28 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   groupedShortcuts,
+  shortcutMatchesMode,
   type Shortcut,
 } from '@core/input/ShortcutRegistry';
 import { useFocusTrap } from '@core/a11y/useFocusTrap';
 // Phase 10.F — replay the first-run coach-mark walkthrough on demand.
 import { useOnboardingStore } from '@store/onboardingStore';
+// Phase 9 (ARCHITECTURE.md §6) — filter the registry to the user's
+// active workspace so roofing users aren't wading through 30
+// plumbing-only shortcuts and vice versa. Global shortcuts always
+// show.
+import { useAppModeStore } from '@store/appModeStore';
 
 // ── Component ──────────────────────────────────────────────────
 
 export function HelpOverlay() {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState('');
+  // Phase 9 — active workspace drives the registry filter. Global
+  // shortcuts fire in both modes and always show; plumbing /
+  // roofing entries show only when the matching workspace is
+  // active.
+  const appMode = useAppModeStore((s) => s.mode);
   // Phase 10.C — Tab/Shift+Tab cycles inside the dialog; focus
   // restores to the element that was focused before open on close.
   const trapRef = useFocusTrap<HTMLDivElement>(open);
@@ -50,16 +61,21 @@ export function HelpOverlay() {
   }, [open]);
 
   const groups = useMemo(() => {
-    const g = groupedShortcuts();
     const needle = filter.trim().toLowerCase();
-    if (!needle) return g;
-    return g
+    // First filter by active workspace, THEN by the search needle.
+    // Two passes rather than combined so an empty search still
+    // benefits from the mode filter.
+    return groupedShortcuts()
       .map((grp) => ({
         ...grp,
-        entries: grp.entries.filter((e) => matches(e, needle)),
+        entries: grp.entries.filter((e) => {
+          if (!shortcutMatchesMode(e.mode, appMode)) return false;
+          if (!needle) return true;
+          return matches(e, needle);
+        }),
       }))
       .filter((grp) => grp.entries.length > 0);
-  }, [filter]);
+  }, [filter, appMode]);
 
   if (!open) return null;
 
