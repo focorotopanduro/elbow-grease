@@ -64,6 +64,7 @@ import {
 } from '@store/appModeStore';
 import { useReducedMotion } from '@core/a11y/useReducedMotion';
 import { useInteractiveButton } from '@ui/shared/useInteractiveButton';
+import { getReadableText } from '@ui/shared/accentContrast';
 
 const MODES: AppMode[] = ['plumbing', 'roofing'];
 const TAB_WIDTH_PX = 150;
@@ -257,7 +258,15 @@ function ModeTab({ mode: m, active, reducedMotion, onActivate, onKeyDown }: Mode
     ? 'none'
     : 'color 200ms ease, background 200ms ease, box-shadow 200ms ease, transform 100ms ease';
 
-  const color = active ? '#0a0a0f' : hovered ? '#ccc' : '#777';
+  // Active-tab text sits on the accent-colored pill. Use
+  // `getReadableText` rather than hardcoding `#0a0a0f` so that if a
+  // future workspace ships a dim accent (navy, forest, maroon) the
+  // text flips to white automatically. No-op for cyan + orange —
+  // both are bright enough that dark text wins the contrast check
+  // (and the spec tests pin that equivalence).
+  const color = active
+    ? getReadableText(APP_MODE_ACCENTS[m])
+    : hovered ? '#ccc' : '#777';
 
   // Hover affordance on the INACTIVE tab: the tab picks up
   // a faint halo in its OWN accent colour — a preview of
