@@ -38,6 +38,7 @@ import { WheelHolographics } from './WheelHolographics';
 // Phase 5 — velocity-predicted sector pre-highlight + a11y.
 import { SectorPredictor } from './SectorPredictor';
 import { usePrefersReducedMotion } from './usePrefersReducedMotion';
+import { useAccentPulse } from './useAccentPulse';
 
 // ── Config types (unchanged external API) ──────────────────────
 
@@ -504,6 +505,15 @@ const WheelSVG = forwardRef<SVGSVGElement, WheelSVGProps>(function WheelSVG(
   const cx = size / 2;
   const cy = size / 2;
 
+  // One-shot pulse when the accent color flips mid-session (e.g. user
+  // hits Shift+M while the wheel is open). Returns 1 normally, 1.08
+  // briefly on an accent change, then snaps back to 1. Reinforces the
+  // mode flip at the point of interaction. No-op under
+  // prefers-reduced-motion. Scoped to WheelSVG so the hook remounts
+  // with the wheel; menus opened AFTER a mode change start at 1 with
+  // no pulse (entry spring covers that beat).
+  const accentPulseScale = useAccentPulse(config.accentColor, prefersReducedMotion);
+
   // Build lookup for original sector config by id
   const configById = useMemo(() => {
     const m = new Map<string, WheelSector>();
@@ -530,17 +540,38 @@ const WheelSVG = forwardRef<SVGSVGElement, WheelSVGProps>(function WheelSVG(
         </linearGradient>
       </defs>
 
-      {/* Outer halo — single subtle ring */}
-      <circle cx={cx} cy={cy} r={config.outerRadiusPx + 4} fill="none"
-        stroke={config.accentColor} strokeWidth={0.5} opacity={0.3} />
+      {/* Accent-bearing rings, grouped so a single `transform` scales
+          them together from (cx, cy). `useAccentPulse` drives the
+          scale value — 1 normally, briefly 1.08 when the workspace
+          accent flips, then back to 1. CSS transition smooths both
+          directions. Transform-origin via the explicit
+          `translate/scale/translate` chain because SVG 1.1
+          `transform-origin` support was historically patchy — the
+          matrix form works everywhere. */}
+      <g
+        data-testid="radial-accent-rings"
+        transform={`translate(${cx} ${cy}) scale(${accentPulseScale}) translate(${-cx} ${-cy})`}
+        style={{
+          transition: prefersReducedMotion
+            ? 'none'
+            : 'transform 150ms ease-out',
+          // Transform origin is baked into the matrix above, but set
+          // the CSS property too for browsers that honour SVG 2.
+          transformOrigin: `${cx}px ${cy}px`,
+        }}
+      >
+        {/* Outer halo — single subtle ring */}
+        <circle cx={cx} cy={cy} r={config.outerRadiusPx + 4} fill="none"
+          stroke={config.accentColor} strokeWidth={0.5} opacity={0.3} />
 
-      {/* Outer ring — solid background for clarity, crisper border */}
-      <circle cx={cx} cy={cy} r={config.outerRadiusPx} fill="rgba(10,12,18,0.92)"
-        stroke={config.accentColor} strokeWidth={1.5} strokeOpacity={0.75} />
+        {/* Outer ring — solid background for clarity, crisper border */}
+        <circle cx={cx} cy={cy} r={config.outerRadiusPx} fill="rgba(10,12,18,0.92)"
+          stroke={config.accentColor} strokeWidth={1.5} strokeOpacity={0.75} />
 
-      {/* Inner dead zone — darker so center hub reads clearly */}
-      <circle cx={cx} cy={cy} r={config.innerRadiusPx} fill="rgba(6,8,12,0.98)"
-        stroke={config.accentColor} strokeWidth={1} strokeOpacity={0.4} />
+        {/* Inner dead zone — darker so center hub reads clearly */}
+        <circle cx={cx} cy={cy} r={config.innerRadiusPx} fill="rgba(6,8,12,0.98)"
+          stroke={config.accentColor} strokeWidth={1} strokeOpacity={0.4} />
+      </g>
 
       {/* Sector dividers (based on DEFORMED boundaries) */}
       {deformedSectors.map((sector, i) => {
