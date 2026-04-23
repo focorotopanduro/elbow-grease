@@ -60,7 +60,7 @@ import {
 } from '@engine/roofing/fl/aggregate';
 import { estimate as estimateFl } from '@engine/roofing/fl/estimator';
 import { PENETRATION_LABELS } from '@engine/roofing/RoofGraph';
-import { useRoofingEstimateScopeStore } from '@store/roofingEstimateScopeStore';
+import { useRoofingScopeStore } from '@store/roofingScopeStore';
 import { EstimateScopeToggle } from './EstimateScopeToggle';
 import {
   areaActual,
@@ -414,7 +414,7 @@ export function RoofingInspector() {
   // via `getState()` to re-run on any input change, and explicitly
   // subscribe to the drawn-section list so the aggregate BOM updates
   // when the user draws/deletes/edits a section.
-  const scope = useRoofingEstimateScopeStore((s) => s.scope);
+  const scope = useRoofingScopeStore((s) => s.scope);
   const sections = useRoofStore(selectSectionsArray);
   // Phase 14.R.27 — spatial penetration markers. When any markers
   // exist for a kind, they OVERRIDE the manual form count for that

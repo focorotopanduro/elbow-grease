@@ -13,9 +13,9 @@
  */
 
 import {
-  useRoofingEstimateScopeStore,
+  useRoofingScopeStore,
   type EstimateScope,
-} from '@store/roofingEstimateScopeStore';
+} from '@store/roofingScopeStore';
 import { useRoofStore } from '@store/roofStore';
 
 interface Option {
@@ -43,8 +43,8 @@ const OPTIONS: Option[] = [
 const ACCENT = '#ff9800';
 
 export function EstimateScopeToggle() {
-  const scope = useRoofingEstimateScopeStore((s) => s.scope);
-  const setScope = useRoofingEstimateScopeStore((s) => s.setScope);
+  const scope = useRoofingScopeStore((s) => s.scope);
+  const setScope = useRoofingScopeStore((s) => s.setScope);
   const sectionCount = useRoofStore((s) => s.sectionOrder.length);
   const aggregateDisabled = sectionCount === 0;
 

@@ -24,7 +24,7 @@
  *      (`roofStore.pdf.scale`, `sections[id].x/y`) is what
  *      actually lands in the bundle.
  *
- *   4. `roofingEstimateScopeStore` is a per-machine preference
+ *   4. `roofingScopeStore` is a per-machine preference
  *      (localStorage), NOT part of the bundle — opening someone
  *      else's project should not flip the contractor's UI
  *      preference.
@@ -46,9 +46,9 @@ import {
 import { useRoofingCalibrationStore } from '@store/roofingCalibrationStore';
 import { useRoofingDragStore } from '@store/roofingDragStore';
 import {
-  useRoofingEstimateScopeStore,
+  useRoofingScopeStore,
   __testables as scopeTestables,
-} from '@store/roofingEstimateScopeStore';
+} from '@store/roofingScopeStore';
 import { usePipeStore } from '@store/pipeStore';
 import { useFixtureStore } from '@store/fixtureStore';
 import {
@@ -94,7 +94,7 @@ function resetAll() {
     sectionStart: null,
   });
 
-  useRoofingEstimateScopeStore.setState({ scope: 'all' });
+  useRoofingScopeStore.setState({ scope: 'all' });
 
   usePipeStore.setState({
     pipes: {}, pipeOrder: [], selectedId: null,
@@ -344,15 +344,15 @@ describe('roofing bundle roundtrip — per-machine preference stays local', () =
   // local-machine setting, not a project setting. Opening a
   // file someone else saved must not flip it.
 
-  it('roofingEstimateScopeStore value is NOT overwritten by applyBundle', () => {
-    useRoofingEstimateScopeStore.getState().setScope('all');
+  it('roofingScopeStore value is NOT overwritten by applyBundle', () => {
+    useRoofingScopeStore.getState().setScope('all');
     seedRichRoofingScene();
     const bundle = captureBundle();
 
     // Local preference flips BEFORE apply.
-    useRoofingEstimateScopeStore.getState().setScope('selected');
+    useRoofingScopeStore.getState().setScope('selected');
     applyBundle(bundle);
-    expect(useRoofingEstimateScopeStore.getState().scope).toBe('selected');
+    expect(useRoofingScopeStore.getState().scope).toBe('selected');
   });
 });
 

@@ -1,5 +1,10 @@
 /**
- * roofingEstimateScopeStore — Phase 14.R.6.
+ * roofingScopeStore — Phase 14.R.6.
+ *
+ * Renamed from `roofingEstimateScopeStore` in Phase 6a of the
+ * hybrid-architecture refactor (ARCHITECTURE.md §7.7). "Estimate"
+ * was redundant — the store's only job IS scope selection for the
+ * estimator.
  *
  * Which drawn-sections feed the RoofingInspector's live FL estimate:
  *
@@ -43,7 +48,7 @@ function persist(scope: EstimateScope): void {
   try { localStorage.setItem(STORAGE_KEY, scope); } catch { /* ignore */ }
 }
 
-export const useRoofingEstimateScopeStore = create<EstimateScopeState>((set, get) => ({
+export const useRoofingScopeStore = create<EstimateScopeState>((set, get) => ({
   scope: loadScope(),
 
   setScope: (s) => {

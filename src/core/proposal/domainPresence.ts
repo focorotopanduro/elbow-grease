@@ -8,7 +8,7 @@
  *   • Presence = ENTITY EXISTENCE, not pricing > $0. Users who draw
  *     items before pricing them still see the section.
  *   • Both-empty is a valid state — renderers must not crash on it.
- *   • `roofingEstimateScopeStore` scope filters WHAT IS PRICED, not
+ *   • `roofingScopeStore` scope filters WHAT IS PRICED, not
  *     WHAT IS PRESENT. A scoped-out section still counts as "roofing
  *     is present" for gating purposes.
  *   • Change orders follow the same rule — a CO touching only
