@@ -3,6 +3,53 @@
  *
  * Every event the simulation engine or UI can emit is defined here
  * so both sides share a single source of truth.
+ *
+ * ─── Naming convention (ARCHITECTURE.md §2) ─────────────────────
+ *
+ * **New events MUST follow this. Existing events are grandfathered
+ * (see list below) — do NOT rename solely to satisfy the convention.**
+ *
+ * Pattern for the event-name KEY (left-hand side of `EV.`):
+ *
+ *   • **Domain-scoped events** — payload references entities from
+ *     exactly one workspace (plumbing OR roofing):
+ *        `EV.{DOMAIN}_{NOUN}_{VERB}`
+ *        Examples:
+ *          `EV.PLUMBING_PIPE_COMPLETE`
+ *          `EV.ROOFING_SECTION_COMPLETE`
+ *          `EV.ROOFING_PENETRATION_PLACED`
+ *
+ *   • **Shared events** — fired by the shell or a cross-domain
+ *     feature (customer, pricing, file IO, app mode, selection):
+ *        `EV.{NOUN}_{VERB}` (bare — no domain prefix)
+ *        Examples:
+ *          `EV.MODE_CHANGED`
+ *          `EV.FILE_SAVED`
+ *          `EV.SELECTION_CHANGED`
+ *
+ * Verb form:
+ *   • **Past tense** (`_COMPLETE`, `_PLACED`, `_CHANGED`, `_SAVED`)
+ *     for things that happened — this is the pub/sub convention.
+ *   • **Imperative** (`.add`, `.remove`) lives on the CommandBus
+ *     under `src/core/commands/` — NOT here.
+ *
+ * ─── Grandfathered identifiers (pre-convention) ─────────────────
+ *
+ * The entries below use the legacy colon-separated namespace form
+ * (e.g. `'pipe:complete'` as the STRING value). Renaming them would
+ * churn every subscriber + every log entry in every user's God Mode
+ * console. Keep as-is until you're already editing the file that
+ * owns them for another reason. The GRANDFATHER cutoff:
+ *
+ *   PIPE_*        — lifecycle events (drag/route/snap/complete/...)
+ *   COLLISION_*   — spatial collision pairs
+ *   CODE_*        — compliance ok / violation
+ *   FIXTURE_*     — placement / params / selection / moved
+ *   STATE_TRANSITION, MILESTONE  — FSM observability
+ *   CUE, REWARD   — sensory-feedback triggers
+ *
+ * Everything added after Phase 8 of the hybrid-architecture
+ * refactor follows the convention above.
  */
 
 // ── Vec3 shorthand ──────────────────────────────────────────────
