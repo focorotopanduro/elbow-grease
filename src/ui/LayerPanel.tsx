@@ -16,6 +16,7 @@ import {
   type LayerState,
 } from '@store/plumbingLayerStore';
 import { usePipeStore } from '@store/pipeStore';
+import { APP_MODE_ACCENTS } from '@store/appModeStore';
 import type { SystemType } from '../engine/graph/GraphNode';
 
 // ── System types to render ──────────────────────────────────────
@@ -194,6 +195,10 @@ const styles: Record<string, React.CSSProperties> = {
     padding: 10,
     borderRadius: 10,
     border: '1px solid #333',
+    // Workspace-accent border on the canvas-facing edge (right,
+    // since the panel sits left-of-canvas). Plumbing-only mount
+    // by App.tsx gate — hardcoded cyan is correct.
+    borderRight: `3px solid ${APP_MODE_ACCENTS.plumbing}`,
     background: 'rgba(10,10,15,0.92)',
     fontFamily: "'Segoe UI', system-ui, sans-serif",
     pointerEvents: 'auto',

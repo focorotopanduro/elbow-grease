@@ -13,6 +13,7 @@
 
 import { useMemo } from 'react';
 import { usePipeStore } from '@store/pipeStore';
+import { APP_MODE_ACCENTS } from '@store/appModeStore';
 import { useCappedEndpointStore } from '@store/cappedEndpointStore';
 import { eventBus } from '@core/EventBus';
 import { EV, type Vec3, type PipeCompletePayload } from '@core/events';
@@ -327,6 +328,11 @@ const styles: Record<string, React.CSSProperties> = {
     padding: 12,
     borderRadius: 10,
     border: '1px solid #333',
+    // Workspace-accent left border — cyan for plumbing — frames
+    // the panel edge that faces the 3D canvas. Panel only mounts
+    // in plumbing mode (App.tsx gate), so the hardcoded accent is
+    // always correct.
+    borderLeft: `3px solid ${APP_MODE_ACCENTS.plumbing}`,
     background: 'rgba(10,10,15,0.92)',
     fontFamily: "'Segoe UI', system-ui, sans-serif",
     pointerEvents: 'auto',
