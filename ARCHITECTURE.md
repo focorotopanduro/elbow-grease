@@ -88,50 +88,57 @@ working code for cosmetics.
 
 ## 3. Store classification
 
-### 🔧 Plumbing-only (13)
+*(Resolved through Phases 1, 6, and 7 of the hybrid-architecture
+refactor. Phase 7 closed out the ❓ audit category; no open
+candidates remain.)*
 
-`interactionStore` *(rename to `plumbingDrawStore` — priority 1)*,
-`pipeStore`, `cappedEndpointStore`, `pipeConnectivityStore`,
-`manifoldStore`, `complianceTraceStore` *(rename to
-`plumbingComplianceStore`)*, `fixtureStore`, `fixtureEditorStore`,
-`fixtureInspectorStore`, `layerStore` *(rename to `plumbingLayerStore`)*,
-`phaseStore` *(rename to `plumbingPhaseStore`)*.
+### 🔧 Plumbing-only (14)
 
-### 🏠 Roofing-only (7)
+`plumbingDrawStore`, `pipeStore`, `cappedEndpointStore`,
+`pipeConnectivityStore`, `manifoldStore`, `plumbingComplianceStore`,
+`fixtureStore`, `fixtureEditorStore`, `fixtureInspectorStore`,
+`plumbingLayerStore`, `plumbingPhaseStore`,
+`plumbingAssemblyTemplateStore`, `plumbingClipboardStore`,
+`plumbingMultiSelectStore`.
+
+### 🏠 Roofing-only (10)
 
 `roofingDrawStore`, `roofStore`, `roofingProjectStore`,
-`roofingPdfCalibStore` *(consider rename to `roofingCalibrationStore` —
-PDF is an impl detail)*, `roofingSectionDragStore` *(consider rename to
-`roofingDragStore`)*, `roofingEstimateScopeStore` *(consider rename to
-`roofingScopeStore`)*.
+`roofingCalibrationStore`, `roofingDragStore`, `roofingScopeStore`,
+`roofingVertexDragStore`, `roofingRotationDragStore`,
+`roofingAxisDragStore`.
 
-### 🤝 Shared (12)
+The last three are transient interaction sub-stores — each holds
+one drag session's anchors (vertex-edit, section-rotation,
+axis-rotation respectively). They mirror `roofingDragStore`'s idle/
+active lifecycle but are dedicated to their specific interaction
+surfaces.
 
-`appModeStore`, `customerStore`, `pricingStore`, `contractorProfileStore`,
-`backdropStore`, `measureStore`, `featureFlagStore`, `onboardingStore`,
-`proposalRevisionStore`, `radialMenuStore`, `wallStore`, `floorStore`
-*(shared infrastructure — primarily written by plumbing workflows, read
-by `backdropStore` which is itself shared; roofing bypasses floor
-assignment for its geometry — see §4.6)*.
+### 🤝 Shared (14)
 
-### ❓ Needs investigation (5)
+`appModeStore`, `customerStore`, `pricingStore`,
+`contractorProfileStore`, `backdropStore`, `measureStore`,
+`featureFlagStore`, `onboardingStore`, `proposalRevisionStore`,
+`radialMenuStore`, `wallStore`, `floorStore`, `drawFeedbackStore`,
+`renderModeStore`.
 
-For each, answer: (a) does any file outside the plumbing domain import it
-today? (b) is there a plausible roofing feature in the next 6 months that
-would? Both no → rename to plumbing-prefixed. Either yes → keep shared
-and audit types for plumbing-specific leaks.
+- `floorStore` is shared infrastructure — primarily written by
+  plumbing workflows, read by `backdropStore` which is itself
+  shared; roofing bypasses floor assignment for its geometry —
+  see §4.6.
+- `drawFeedbackStore` stays shared by design. Its `SnapKind`
+  (`'grid' | 'endpoint' | 'body' | 'fixture' | 'manifold-port'`)
+  and `NextAction` unions are plumbing-biased today and should be
+  widened (not split) when roofing cursor-feedback integration
+  lands.
+- `renderModeStore` is shared: the Sims-style walls-up /
+  walls-down / cutaway cycle applies in every workspace, since
+  walls themselves are shared infrastructure (see `wallStore`
+  + §4.6).
 
-- `assemblyTemplateStore` — plumbing today; could host roofing templates?
-- `clipboardStore` — copy/paste roof sections ever?
-- `drawFeedbackStore` — leaning shared; `SnapKind` enum may be
-  plumbing-biased.
-- `multiSelectStore` — leaning shared; generalize payload to
-  `{ domain, ids[] }`.
-- `renderModeStore` — leaning shared that no-ops in roofing.
-
-**Five-minute resolution**: open each file, scan the exported types. If
-every type name mentions pipes / fixtures / manifolds / DFU / WSFU, it's
-plumbing masquerading as shared — rename it.
+Leaves **no ❓ category** — Phase 7 resolved all five audit
+candidates. `pipeStore` and `roofStore` stay unchanged by design
+— the domain is already in the name (§7 explicitly excludes them).
 
 ---
 
@@ -399,7 +406,12 @@ in the name.
   **Shared** (see §3, §4.6).
 - [x] `FloorResolver` scope — plumbing-only, or defined for roofing?
   **Plumbing-only** (see §4.6).
-- [ ] Resolution for each of the six ❓ ambiguous stores. (§3)
+- [x] Resolution for each of the five ❓ ambiguous stores (§3) —
+  **Phase 7 (2026-04-23)**. Three renamed to plumbing-prefixed
+  (`assemblyTemplateStore` → `plumbingAssemblyTemplateStore`,
+  `clipboardStore` → `plumbingClipboardStore`,
+  `multiSelectStore` → `plumbingMultiSelectStore`). Two kept
+  shared (`drawFeedbackStore`, `renderModeStore`).
 - [ ] Move `engine/` plumbing solver into `engine/plumbing/`? (§5)
 - [ ] Regroup `src/ui/` plumbing folders under `src/ui/plumbing/`? (§5)
 - [ ] Root-level UI components: branch-by-mode or split? (§6)
