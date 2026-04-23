@@ -3,7 +3,7 @@
  *
  * Scene-level invisible ground-plane catcher that captures the two
  * calibration clicks for the PDF underlay. Runs only when
- * `useRoofingPdfCalibStore.mode` is `calibrate-1` or `calibrate-2`,
+ * `useRoofingCalibrationStore.mode` is `calibrate-1` or `calibrate-2`,
  * so drawing a roof section and calibrating never conflict — only
  * one interaction catcher is live at a time.
  *
@@ -28,9 +28,9 @@ import { useEffect } from 'react';
 import * as THREE from 'three';
 import { useThree, type ThreeEvent } from '@react-three/fiber';
 import {
-  useRoofingPdfCalibStore,
+  useRoofingCalibrationStore,
   type GroundPoint,
-} from '@store/roofingPdfCalibStore';
+} from '@store/roofingCalibrationStore';
 
 function pointerToGround(e: ThreeEvent<PointerEvent>): GroundPoint {
   const p = e.point as THREE.Vector3;
@@ -38,10 +38,10 @@ function pointerToGround(e: ThreeEvent<PointerEvent>): GroundPoint {
 }
 
 export function PDFCalibrationInteraction() {
-  const mode = useRoofingPdfCalibStore((s) => s.mode);
-  const setFirst = useRoofingPdfCalibStore((s) => s.setFirstPoint);
-  const setSecond = useRoofingPdfCalibStore((s) => s.setSecondPoint);
-  const reset = useRoofingPdfCalibStore((s) => s.reset);
+  const mode = useRoofingCalibrationStore((s) => s.mode);
+  const setFirst = useRoofingCalibrationStore((s) => s.setFirstPoint);
+  const setSecond = useRoofingCalibrationStore((s) => s.setSecondPoint);
+  const reset = useRoofingCalibrationStore((s) => s.reset);
 
   const gl = useThree((s) => s.gl);
 
@@ -61,7 +61,7 @@ export function PDFCalibrationInteraction() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
-      const st = useRoofingPdfCalibStore.getState();
+      const st = useRoofingCalibrationStore.getState();
       if (st.mode === 'idle') return;
       reset();
     };

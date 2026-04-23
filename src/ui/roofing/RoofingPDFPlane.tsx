@@ -25,7 +25,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { Line } from '@react-three/drei';
 import { useRoofStore } from '@store/roofStore';
-import { useRoofingPdfCalibStore } from '@store/roofingPdfCalibStore';
+import { useRoofingCalibrationStore } from '@store/roofingCalibrationStore';
 import { pdfPhysicalSize } from '@engine/roofing/RoofGraph';
 
 // ── Texture cache ───────────────────────────────────────────────
@@ -65,9 +65,9 @@ function useCachedTexture(dataUrl: string | undefined): THREE.Texture | null {
 
 export function RoofingPDFPlane() {
   const pdf = useRoofStore((s) => s.pdf);
-  const calibMode = useRoofingPdfCalibStore((s) => s.mode);
-  const p1 = useRoofingPdfCalibStore((s) => s.firstPoint);
-  const p2 = useRoofingPdfCalibStore((s) => s.secondPoint);
+  const calibMode = useRoofingCalibrationStore((s) => s.mode);
+  const p1 = useRoofingCalibrationStore((s) => s.firstPoint);
+  const p2 = useRoofingCalibrationStore((s) => s.secondPoint);
 
   const size = useMemo(() => pdfPhysicalSize(pdf), [pdf.widthPx, pdf.heightPx, pdf.scale]);
   const texture = useCachedTexture(pdf.imageDataUrl);

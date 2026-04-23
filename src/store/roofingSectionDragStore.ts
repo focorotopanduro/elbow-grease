@@ -3,7 +3,7 @@
  *
  * Transient drag-session state for the "drag-to-move section" tool
  * in the roofing workspace. Mirrors the lifecycle shape of
- * `roofingDrawStore` + `roofingPdfCalibStore` — idle by default,
+ * `roofingDrawStore` + `roofingCalibrationStore` — idle by default,
  * flips active only while a pointer is down on a section mesh.
  *
  * The store ONLY holds anchors (starting pointer + starting section

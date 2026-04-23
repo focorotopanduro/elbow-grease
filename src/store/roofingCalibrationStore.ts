@@ -1,7 +1,12 @@
 /**
- * roofingPdfCalibStore — Phase 14.R.5.
+ * roofingCalibrationStore — Phase 14.R.5.
  *
- * Transient calibration state for the PDF blueprint underlay. Not
+ * Renamed from `roofingPdfCalibStore` in Phase 6a of the
+ * hybrid-architecture refactor (ARCHITECTURE.md §7.7): "PDF" is
+ * an implementation detail; DXF or other underlay formats will
+ * calibrate through the same sequence.
+ *
+ * Transient calibration state for the blueprint underlay. Not
  * persisted — lives only for the duration of the calibrate click
  * sequence. Separate from `roofStore.pdf` (persisted transform +
  * image) so the user flipping in and out of calibrate mode doesn't
@@ -39,7 +44,7 @@ export interface PdfCalibState {
   reset: () => void;
 }
 
-export const useRoofingPdfCalibStore = create<PdfCalibState>((set) => ({
+export const useRoofingCalibrationStore = create<PdfCalibState>((set) => ({
   mode: 'idle',
   firstPoint: null,
   secondPoint: null,

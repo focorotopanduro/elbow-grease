@@ -46,7 +46,7 @@ import { useRoofStore } from '@store/roofStore';
 // a sibling ground-plane catcher.
 import { useRoofingSectionDragStore } from '@store/roofingSectionDragStore';
 import { useRoofingDrawStore } from '@store/roofingDrawStore';
-import { useRoofingPdfCalibStore } from '@store/roofingPdfCalibStore';
+import { useRoofingCalibrationStore } from '@store/roofingCalibrationStore';
 
 // ── Palettes ────────────────────────────────────────────────────
 
@@ -223,7 +223,7 @@ export function RoofSection3D({ section, onClick }: RoofSection3DProps) {
   // when the pointer comes back up without any movement because R3F
   // only emits onClick on clean clicks.
   const drawMode = useRoofingDrawStore((s) => s.mode);
-  const calibMode = useRoofingPdfCalibStore((s) => s.mode);
+  const calibMode = useRoofingCalibrationStore((s) => s.mode);
   const beginDrag = useRoofingSectionDragStore((s) => s.beginDrag);
   const dragEnabled =
     !section.locked &&

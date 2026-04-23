@@ -17,7 +17,7 @@
  *   2. PDF underlay image data round-trips when included; is
  *      correctly dropped when autosave passes `omitPdfImageData`.
  *
- *   3. Transient-by-design stores (`roofingPdfCalibStore`,
+ *   3. Transient-by-design stores (`roofingCalibrationStore`,
  *      `roofingSectionDragStore`) are NOT serialized. The
  *      calibration DRAFT sequence and mid-drag anchors are
  *      deliberately out of scope; their persistent output
@@ -43,7 +43,7 @@ import {
   useRoofingProjectStore,
   __testables as projectTestables,
 } from '@store/roofingProjectStore';
-import { useRoofingPdfCalibStore } from '@store/roofingPdfCalibStore';
+import { useRoofingCalibrationStore } from '@store/roofingCalibrationStore';
 import { useRoofingSectionDragStore } from '@store/roofingSectionDragStore';
 import {
   useRoofingEstimateScopeStore,
@@ -81,7 +81,7 @@ function resetAll() {
 
   useRoofingProjectStore.getState().set({ ...projectTestables.DEFAULTS });
 
-  useRoofingPdfCalibStore.setState({
+  useRoofingCalibrationStore.setState({
     mode: 'idle',
     firstPoint: null,
     secondPoint: null,
@@ -291,9 +291,9 @@ describe('roofing bundle roundtrip — transient stores are out of scope', () =>
   // final x/y after a drag) lives in `roofStore` — which is
   // tested above.
 
-  it('roofingPdfCalibStore draft state is NOT serialized by the bundle', () => {
+  it('roofingCalibrationStore draft state is NOT serialized by the bundle', () => {
     // Put the calibrate-sequence into a mid-flight state.
-    useRoofingPdfCalibStore.setState({
+    useRoofingCalibrationStore.setState({
       mode: 'calibrate-2',
       firstPoint: [5, 10],
       secondPoint: null,
@@ -311,9 +311,9 @@ describe('roofing bundle roundtrip — transient stores are out of scope', () =>
     // draft state remains whatever the local UI had. That's the
     // correct default: a file open shouldn't jump the user into
     // someone else's half-finished calibration.
-    const calibBefore = useRoofingPdfCalibStore.getState();
+    const calibBefore = useRoofingCalibrationStore.getState();
     applyBundle(bundle);
-    const calibAfter = useRoofingPdfCalibStore.getState();
+    const calibAfter = useRoofingCalibrationStore.getState();
     expect(calibAfter.mode).toBe(calibBefore.mode);
     expect(calibAfter.firstPoint).toEqual(calibBefore.firstPoint);
   });

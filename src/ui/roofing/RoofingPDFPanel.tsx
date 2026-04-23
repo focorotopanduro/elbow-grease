@@ -29,7 +29,7 @@
 
 import { useRef, useState } from 'react';
 import { useRoofStore } from '@store/roofStore';
-import { useRoofingPdfCalibStore } from '@store/roofingPdfCalibStore';
+import { useRoofingCalibrationStore } from '@store/roofingCalibrationStore';
 import { loadPdfRenderer } from '@core/lazy/loaders';
 import { pdfPhysicalSize } from '@engine/roofing/RoofGraph';
 // Phase 14.R.24 — multi-page PDF picker + raster image loader.
@@ -141,11 +141,11 @@ export function RoofingPDFPanel() {
   const setPdfLocked = useRoofStore((s) => s.setPdfLocked);
   const calibratePdfFromWorld = useRoofStore((s) => s.calibratePdfFromWorld);
 
-  const calibMode = useRoofingPdfCalibStore((s) => s.mode);
-  const beginCalibrate = useRoofingPdfCalibStore((s) => s.beginCalibrate);
-  const resetCalib = useRoofingPdfCalibStore((s) => s.reset);
-  const firstPt = useRoofingPdfCalibStore((s) => s.firstPoint);
-  const secondPt = useRoofingPdfCalibStore((s) => s.secondPoint);
+  const calibMode = useRoofingCalibrationStore((s) => s.mode);
+  const beginCalibrate = useRoofingCalibrationStore((s) => s.beginCalibrate);
+  const resetCalib = useRoofingCalibrationStore((s) => s.reset);
+  const firstPt = useRoofingCalibrationStore((s) => s.firstPoint);
+  const secondPt = useRoofingCalibrationStore((s) => s.secondPoint);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);

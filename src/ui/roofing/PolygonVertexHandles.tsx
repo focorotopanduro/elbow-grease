@@ -24,7 +24,7 @@ import * as THREE from 'three';
 import { type ThreeEvent } from '@react-three/fiber';
 import { useRoofStore } from '@store/roofStore';
 import { useRoofingDrawStore } from '@store/roofingDrawStore';
-import { useRoofingPdfCalibStore } from '@store/roofingPdfCalibStore';
+import { useRoofingCalibrationStore } from '@store/roofingCalibrationStore';
 import { useRoofingSectionDragStore } from '@store/roofingSectionDragStore';
 import {
   useRoofingVertexDragStore,
@@ -44,7 +44,7 @@ export function PolygonVertexHandles() {
     s.selectedSectionId ? (s.sections[s.selectedSectionId] ?? null) : null,
   );
   const drawMode = useRoofingDrawStore((s) => s.mode);
-  const calibMode = useRoofingPdfCalibStore((s) => s.mode);
+  const calibMode = useRoofingCalibrationStore((s) => s.mode);
   const sectionDragMode = useRoofingSectionDragStore((s) => s.mode);
   const vertexDragMode = useRoofingVertexDragStore((s) => s.mode);
   const vertexDragIdx = useRoofingVertexDragStore((s) => s.vertexIdx);
