@@ -334,3 +334,109 @@ describe('ModeTabs — prefers-reduced-motion', () => {
     expect(pill.style.transition).toContain('280ms');
   });
 });
+
+// ── Hover-glow affordance ────────────────────────────────────
+//
+// Hovering an INACTIVE tab paints a faint halo in that tab's
+// OWN accent color — a preview of the workspace the user is
+// about to land in. The active tab never picks up the hover
+// treatment (the pill already owns that area visually).
+
+describe('ModeTabs — hover-glow affordance', () => {
+  // jsdom normalises 8-digit hex-with-alpha (`#RRGGBBAA`) to
+  // `rgba(r, g, b, a.a)` when reading `.style.background`, and
+  // may leave box-shadow hex values as written. We match on the
+  // accent's RGB triplet so either representation passes.
+  const RGB = {
+    plumbing: '0,\\s*229,\\s*255',   // #00e5ff
+    roofing:  '255,\\s*152,\\s*0',   // #ff9800
+  };
+
+  it('hovering the inactive roofing tab from plumbing mode paints an ORANGE halo', () => {
+    useAppModeStore.setState({ mode: 'plumbing' });
+    const { container } = render(<ModeTabs />);
+    const roofing = container.querySelector('[data-mode-tab="roofing"]') as HTMLButtonElement;
+
+    fireEvent.mouseEnter(roofing);
+
+    // Background carries a low-alpha roofing-accent tint —
+    // jsdom reports the rgba form.
+    expect(roofing.style.background).toMatch(new RegExp(`rgba\\(${RGB.roofing}`));
+    // Box-shadow picks up an orange halo — accept hex OR rgba form.
+    const halo = roofing.style.boxShadow;
+    expect(
+      halo.includes(`${APP_MODE_ACCENTS.roofing}55`)
+      || new RegExp(`rgba\\(${RGB.roofing}`).test(halo),
+    ).toBe(true);
+  });
+
+  it('hovering the inactive plumbing tab from roofing mode paints a CYAN halo', () => {
+    useAppModeStore.setState({ mode: 'roofing' });
+    const { container } = render(<ModeTabs />);
+    const plumbing = container.querySelector('[data-mode-tab="plumbing"]') as HTMLButtonElement;
+
+    fireEvent.mouseEnter(plumbing);
+
+    expect(plumbing.style.background).toMatch(new RegExp(`rgba\\(${RGB.plumbing}`));
+    const halo = plumbing.style.boxShadow;
+    expect(
+      halo.includes(`${APP_MODE_ACCENTS.plumbing}55`)
+      || new RegExp(`rgba\\(${RGB.plumbing}`).test(halo),
+    ).toBe(true);
+  });
+
+  it('hovering the ACTIVE tab leaves it visually unchanged (the pill owns that space)', () => {
+    useAppModeStore.setState({ mode: 'plumbing' });
+    const { container } = render(<ModeTabs />);
+    const plumbing = container.querySelector('[data-mode-tab="plumbing"]') as HTMLButtonElement;
+
+    fireEvent.mouseEnter(plumbing);
+
+    // No hover glow on the active tab — background stays transparent,
+    // box-shadow stays 'none'.
+    expect(plumbing.style.background).toBe('transparent');
+    expect(plumbing.style.boxShadow).toBe('none');
+  });
+
+  it('mouse-leave clears the hover glow on the previously-hovered tab', () => {
+    useAppModeStore.setState({ mode: 'plumbing' });
+    const { container } = render(<ModeTabs />);
+    const roofing = container.querySelector('[data-mode-tab="roofing"]') as HTMLButtonElement;
+
+    fireEvent.mouseEnter(roofing);
+    expect(roofing.style.background).not.toBe('transparent');
+
+    fireEvent.mouseLeave(roofing);
+    expect(roofing.style.background).toBe('transparent');
+    expect(roofing.style.boxShadow).toBe('none');
+  });
+
+  it('focus + hover stack — both the white focus ring AND the accent glow render', () => {
+    useAppModeStore.setState({ mode: 'plumbing' });
+    const { container } = render(<ModeTabs />);
+    const roofing = container.querySelector('[data-mode-tab="roofing"]') as HTMLButtonElement;
+
+    fireEvent.focus(roofing);
+    fireEvent.mouseEnter(roofing);
+
+    const halo = roofing.style.boxShadow;
+    // White focus ring present (allow any inner/outer whitespace).
+    expect(halo).toMatch(/rgba\(\s*255\s*,\s*255\s*,\s*255\s*,\s*0\.7\s*\)/);
+    // Accent halo present — accept hex or rgba serialization.
+    expect(
+      halo.includes(`${APP_MODE_ACCENTS.roofing}55`)
+      || /rgba\(255,\s*152,\s*0/.test(halo),
+    ).toBe(true);
+  });
+
+  it('hover transition includes background + box-shadow (smooth fade-in)', () => {
+    installMatchMediaMock(false);
+    const { container } = render(<ModeTabs />);
+    const roofing = container.querySelector('[data-mode-tab="roofing"]') as HTMLButtonElement;
+
+    const transition = roofing.style.transition;
+    expect(transition).toContain('color 200ms');
+    expect(transition).toContain('background 200ms');
+    expect(transition).toContain('box-shadow 200ms');
+  });
+});

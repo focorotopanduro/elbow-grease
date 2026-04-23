@@ -86,7 +86,12 @@ export function ModeTabs() {
   const pillTransition = reducedMotion
     ? 'none'
     : 'transform 280ms cubic-bezier(0.4, 0, 0.2, 1), background 280ms ease, box-shadow 280ms ease';
-  const tabTextTransition = reducedMotion ? 'none' : 'color 200ms ease';
+  // Transition text colour AND the hover glow/background on the
+  // same 200ms curve. Keeps the affordance feeling like a single
+  // coordinated move rather than a staggered fade.
+  const tabTextTransition = reducedMotion
+    ? 'none'
+    : 'color 200ms ease, background 200ms ease, box-shadow 200ms ease';
   const containerGlowTransition = reducedMotion ? 'none' : 'box-shadow 280ms ease';
 
   /** Pointer / keyboard: move focus to `idx` and activate that
@@ -195,9 +200,21 @@ export function ModeTabs() {
           const hovered = hoveredIdx === idx;
           const focused = focusedIdx === idx;
           const color = active ? '#0a0a0f' : hovered ? '#ccc' : '#777';
-          const boxShadow = focused
-            ? '0 0 0 2px rgba(255,255,255,0.7)'
-            : 'none';
+
+          // Hover affordance on the INACTIVE tab: the tab picks up
+          // a faint halo in its OWN accent colour — a preview of
+          // the workspace the user is about to land in. When
+          // hovering the roofing tab from plumbing mode, the halo
+          // is orange (destination), not cyan (current). When
+          // active, no hover accent — the pill already owns that
+          // tab's visual space.
+          const hoverAccent = !active && hovered ? APP_MODE_ACCENTS[m] : null;
+          const tabBackground = hoverAccent ? `${hoverAccent}1A` : 'transparent';
+          const hoverShadow = hoverAccent ? `0 0 12px ${hoverAccent}55` : '';
+          const focusShadow = focused ? '0 0 0 2px rgba(255,255,255,0.7)' : '';
+          // Stack focus + hover if both apply — focused-and-hovered
+          // gets white focus ring AND accent glow.
+          const boxShadow = [focusShadow, hoverShadow].filter(Boolean).join(', ') || 'none';
           return (
             <button
               key={m}
@@ -223,7 +240,7 @@ export function ModeTabs() {
                 gap: 8,
                 width: TAB_WIDTH_PX,
                 height: TAB_HEIGHT_PX,
-                background: 'transparent',
+                background: tabBackground,
                 border: 'none',
                 borderRadius: 8,
                 fontSize: 14,
