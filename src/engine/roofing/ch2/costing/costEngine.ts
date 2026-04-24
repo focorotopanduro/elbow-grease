@@ -59,6 +59,10 @@ import type {
 } from '../types';
 import { compute_loads } from '../algorithms/loads';
 import { determine_sheathing_type } from '../algorithms/sheathingDecision';
+import {
+  apply_florida_bid_audit_flags,
+  apply_florida_sheathing_type_override,
+} from '../floridaOverrides';
 import { edge_support_required } from '../algorithms/edgeSupport';
 import { flag_frame_load_check_needed } from '../algorithms/frameLoad';
 import { nail_schedule_for_panel } from '../algorithms/fasteners';
@@ -216,7 +220,18 @@ export function price_sheathing_bid(
   if (stale_flag !== null) flags.push(stale_flag);
 
   // ─── ALG-001 sheathing type ──────────────────────────────
-  const sheathing_type = determine_sheathing_type(inputs, flags);
+  let sheathing_type = determine_sheathing_type(inputs, flags);
+
+  // ─── §9.4 pre-process — FL forced-solid override ────────
+  // Must run AFTER ALG-001 (which emits the
+  // `wind_rain_zone_solid_recommended` flag for wood + FL) but
+  // BEFORE panel selection (because the override affects which
+  // algorithms run next). Keeps FL logic in its own module.
+  sheathing_type = apply_florida_sheathing_type_override(
+    inputs,
+    sheathing_type,
+    flags,
+  );
 
   // ─── Non-plywood paths: flag + return partial ───────────
   const material_pref = inputs.sheathing_material_pref ?? 'plywood';
@@ -253,7 +268,7 @@ export function price_sheathing_bid(
       solid_zones: null,
     };
 
-    return {
+    return apply_florida_bid_audit_flags(inputs, {
       sheathing_spec: stub_spec,
       materials: [],
       labor: [],
@@ -264,7 +279,7 @@ export function price_sheathing_bid(
       staging_instruction: build_staging_instruction(inputs, flags),
       rate_set_version: rate_set.version,
       priced_on: today_iso(),
-    };
+    });
   }
 
   // ─── SOLID + plywood canonical path ─────────────────────
@@ -338,7 +353,7 @@ export function price_sheathing_bid(
     adders.reduce((s, l) => s + l.extended_usd, 0);
   const total_usd = subtotal_usd * (1 + rate_set.tax_rate);
 
-  return {
+  return apply_florida_bid_audit_flags(inputs, {
     sheathing_spec: spec,
     materials,
     labor,
@@ -349,7 +364,7 @@ export function price_sheathing_bid(
     staging_instruction: build_staging_instruction(inputs, flags),
     rate_set_version: rate_set.version,
     priced_on: today_iso(),
-  };
+  });
 }
 
 /**

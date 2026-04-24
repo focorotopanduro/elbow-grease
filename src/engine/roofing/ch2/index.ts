@@ -73,6 +73,14 @@ export { validate_job_inputs } from './validation';
 export { material_cost_line } from './costing/materialCost';
 export { labor_cost_line } from './costing/laborCost';
 export { price_sheathing_bid } from './costing/costEngine';
+
+// FL overrides (§9.4)
+export {
+  apply_florida_bid_audit_flags,
+  apply_florida_sheathing_type_override,
+  is_fl_job,
+  is_hvhz_job,
+} from './floridaOverrides';
 export {
   compute_effective_live_load_psf,
   compute_loads,

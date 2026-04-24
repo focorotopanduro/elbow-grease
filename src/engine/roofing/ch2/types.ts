@@ -90,6 +90,29 @@ export type BoardEdgeProfile = typeof BOARD_EDGE_PROFILES[number];
 export const CLIMATE_HUMIDITIES = ['low', 'normal', 'high'] as const;
 export type ClimateHumidity = typeof CLIMATE_HUMIDITIES[number];
 
+/**
+ * Jurisdiction tag — drives the `floridaOverrides` module (§9.4).
+ *
+ *   `fl_hvhz`     — Florida High-Velocity Hurricane Zone (currently
+ *                   Miami-Dade + Broward counties). HVHZ triggers
+ *                   the `hvhz_fastener_schedule_verify` flag per
+ *                   spec §9.4 point 4.
+ *   `fl_non_hvhz` — Rest of Florida; FL wind-rain + humidity
+ *                   overrides apply but not the HVHZ rider flag.
+ *   `other`       — Everywhere else. No FL overrides.
+ *
+ * Optional field on `Climate`; undefined treated as `'other'`.
+ * `wind_driven_rain_zone: true` still triggers FL-style behaviour
+ * as a proxy when the jurisdiction field is unset (back-compat
+ * for callers that predate this field).
+ */
+export const JURISDICTIONS = [
+  'fl_hvhz',
+  'fl_non_hvhz',
+  'other',
+] as const;
+export type Jurisdiction = typeof JURISDICTIONS[number];
+
 // ── Roof shape / frame ─────────────────────────────────────────
 
 export const ROOF_SHAPES = ['gable', 'hip', 'shed', 'complex'] as const;
@@ -130,6 +153,11 @@ export interface Climate {
   readonly ice_risk_at_eaves: boolean;
   readonly wind_driven_rain_zone: boolean;
   readonly seismic_zone: boolean;
+  /** Optional jurisdiction tag — drives the FL overrides module
+   *  (§9.4). When set, takes priority over `wind_driven_rain_zone`
+   *  for FL-detection logic. When undefined, FL detection falls
+   *  back to `wind_driven_rain_zone === true`. */
+  readonly jurisdiction?: Jurisdiction;
 }
 
 export interface Frame {
