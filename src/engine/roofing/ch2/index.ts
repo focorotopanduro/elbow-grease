@@ -44,6 +44,11 @@ export {
   staple_schedule_for_panel,
 } from './algorithms/fasteners';
 export {
+  panel_expansion_gaps,
+  validate_gaps_match_humidity,
+} from './algorithms/expansionGaps';
+export { solid_zones_for_spaced_roof } from './algorithms/solidZones';
+export {
   compute_effective_live_load_psf,
   compute_loads,
   compute_total_dead_load_psf,

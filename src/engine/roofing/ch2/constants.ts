@@ -117,6 +117,11 @@ export const SHAKE_SPACING_MAX_IN = 2.5;
 /** Eave solid zone extends 12–24 in past the interior wall face. */
 export const EAVE_SOLID_MIN_IN       = 12;
 export const EAVE_SOLID_MAX_IN       = 24;
+/** Default eave solid zone width — midpoint of the 12–24 range,
+ *  chosen because it balances cold-climate ice-dam performance
+ *  against material cost. Callers can override within [12, 24]
+ *  when a particular jurisdiction or insurer prefers otherwise. */
+export const EAVE_SOLID_DEFAULT_IN   = 18;
 /** Low-slope eave solid zone widens to 36 in. Slope < 4:12. */
 export const EAVE_SOLID_LOW_SLOPE_IN = 36;
 /** Solid sheathing band each side of the ridge. Author rec. */
