@@ -56,6 +56,15 @@ export {
 } from './algorithms/tileStaging';
 export { flag_frame_load_check_needed } from './algorithms/frameLoad';
 export { check_attic_ventilation } from './algorithms/ventilation';
+
+// RateSet loader + seed (§9)
+export {
+  RATE_SET_STALENESS_DAYS,
+  TEST_RATE_SET_FL_2026_Q2_V1,
+  check_rate_set_staleness,
+  load_rate_set,
+  validate_rate_set,
+} from './rateSet';
 export {
   compute_effective_live_load_psf,
   compute_loads,
