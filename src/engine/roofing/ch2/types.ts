@@ -188,6 +188,16 @@ export interface PanelSpec {
   readonly span_rating: string | null;
   /** Grade string e.g. "C-D Ext Glue". Null for boards. */
   readonly grade: string | null;
+  /** Max rafter spacing this panel can span WITHOUT aftermarket
+   *  edge support (T&G, clips, or blocking). Populated for APA
+   *  panels selected via ALG-003. Undefined for boards and for
+   *  custom panels whose row isn't in Table 21. ALG-007 uses
+   *  this to decide whether edge support is required. */
+  readonly max_span_without_edge_support_in?: number;
+  /** True if the panel ships with tongue-and-groove edges —
+   *  edge support is then built-in and aftermarket clips /
+   *  blocking aren't needed. Defaults to false (undefined). */
+  readonly has_tongue_and_groove_edges?: boolean;
 }
 
 export interface FastenerSpec {
@@ -266,6 +276,42 @@ export interface BidOutput {
   /** ISO-8601 date string (YYYY-MM-DD). TypeScript doesn't have
    *  a native `date` type, so we stringify at the source. */
   readonly priced_on: string;
+}
+
+// ── Edge-support determination (ALG-007) ───────────────────────
+
+/**
+ * Compact machine-readable reasons for the edge-support decision
+ * returned by `edge_support_required` (ALG-007). Lets the UI group
+ * panels by "why" when presenting cost lines.
+ */
+export const EDGE_SUPPORT_REASONS = [
+  'panel_tongue_and_groove',     // panel has T&G edges; no aftermarket
+  'within_max_wo_edge',          // spacing fits within max without edge support
+  'spacing_exceeds_wo_edge',     // spacing > max_wo — clips required (default 1)
+  'built_up_48in_double_clips',  // §2D Tbl 22 footnote a — BUILT_UP @ 48" needs 2
+] as const;
+export type EdgeSupportReason = typeof EDGE_SUPPORT_REASONS[number];
+
+/**
+ * Full result of `edge_support_required`.
+ *
+ * Wider than the spec's `Optional[EdgeSupportMethod]` return
+ * because the "2 clips per span" rule (§2D Table 22 footnote a for
+ * BUILT_UP at 48" spacing) is a quantity, not a different method.
+ * Rolling it into the return keeps the cost engine's fastener-line
+ * builder from having to re-derive the doubling.
+ */
+export interface EdgeSupportRequirement {
+  /** `null` iff edge support is NOT required (T&G panel, or
+   *  rafter spacing ≤ max without edge support). */
+  readonly method: EdgeSupportMethod | null;
+  /** How many clips / blocks per span. 0 when method is null or
+   *  `'tongue_and_groove'`, 1 default for aftermarket, 2 for the
+   *  BUILT_UP @ 48" doubled-clip rule. */
+  readonly clips_per_span: number;
+  /** Decision path. See `EdgeSupportReason` doc. */
+  readonly reason: EdgeSupportReason;
 }
 
 // ── Spaced-sheathing layout (ALG-005) ──────────────────────────

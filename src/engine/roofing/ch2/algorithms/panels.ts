@@ -191,12 +191,19 @@ export function select_apa_panel(
       continue;
     }
 
-    // First qualifying row wins.
+    // First qualifying row wins. Carry the row's max-without-
+    // edge-support value through so ALG-007 can decide clips vs
+    // bare installation without re-walking Table 21.
     return {
       material: 'plywood',
       thickness_in: row.min_thick_in,
       span_rating: row.span_rating,
       grade: 'C-D Ext Glue',
+      max_span_without_edge_support_in: row.max_wo_edge_support_in,
+      // `has_tongue_and_groove_edges` left undefined — APA panels
+      // selected by row have square-edged defaults. T&G is an
+      // upcharge SKU. Callers who know they're installing T&G
+      // plywood can override this field downstream.
     };
   }
 

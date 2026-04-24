@@ -35,6 +35,15 @@ export { determine_sheathing_type } from './algorithms/sheathingDecision';
 export { nails_per_rafter_for_board } from './algorithms/board';
 export { spaced_sheathing_layout } from './algorithms/spaced';
 export {
+  LOW_SLOPE_WOOD_BUILD_UP_STACK,
+  low_slope_wood_layer_stack,
+} from './algorithms/lowSlope';
+export { edge_support_required } from './algorithms/edgeSupport';
+export {
+  nail_schedule_for_panel,
+  staple_schedule_for_panel,
+} from './algorithms/fasteners';
+export {
   compute_effective_live_load_psf,
   compute_loads,
   compute_total_dead_load_psf,
