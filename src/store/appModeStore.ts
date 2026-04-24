@@ -92,20 +92,21 @@ export const APP_MODE_ACCENTS: Record<AppMode, string> = {
  *
  * Plumbing mode uses cyan (matches `APP_MODE_ACCENTS.plumbing`) —
  * shared chrome is indistinguishable from primary chrome, by design.
- * Roofing mode uses AMBER instead of orange so the eye reads a
- * hierarchy:
- *   ORANGE = roofing-specific (toolbar, inspector, stripe)
- *   AMBER  = meta-panels (camera, floors, view mode) visible in
- *            roofing mode but not carrying roofing domain meaning.
  *
- * Amber (#ffd54f, Material Design amber 300) is warm — pairs
- * visually with the roofing orange — but distinct enough that a
- * glance at the amber panel immediately registers "utility chrome"
- * rather than "another roofing tool".
+ * Roofing mode uses a deeper GOLD (`#ffc107`, Material amber 500)
+ * so the eye reads a hierarchy:
+ *   ORANGE (#ff9800) = roofing-specific chrome
+ *   GOLD   (#ffc107) = shared chrome in roofing mode
+ *
+ * Why #ffc107 and not #ffd54f (a lighter amber): #ffd54f has a blue
+ * component of 79/255 which reads as "canary yellow" / pastel on
+ * dark backgrounds. Dropping blue to 7/255 (#ffc107) produces a
+ * richer, "gold bar" hue — distinct from orange without looking
+ * washed out. Still passes WCAG AAA against #0a0a0f.
  */
 export const SHARED_CHROME_ACCENTS: Record<AppMode, string> = {
   plumbing: '#00e5ff', // cyan — same as primary (plumbing is monochrome)
-  roofing: '#ffd54f',  // amber — distinct from the orange primary
+  roofing: '#ffc107',  // gold — distinct from the orange primary
 };
 
 export const __testables = {

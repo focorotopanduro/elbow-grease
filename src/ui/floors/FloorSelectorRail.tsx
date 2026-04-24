@@ -157,7 +157,12 @@ export function FloorSelectorRail() {
             }}
             title={`${floor.name} (${floor.elevationBase}' to ${floor.elevationTop}')${isActive ? ' — ACTIVE' : ''}${isHidden ? ' — HIDDEN' : ''}\nShift+Click to solo`}
           >
-            {/* Color accent bar */}
+            {/* Color accent bar — per-floor identity marker stays
+                per-floor (each floor keeps its own colour strip on
+                the left edge). The GLOW around the bar when active,
+                however, uses `selectionAccent` so in roofing mode
+                the bar's halo reads gold, not a leaking per-floor
+                cyan/blue. */}
             <div
               style={{
                 position: 'absolute',
@@ -167,7 +172,7 @@ export function FloorSelectorRail() {
                 width: 3,
                 background: floor.color,
                 borderRadius: 2,
-                boxShadow: isActive ? `0 0 8px ${floor.color}` : 'none',
+                boxShadow: isActive ? `0 0 8px ${selectionAccent}` : 'none',
               }}
             />
 

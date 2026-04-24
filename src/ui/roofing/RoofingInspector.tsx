@@ -423,10 +423,10 @@ function RoofingInspectorCollapsedChip({ onExpand }: { onExpand: () => void }) {
         e.currentTarget.style.transform = 'scale(1)';
         e.currentTarget.style.boxShadow = `0 2px 14px rgba(0,0,0,0.5), 0 0 12px ${APP_MODE_ACCENTS.roofing}33`;
       }}
-      title="Expand the roofing estimator panel"
+      title="Expand the roofing inspector panel"
     >
       <span style={{ fontSize: 14 }}>🏠</span>
-      <span>Roofing Estimator</span>
+      <span>Roofing Inspector</span>
       <span style={{ fontSize: 10, opacity: 0.7 }}>▲</span>
     </button>
   );
