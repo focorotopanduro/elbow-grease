@@ -49,6 +49,12 @@ export {
 } from './algorithms/expansionGaps';
 export { solid_zones_for_spaced_roof } from './algorithms/solidZones';
 export {
+  GABLE_TILE_GENERAL_RULES,
+  HIP_TILE_GENERAL_RULES,
+  gable_tile_loading_pattern,
+  hip_tile_loading_pattern,
+} from './algorithms/tileStaging';
+export {
   compute_effective_live_load_psf,
   compute_loads,
   compute_total_dead_load_psf,

@@ -278,6 +278,42 @@ export interface BidOutput {
   readonly priced_on: string;
 }
 
+// ── Tile staging (ALG-014 / ALG-015) ───────────────────────────
+
+/**
+ * One tile-stack location on a course of the roof. Written to the
+ * work-order so the crew knows where to pre-stage pallets before
+ * the installer starts setting tile.
+ *
+ * `course`: 1-indexed from the eave up. Course `slope_courses` is
+ *           the ridge. Other courses without staging instructions
+ *           are absent from the output list (not zero-sized entries).
+ * `stack_size`: number of tiles per stack at this course — 4 for
+ *           ridge stacks, 8 for every-4th-course stacks per §2M.
+ * `horizontal_gap_ft`: spacing between adjacent stacks along the
+ *           course. Constant 1 ft per §2M for typical residential.
+ */
+export interface TileStackEntry {
+  readonly course: number;
+  readonly stack_size: number;
+  readonly horizontal_gap_ft: number;
+}
+
+/**
+ * Composite staging instruction returned by the tile-loading
+ * algorithms. `stacks` is the machine-readable pattern for a work-
+ * order renderer; `general_rules` is human-readable prose the cost
+ * engine can concatenate into `BidOutput.staging_instruction`.
+ *
+ * Gable (ALG-014) returns a populated `stacks` array; hip
+ * (ALG-015) returns an empty `stacks` array + a `hip_tile_loading_review_needed`
+ * flag until course-length-scaled SKU data is available.
+ */
+export interface TileLoadingPattern {
+  readonly stacks: readonly TileStackEntry[];
+  readonly general_rules: readonly string[];
+}
+
 // ── Edge-support determination (ALG-007) ───────────────────────
 
 /**
