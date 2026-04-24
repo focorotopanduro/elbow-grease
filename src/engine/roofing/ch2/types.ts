@@ -268,6 +268,69 @@ export interface BidOutput {
   readonly priced_on: string;
 }
 
+// ── Spaced-sheathing layout (ALG-005) ──────────────────────────
+
+/**
+ * Method label for wood-shingle spaced-sheathing layouts.
+ *
+ * Per §2I + spec §6 ALG-005:
+ *   - `1x4_one_per_course`: 1×4 boards, one shingle course per
+ *     board, center spacing = weather exposure.
+ *   - `1x6_two_per_course`: 1×6 boards, two shingle courses per
+ *     board when exposure ≤ 5.5"; degrades to one-per-course
+ *     (center spacing = exposure) when exposure > 5.5".
+ *
+ * Wood shakes always use 1×6 with one-per-course; there's no
+ * method choice — hence no shake-specific method label here.
+ */
+export const SHINGLE_SPACING_METHODS = [
+  '1x4_one_per_course',
+  '1x6_two_per_course',
+] as const;
+export type ShingleSpacingMethod = typeof SHINGLE_SPACING_METHODS[number];
+
+/**
+ * Discriminated-union result of `spaced_sheathing_layout`.
+ *
+ * Why a discriminated union (vs a single interface with a
+ * nullable field): the two layout modes carry semantically
+ * different data. `single_per_course` has an explicit center-to-
+ * center board spacing; `two_per_course` doesn't — the board
+ * positions are derived from the shingle exposure pattern. A
+ * single interface would force callers to branch on an `if`
+ * anyway, but make the safety lossy (forgetting the branch
+ * silently reads the wrong field). The union makes the branch
+ * mandatory at the type level.
+ *
+ * Consumers discriminate on `kind`:
+ *
+ *     switch (layout.kind) {
+ *       case 'single_per_course':
+ *         // use layout.center_spacing_in
+ *         break;
+ *       case 'two_per_course':
+ *         // use layout.exposure_in; spacing is implicit
+ *         break;
+ *     }
+ */
+export type SpacedBoardLayout =
+  | {
+      readonly kind: 'single_per_course';
+      readonly board_nominal_in: number;
+      /** Center-to-center spacing between boards.
+       *  Equal to the weather exposure for single-per-course layouts. */
+      readonly center_spacing_in: number;
+    }
+  | {
+      readonly kind: 'two_per_course';
+      readonly board_nominal_in: number;
+      /** Shingle weather exposure the layout was designed for.
+       *  Two courses fit within each 1×6 board — the explicit
+       *  board-to-board spacing is a function of exposure, not
+       *  stored separately. */
+      readonly exposure_in: number;
+    };
+
 // ── RateSet ────────────────────────────────────────────────────
 
 /**

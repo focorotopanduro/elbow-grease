@@ -32,6 +32,8 @@ export * from './errors';
 
 // Algorithms
 export { determine_sheathing_type } from './algorithms/sheathingDecision';
+export { nails_per_rafter_for_board } from './algorithms/board';
+export { spaced_sheathing_layout } from './algorithms/spaced';
 export {
   compute_effective_live_load_psf,
   compute_loads,
