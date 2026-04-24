@@ -54,6 +54,8 @@ export {
   gable_tile_loading_pattern,
   hip_tile_loading_pattern,
 } from './algorithms/tileStaging';
+export { flag_frame_load_check_needed } from './algorithms/frameLoad';
+export { check_attic_ventilation } from './algorithms/ventilation';
 export {
   compute_effective_live_load_psf,
   compute_loads,
