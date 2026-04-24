@@ -65,6 +65,14 @@ export {
   load_rate_set,
   validate_rate_set,
 } from './rateSet';
+
+// §7 validation gate
+export { validate_job_inputs } from './validation';
+
+// Cost engine (ALG-018/019/020)
+export { material_cost_line } from './costing/materialCost';
+export { labor_cost_line } from './costing/laborCost';
+export { price_sheathing_bid } from './costing/costEngine';
 export {
   compute_effective_live_load_psf,
   compute_loads,
