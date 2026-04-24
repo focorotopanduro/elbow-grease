@@ -69,11 +69,58 @@ describe('ALG-003 select_apa_panel — spec §6 edge cases', () => {
     ).toThrow(SheathingSpecViolation);
   });
 
-  // Row 9 — 19.2" truss spacing → round up to 24" bin
-  it('19.2" truss spacing → bumped up to 24" bin (conservative)', () => {
+  // Row 9 — 19.2" truss spacing → round up to 20" bin (next tabulated)
+  it('19.2" truss spacing → bumped up to 20" bin (conservative)', () => {
     const panel = select_apa_panel(19.2, 30, 'asphalt_shingle', true);
-    // At 24" bin with 30 psf, panel is 32/16 per Row 1
+    // At 20" bin with 30 psf, 24/0 and 24/16 are filtered by §2D
+    // floor. 32/16 is the first qualifier (rated 120 psf at 20").
     expect(panel.span_rating).toBe('32/16');
+  });
+
+  it('19.2" truss spacing with flags → appends `truss_spacing_rounded_up` info flag (20" bin, not 24")', () => {
+    // TABULATED_SPACINGS = [12, 16, 20, 24, 32, 40, 48, 60].
+    // 19.2 → first bin ≥ 19.2 is 20, NOT 24. The panel selected
+    // is still 32/16 because at 20" spacing + 30 psf the 32/16
+    // row qualifies after the §2D floor filter (24/0 and 24/16
+    // are skipped).
+    const flags: import('../types').WarningFlag[] = [];
+    select_apa_panel(19.2, 30, 'asphalt_shingle', true, { flags });
+    const flag = flags.find((f) => f.code === 'truss_spacing_rounded_up');
+    expect(flag).toBeDefined();
+    expect(flag?.severity).toBe('info');
+    expect(flag?.message).toContain('19.2');
+    expect(flag?.message).toContain('20');
+  });
+
+  it('tabulated 24" spacing → no truss flag even if flags array passed', () => {
+    const flags: import('../types').WarningFlag[] = [];
+    select_apa_panel(24, 30, 'asphalt_shingle', true, { flags });
+    expect(flags.some((f) => f.code === 'truss_spacing_rounded_up')).toBe(false);
+  });
+});
+
+describe('ALG-003 — allow_below_min_unsanded override', () => {
+  it('24" spacing, 30 psf, with edge-support, default → 32/16 (floor enforced)', () => {
+    const panel = select_apa_panel(24, 30, 'asphalt_shingle', true);
+    expect(panel.span_rating).toBe('32/16');
+  });
+
+  it('same inputs, allow_below_min_unsanded=true → 24/0 (floor bypassed)', () => {
+    const panel = select_apa_panel(24, 30, 'asphalt_shingle', true, {
+      allow_below_min_unsanded: true,
+    });
+    // 24/0 has live_loads[24]=30, max_w_edge=24 → first qualifier
+    expect(panel.span_rating).toBe('24/0');
+    expect(panel.thickness_in).toBeCloseTo(3 / 8, 5);
+  });
+
+  it('allow_below_min_unsanded still enforces load + spacing constraints', () => {
+    // Even with floor bypassed, 12/0 only supports 12" spacing.
+    // At 24" spacing + 30 psf, 12/0 fails max_span check.
+    const panel = select_apa_panel(24, 30, 'asphalt_shingle', true, {
+      allow_below_min_unsanded: true,
+    });
+    expect(panel.span_rating).not.toBe('12/0');
   });
 });
 

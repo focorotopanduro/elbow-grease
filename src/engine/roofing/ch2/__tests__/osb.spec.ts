@@ -7,7 +7,9 @@ import {
   osb_max_span_for_thickness,
   osb_meets_min_thickness,
   parse_fractional_thickness_in,
+  validate_osb_panel_spec,
   validate_osb_spec,
+  validate_waferboard_panel_spec,
 } from '../algorithms/osb';
 import { SheathingSpecViolation } from '../errors';
 import { OSB_MIN_THICKNESS_IN } from '../constants';
@@ -73,36 +75,85 @@ describe('ALG-013 osb_meets_min_thickness', () => {
   });
 });
 
-describe('ALG-013 validate_osb_spec (combined)', () => {
-  it('15/32 OSB at 24" spacing → throws (15/32 tabulated max is 24", but 15/32 is not in WAFERBOARD_MAX_SPAN_IN table)', () => {
-    // 15/32 isn't one of the three tabulated OSB sizes — the spec
-    // only tabulates 3/8, 7/16, 1/2. 15/32 ≈ 0.469 is closer to
-    // 7/16 but isn't a key. Expect the span lookup to fail.
-    expect(() => validate_osb_spec('15/32', 24)).toThrow(SheathingSpecViolation);
+describe('ALG-013 validate_osb_panel_spec (OSB strict)', () => {
+  it('1/2 OSB at 24" spacing → passes (meets 15/32 min + within span)', () => {
+    expect(() => validate_osb_panel_spec('1/2', 24)).not.toThrow();
   });
 
-  it('1/2 OSB at 24" spacing → passes (meets 15/32 min + within span)', () => {
-    expect(() => validate_osb_spec('1/2', 24)).not.toThrow();
+  it('1/2 OSB at 16" spacing → passes (well within span)', () => {
+    expect(() => validate_osb_panel_spec('1/2', 16)).not.toThrow();
   });
 
   it('7/16 OSB at any span → fails (below 15/32 min for OSB)', () => {
-    // 7/16 = 0.4375, OSB_MIN_THICKNESS_IN = 15/32 ≈ 0.469. The
-    // table `WAFERBOARD_MAX_SPAN_IN` allows 7/16 up to 24" for
-    // WAFERBOARD (different material), but for OSB the absolute
-    // minimum thickness wins.
-    expect(() => validate_osb_spec('7/16', 16)).toThrow(SheathingSpecViolation);
-  });
-
-  it('3/8 OSB (below 15/32 absolute min) → fails with min-thickness msg', () => {
-    // 3/8 = 0.375. Below 15/32 ≈ 0.469. The min-thickness
-    // check fires first, so the error is about thickness, not
-    // max span.
-    expect(() => validate_osb_spec('3/8', 16)).toThrow(SheathingSpecViolation);
+    expect(() => validate_osb_panel_spec('7/16', 16)).toThrow(SheathingSpecViolation);
     try {
-      validate_osb_spec('3/8', 16);
+      validate_osb_panel_spec('7/16', 16);
     } catch (e) {
       expect((e as Error).message).toContain('below');
-      expect((e as Error).message).toContain('minimum');
+      expect((e as Error).message).toContain('15/32');
     }
+  });
+
+  it('3/8 OSB → fails (min thickness); error fires BEFORE span check', () => {
+    expect(() => validate_osb_panel_spec('3/8', 16)).toThrow(SheathingSpecViolation);
+    try {
+      validate_osb_panel_spec('3/8', 16);
+    } catch (e) {
+      const msg = (e as Error).message;
+      expect(msg).toContain('below');
+      expect(msg).toContain('minimum');
+      // The msg should NOT mention span — min-thickness error fires first.
+      expect(msg).not.toContain('supports rafters');
+    }
+  });
+
+  it('15/32 OSB → fails span lookup (15/32 isn\'t in §2G table)', () => {
+    // 15/32 MEETS the min-thickness requirement (it IS the min)
+    // but 15/32 isn't one of the tabulated values in §2G (only
+    // 3/8, 7/16, 1/2). The min-thickness check passes; the span
+    // lookup then fails.
+    expect(() => validate_osb_panel_spec('15/32', 24)).toThrow(SheathingSpecViolation);
+    try {
+      validate_osb_panel_spec('15/32', 24);
+    } catch (e) {
+      expect((e as Error).message).toContain('not tabulated');
+    }
+  });
+});
+
+describe('ALG-013 validate_waferboard_panel_spec (waferboard, no min-thickness)', () => {
+  it('7/16 waferboard at 16" spacing → passes (below 15/32 is OK for waferboard)', () => {
+    expect(() => validate_waferboard_panel_spec('7/16', 16)).not.toThrow();
+  });
+
+  it('7/16 waferboard at 24" spacing → passes (at max)', () => {
+    expect(() => validate_waferboard_panel_spec('7/16', 24)).not.toThrow();
+  });
+
+  it('3/8 waferboard at 16" spacing → passes', () => {
+    expect(() => validate_waferboard_panel_spec('3/8', 16)).not.toThrow();
+  });
+
+  it('3/8 waferboard at 24" spacing → fails (3/8 max is 16")', () => {
+    expect(() => validate_waferboard_panel_spec('3/8', 24)).toThrow(SheathingSpecViolation);
+    try {
+      validate_waferboard_panel_spec('3/8', 24);
+    } catch (e) {
+      expect((e as Error).message).toContain('up to 16"');
+    }
+  });
+
+  it('1/2 waferboard at 24" spacing → passes', () => {
+    expect(() => validate_waferboard_panel_spec('1/2', 24)).not.toThrow();
+  });
+
+  it('unknown thickness → throws with valid-values list', () => {
+    expect(() => validate_waferboard_panel_spec('9/16', 16)).toThrow(SheathingSpecViolation);
+  });
+});
+
+describe('ALG-013 — validate_osb_spec back-compat alias', () => {
+  it('aliases `validate_osb_panel_spec` for legacy callers', () => {
+    expect(validate_osb_spec).toBe(validate_osb_panel_spec);
   });
 });

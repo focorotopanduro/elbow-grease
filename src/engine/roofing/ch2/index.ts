@@ -34,12 +34,18 @@ export * from './errors';
 export { determine_sheathing_type } from './algorithms/sheathingDecision';
 export {
   compute_effective_live_load_psf,
+  compute_loads,
   compute_total_dead_load_psf,
 } from './algorithms/loads';
-export { select_apa_panel } from './algorithms/panels';
+export {
+  select_apa_panel,
+  type SelectApaPanelOptions,
+} from './algorithms/panels';
 export {
   osb_max_span_for_thickness,
   osb_meets_min_thickness,
   parse_fractional_thickness_in,
-  validate_osb_spec,
+  validate_osb_panel_spec,
+  validate_osb_spec,                 // back-compat alias
+  validate_waferboard_panel_spec,
 } from './algorithms/osb';
