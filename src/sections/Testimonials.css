@@ -1,0 +1,325 @@
+.testimonials {
+  background:
+    var(--grad-black-marble),
+    var(--black);
+  color: var(--cream);
+  position: relative;
+  overflow: hidden;
+}
+
+.testimonials::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 900px;
+  height: 900px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(184, 145, 53, 0.11), transparent 65%);
+  pointer-events: none;
+  filter: blur(120px);
+  z-index: 0;
+}
+
+.testimonials > .container { position: relative; z-index: 2; }
+
+.testimonials__header {
+  text-align: center;
+  margin-bottom: var(--sp-8);
+  position: relative;
+}
+
+.testimonials__title {
+  font-size: clamp(var(--fs-3xl), 5vw, var(--fs-4xl));
+  margin-top: var(--sp-3);
+  color: var(--cream);
+}
+
+.testimonials__title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--orange);
+}
+
+/* Aggregate rating row — appears under the heading and shows the
+ * average + review count. Mirrors what AggregateRating schema declares,
+ * so the visible UI and Schema.org markup stay aligned (Google penalises
+ * "review-only" schema where the markup isn't reflected on the page). */
+.testimonials__aggregate {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+  padding: 6px 14px;
+  background:
+    var(--grad-glass-black),
+    rgba(15, 14, 16, 0.68);
+  border: 1px solid var(--marble-border);
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.testimonials__aggregate-stars {
+  display: inline-flex;
+}
+
+.testimonials__aggregate-text {
+  font-family: var(--font-condensed);
+  font-size: var(--fs-sm);
+  letter-spacing: 0.06em;
+  color: var(--cream);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.testimonials__aggregate-text strong {
+  color: var(--gold-light);
+  font-weight: 700;
+  font-size: 1.05em;
+  letter-spacing: 0.02em;
+}
+
+.testimonials__aggregate-text span {
+  color: var(--gray-light);
+  text-transform: uppercase;
+  font-size: 0.85em;
+  letter-spacing: 0.18em;
+}
+
+.testimonials__list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--sp-4);
+  position: relative;
+}
+
+.testimonial {
+  position: relative;
+  padding: var(--sp-5);
+  background:
+    var(--grad-marble-veins),
+    var(--grad-glass-black),
+    rgba(15, 14, 16, 0.62);
+  backdrop-filter: blur(22px) saturate(142%);
+  -webkit-backdrop-filter: blur(22px) saturate(142%);
+  border: 1px solid var(--marble-border);
+  border-radius: var(--radius-md);
+  transition: transform 0.5s var(--ease-back),
+              box-shadow 0.5s var(--ease),
+              background 0.4s var(--ease),
+              border-color 0.4s var(--ease);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  overflow: hidden;
+  box-shadow:
+    0 12px 38px rgba(0, 0, 0, 0.44),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.testimonial::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--gold-light), var(--gold), var(--gold-light), transparent);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.7s var(--ease);
+}
+
+.testimonial::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(244, 215, 122, 0.16) 50%,
+    transparent 70%
+  );
+  background-size: 250% 100%;
+  background-position: -150% 0;
+  pointer-events: none;
+  transition: background-position 0.9s var(--ease-quart);
+}
+
+.testimonial:hover::before { transform: scaleX(1); }
+.testimonial:hover::after { background-position: 200% 0; }
+
+.testimonial:hover {
+  background:
+    var(--grad-marble-veins),
+    linear-gradient(180deg, rgba(245, 239, 225, 0.07), rgba(245, 239, 225, 0.02)),
+    rgba(10, 11, 15, 0.8);
+  border-color: rgba(234, 208, 122, 0.32);
+  transform: translateY(-4px);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.55),
+    0 0 24px rgba(184, 145, 53, 0.12),
+    inset 0 1px 0 rgba(244, 215, 122, 0.25);
+}
+
+.testimonial__stars {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.testimonial__stars svg {
+  width: 16px;
+  height: 16px;
+  fill: var(--gold-light);
+  filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.5));
+}
+
+/* Partial / lower star ratings — when rating drops below 5 (future-proof
+ * for as more reviews come in), unfilled positions de-emphasize so the
+ * UI matches what the AggregateRating schema declares. */
+.testimonial__stars svg[data-filled='false'] {
+  fill: rgba(212, 175, 55, 0.22);
+  filter: none;
+}
+
+.testimonial__quote {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--cream);
+  flex-grow: 1;
+}
+
+.testimonial__quote::before {
+  content: '\201C';
+  margin-right: 2px;
+}
+
+.testimonial__quote::after {
+  content: '\201D';
+  margin-left: 2px;
+}
+
+.testimonial__attr {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: var(--sp-4);
+}
+
+.testimonial__avatar {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--grad-gold-brushed);
+  color: var(--black);
+  font-family: var(--font-condensed);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  flex: 0 0 auto;
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.45);
+  border: 1px solid rgba(244, 215, 122, 0.5);
+}
+
+.testimonial__who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.testimonial__author {
+  font-family: var(--font-condensed);
+  font-weight: 600;
+  font-size: var(--fs-base);
+  letter-spacing: 0.03em;
+  color: var(--cream);
+}
+
+.testimonial__role {
+  font-family: var(--font-condensed);
+  font-size: var(--fs-xs);
+  color: var(--gray-light);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+/* Photo-avatar variant — when the testimonial has a real customer photo
+   (Tier 1.5 addition). Replaces the brushed-gold initials disc. */
+.testimonial__avatar--photo {
+  background: rgba(212, 175, 55, 0.06);
+  object-fit: cover;
+  padding: 0;
+  border: 1px solid rgba(244, 215, 122, 0.5);
+  /* Override the gold-text fill on the initials variant so the image
+     renders without a coloured backdrop bleed. */
+  color: transparent;
+}
+
+/* Project-type tag — small chip at top of testimonial card showing
+   what kind of work the customer had done. Helps visitors quickly
+   match a testimonial to their own intent ("oh, this person had a
+   roof replacement, that's me"). */
+.testimonial__project-tag {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-family: var(--font-condensed);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: var(--radius-xs);
+  margin-bottom: var(--sp-2);
+}
+
+/* Verified-source pill — anchored under the author/role line. Color
+   varies by source for visual recognition (Google = blue-leaning gold,
+   Facebook = blue, BBB = navy). */
+.testimonial__verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 2px 8px;
+  font-family: var(--font-condensed);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border-radius: var(--radius-xs);
+  border: 1px solid currentColor;
+  width: fit-content;
+}
+
+.testimonial__verified--google {
+  color: #7eddaa;
+  background: rgba(46, 184, 92, 0.1);
+}
+
+.testimonial__verified--facebook {
+  color: #8db4ff;
+  background: rgba(60, 110, 220, 0.12);
+}
+
+.testimonial__verified--bbb {
+  color: var(--gold-light);
+  background: rgba(212, 175, 55, 0.12);
+}

@@ -1,0 +1,180 @@
+/**
+ * MobileStickyCta — fixed bottom-bar with two CTA buttons.
+ *
+ * Mobile-only (≤720px). Coordinates with FloatingCTA which displays
+ * on >720px — neither covers the same screen real estate.
+ */
+
+.msc {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 90;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+  gap: 8px;
+  background:
+    var(--grad-marble-veins),
+    var(--grad-glass-black),
+    rgba(5, 5, 7, 0.93);
+  backdrop-filter: blur(22px) saturate(142%);
+  -webkit-backdrop-filter: blur(22px) saturate(142%);
+  border-top: 1px solid var(--marble-border);
+  box-shadow:
+    0 -10px 30px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transform: translateY(110%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    transform 0.4s var(--ease),
+    opacity 0.24s var(--ease),
+    visibility 0s linear 0s;
+}
+
+@media (max-width: 720px) {
+  .msc {
+    display: flex;
+  }
+}
+
+.msc:not(.msc--hidden) {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Slide off-screen when Contact is in viewport */
+.msc--hidden {
+  transform: translateY(110%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+body[data-nav-open="true"] .msc {
+  transform: translateY(110%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    transform 0.4s var(--ease),
+    opacity 0.24s var(--ease),
+    visibility 0s linear 0.24s;
+}
+
+/* ─── Buttons ───────────────────────────────────────────────────────── */
+
+.msc__btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-family: var(--font-condensed);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  transition: transform 0.2s var(--ease-back),
+              background 0.25s var(--ease),
+              border-color 0.25s var(--ease);
+  min-width: 0;
+}
+
+.msc__btn:active {
+  transform: scale(0.97);
+}
+
+.msc__btn-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.msc__btn-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.msc__btn-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.05;
+  min-width: 0;
+}
+
+.msc__btn-eyebrow {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.msc__btn-text {
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-top: 2px;
+}
+
+/* Primary call button — gold solid */
+.msc__btn--call {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.25), transparent 22%, rgba(214, 209, 188, 0.15) 62%, transparent),
+    var(--grad-gold-micrograin),
+    var(--grad-gold-sheet);
+  color: #11100b;
+  border: 1px solid rgba(244, 236, 208, 0.5);
+  box-shadow:
+    0 10px 24px rgba(76, 55, 21, 0.36),
+    inset 0 1px 0 rgba(255, 255, 242, 0.6),
+    inset 0 -2px 0 rgba(50, 35, 11, 0.34);
+  text-shadow: 0 1px 0 rgba(244, 236, 208, 0.5);
+}
+
+.msc__btn--call:hover,
+.msc__btn--call:focus-visible {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.34), transparent 20%, rgba(244, 236, 208, 0.23) 62%, transparent),
+    var(--grad-gold-micrograin),
+    var(--grad-gold-foil);
+  outline: none;
+}
+
+/* Secondary quote button — cream-bordered */
+.msc__btn--quote {
+  background:
+    var(--grad-glass-black),
+    rgba(245, 239, 225, 0.045);
+  color: var(--cream);
+  border: 1px solid rgba(245, 239, 225, 0.35);
+}
+
+.msc__btn--quote:hover,
+.msc__btn--quote:focus-visible {
+  background: rgba(245, 239, 225, 0.12);
+  border-color: var(--cream);
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .msc {
+    transition: none;
+  }
+  .msc__btn {
+    transition: none;
+  }
+  .msc__btn:active {
+    transform: none;
+  }
+}

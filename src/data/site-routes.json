@@ -1,0 +1,93 @@
+{
+  "siteUrl": "https://www.beitbuilding.com",
+  "defaultOgImage": "/og-image.jpg",
+  "twitterHandle": "",
+  "siteName": "Beit Building Contractors",
+  "locale": "en_US",
+  "routes": [
+    {
+      "path": "/",
+      "title": "Beit Building Contractors | Roofing & Construction Orlando, FL",
+      "description": "Beit Building Contractors LLC provides roofing and construction services in Orlando and Central Florida. Roof replacement, repairs, storm damage, decks, painting & more. DBPR licensed, free estimates.",
+      "ogImage": "/og-image.jpg",
+      "ogType": "website",
+      "priority": 1.0,
+      "changefreq": "monthly",
+      "status": "live"
+    },
+    {
+      "path": "/privacy.html",
+      "title": "Privacy Policy | Beit Building Contractors",
+      "description": "How Beit Building Contractors LLC collects, uses, and protects your information.",
+      "ogType": "website",
+      "priority": 0.3,
+      "changefreq": "yearly",
+      "status": "live"
+    },
+    {
+      "path": "/terms.html",
+      "title": "Terms of Service | Beit Building Contractors",
+      "description": "Terms governing use of beitbuilding.com and the services it offers.",
+      "ogType": "website",
+      "priority": 0.3,
+      "changefreq": "yearly",
+      "status": "live"
+    },
+    {
+      "path": "/accessibility.html",
+      "title": "Accessibility Statement | Beit Building Contractors",
+      "description": "Beit Building Contractors LLC's commitment to digital accessibility.",
+      "ogType": "website",
+      "priority": 0.3,
+      "changefreq": "yearly",
+      "status": "live"
+    },
+    {
+      "path": "/orlando-roofing",
+      "title": "Roofing Services in Orlando, FL | Beit Building Contractors",
+      "description": "Local Orlando roofing specialists. Tile, shingle, and metal roof replacement, storm damage, and repair. Free inspections, Florida DBPR licensed.",
+      "ogType": "website",
+      "priority": 0.9,
+      "changefreq": "monthly",
+      "status": "live"
+    },
+    {
+      "path": "/winter-park-roofing",
+      "title": "Roofing Services in Winter Park, FL | Beit Building Contractors",
+      "description": "Premium roofing for Winter Park's historic homes. Slate, cedar, tile, and shingle. Local crew, free estimates.",
+      "ogType": "website",
+      "priority": 0.9,
+      "changefreq": "monthly",
+      "status": "live"
+    },
+    {
+      "path": "/oviedo-roofing",
+      "title": "Roofing Services in Oviedo, FL | Beit Building Contractors",
+      "description": "Roofing contractor serving Oviedo and Seminole County. Florida DBPR licensed with free estimates.",
+      "ogType": "website",
+      "priority": 0.9,
+      "changefreq": "monthly",
+      "status": "live"
+    },
+    {
+      "path": "/oviedo-storm-damage",
+      "title": "Storm Damage Roof Repair in Oviedo, FL | Beit Building Contractors",
+      "description": "Storm damage roof repair support in Oviedo with insurance-aware documentation, mitigation planning, and clear next steps.",
+      "ogType": "website",
+      "priority": 0.9,
+      "changefreq": "monthly",
+      "status": "live"
+    },
+    {
+      "path": "/blog",
+      "title": "Roofing & Construction Insights | Beit Building Blog",
+      "description": "Practical guides on roofing, hurricane prep, insurance claims, and construction in Central Florida.",
+      "ogType": "website",
+      "priority": 0.7,
+      "changefreq": "weekly",
+      "status": "draft",
+      "noindex": true,
+      "draftReason": "Blog articles are under launch review."
+    }
+  ]
+}

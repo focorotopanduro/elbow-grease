@@ -1,0 +1,401 @@
+.hup {
+  background: var(--black);
+  color: var(--cream);
+}
+
+/* Page hero — viral hook tone */
+.hup__hero {
+  background: var(--black);
+  color: var(--cream);
+  position: relative;
+  padding-top: calc(var(--banner-h) + var(--nav-h) + var(--sp-7));
+  padding-bottom: var(--sp-7);
+  overflow: hidden;
+}
+
+.hup__hero::before,
+.hup__hero::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(100px);
+}
+
+.hup__hero::before {
+  top: -180px;
+  right: -160px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.22), transparent 65%);
+}
+
+.hup__hero::after {
+  bottom: -140px;
+  left: -120px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(139, 105, 20, 0.18), transparent 65%);
+}
+
+.hup__hero-inner {
+  position: relative;
+  max-width: 920px;
+}
+
+.hup__crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-condensed);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gray-light);
+  margin-bottom: var(--sp-5);
+  transition: color 0.3s var(--ease), gap 0.4s var(--ease-back);
+}
+
+.hup__crumb:hover {
+  color: var(--gold-light);
+  gap: var(--sp-3);
+}
+
+.hup__title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 4.75rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin: var(--sp-3) 0 var(--sp-4);
+  color: var(--cream);
+}
+
+.hup__title em {
+  font-style: italic;
+  font-weight: 400;
+  background: var(--grad-gold-text);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: text-gold-shimmer 6s linear infinite;
+}
+
+.hup__lead {
+  font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+  line-height: 1.6;
+  color: var(--gray-light);
+  max-width: 720px;
+  margin-bottom: var(--sp-5);
+}
+
+.hup__chips {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.hup__chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(15, 14, 16, 0.55);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  color: var(--gold-light);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-condensed);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.hup__chips li span {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Visualizer container */
+.hup__viz {
+  padding-block: var(--sp-7);
+}
+
+/* Bottom CTA strip — simple, decisive */
+.hup__cta-strip {
+  background: var(--dark);
+  color: var(--cream);
+  padding-block: var(--sp-7);
+  position: relative;
+  overflow: hidden;
+}
+
+.hup__cta-strip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 20% 50%, rgba(212, 175, 55, 0.18), transparent 60%);
+  pointer-events: none;
+}
+
+.hup__cta-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-5);
+  position: relative;
+}
+
+.hup__cta-inner h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3.2vw, 2.5rem);
+  letter-spacing: -0.015em;
+  margin-top: var(--sp-2);
+  color: var(--cream);
+}
+
+.hup__cta-inner h3 em {
+  font-style: italic;
+  font-weight: 400;
+  background: var(--grad-gold-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hup__cta-sub {
+  color: var(--gray-light);
+  font-size: var(--fs-md);
+  line-height: 1.6;
+  max-width: 520px;
+  margin-top: var(--sp-3);
+}
+
+/* Trust strip — codes/data shown without dominating */
+.hup__trust {
+  padding-block: var(--sp-7);
+  border-top: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.hup__trust-label {
+  font-family: var(--font-condensed);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-bottom: var(--sp-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hup__trust-label span {
+  width: 18px;
+  height: 18px;
+  background: var(--gold);
+  color: var(--black);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.hup__trust-codes {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-5);
+}
+
+.hup__trust-codes li {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--gray-light);
+  padding: 4px 10px;
+  background: rgba(15, 14, 16, 0.5);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: var(--radius-xs);
+  letter-spacing: 0.04em;
+}
+
+/* Fine-print disclaimer — collapsible */
+.hup__disclaimer {
+  border-top: 1px dashed rgba(212, 175, 55, 0.2);
+  padding-top: var(--sp-4);
+  max-width: 760px;
+}
+
+.hup__disclaimer summary {
+  font-family: var(--font-condensed);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gray-light);
+  cursor: pointer;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.3s var(--ease);
+}
+
+.hup__disclaimer summary::-webkit-details-marker { display: none; }
+
+.hup__disclaimer summary::before {
+  content: '+';
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  color: var(--gold);
+  line-height: 0.6;
+  transition: transform 0.3s var(--ease-back);
+}
+
+.hup__disclaimer[open] summary::before {
+  transform: rotate(45deg);
+}
+
+.hup__disclaimer summary:hover {
+  color: var(--gold-light);
+}
+
+.hup__disclaimer-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--gray-light);
+  max-width: 720px;
+}
+
+.hup__disclaimer-body strong { color: var(--cream); }
+
+@media (max-width: 540px) {
+  .hup__cta-inner { flex-direction: column; align-items: flex-start; }
+  .hup__cta-inner .btn { width: 100%; justify-content: center; }
+}
+
+/* DEVICE-DETECTION SKELETON — covers the first paint while
+   useIsDesktop runs its synchronous check. Same height profile as
+   the simulator placeholder so the page layout doesn't reflow when
+   the appropriate experience swaps in. Subtle pulse hints "loading". */
+.hup__detecting {
+  height: 540px;
+  max-width: 520px;
+  margin: 0 auto;
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, #0f0d14 0%, #06050a 100%),
+    radial-gradient(ellipse at center, rgba(156, 122, 38, 0.12), transparent 70%);
+  border: 1px solid rgba(212, 160, 74, 0.18);
+  animation: hup-detecting-pulse 1.4s ease-in-out infinite;
+}
+@keyframes hup-detecting-pulse {
+  0%, 100% { opacity: 0.65; }
+  50%      { opacity: 0.95; }
+}
+@media (max-width: 1023px) {
+  /* Mobile: skeleton can be shorter since the lead capture is more compact */
+  .hup__detecting { height: 640px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hup__detecting { animation: none; }
+}
+
+/* CHUNK-LOAD ERROR — graceful degradation when the lazy sim chunk
+   fails to fetch (network glitch, CDN miss, integrity check fail).
+   Same speakeasy palette as MobileLeadCapture so the failure mode
+   still looks intentional. */
+.hup__sim-error {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 28px 24px;
+  text-align: center;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(107, 29, 29, 0.18), transparent 70%),
+    linear-gradient(to bottom, #0f0d14, #06050a);
+  border: 1px solid rgba(212, 160, 74, 0.32);
+  border-radius: 14px;
+  color: #f3ead6;
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.55);
+}
+.hup__sim-error h3 {
+  margin: 6px 0 12px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 22px;
+  color: #f3ead6;
+}
+.hup__sim-error p {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(243, 234, 214, 0.78);
+}
+.hup__sim-error-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* PAGE-LEVEL ERROR — fallback when an uncaught render error fires
+   anywhere in the page tree. Single-screen recovery card that
+   replaces the entire page (vs the .hup__sim-error which only
+   replaces the simulator section). */
+.page-error {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(107, 29, 29, 0.20), transparent 70%),
+    linear-gradient(to bottom, #06050a, #0f0d14);
+  color: #f3ead6;
+  z-index: 9999;
+}
+.page-error__inner {
+  max-width: 460px;
+  text-align: center;
+  padding: 36px 28px;
+  background: rgba(15, 13, 20, 0.85);
+  border: 1px solid rgba(212, 160, 74, 0.32);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.65);
+}
+.page-error__eyebrow {
+  margin: 0 0 8px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9c7a26;
+}
+.page-error__title {
+  margin: 0 0 14px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 26px;
+  line-height: 1.2;
+  color: #f3ead6;
+}
+.page-error__body {
+  margin: 0 0 20px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: rgba(243, 234, 214, 0.78);
+}
+.page-error__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}

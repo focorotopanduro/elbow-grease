@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  BEIT BUILDING CONTRACTORS LLC — vector reconstruction
+  ======================================================
+  Hand-traced approximation of the brand logo for use cases that
+  need scalable / extrudable geometry: 3D intro animation, future
+  print, embroidery, signage, etc.
+
+  Geometry is precise vector paths; the brushed-metal texture in
+  the original PNG is approximated with linearGradients here. For
+  the 3D intro, Blender will import the paths and apply real metal
+  materials — gradients are just a courtesy for 2D viewers.
+
+  The wordmark uses Georgia bold as a placeholder (the original
+  uses a custom display sans). To extrude in Blender, convert the
+  text to paths first (Inkscape: Path → Object to Path, or import
+  with the appropriate font installed).
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1080 1350"
+     width="1080" height="1350"
+     style="background:#000">
+
+  <defs>
+    <!-- Gold gradient: bright top sheen → deep amber bottom -->
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#fce58a"/>
+      <stop offset="35%" stop-color="#e6b952"/>
+      <stop offset="70%" stop-color="#a87a1c"/>
+      <stop offset="100%" stop-color="#6b4f12"/>
+    </linearGradient>
+
+    <!-- Brushed silver gradient -->
+    <linearGradient id="silver" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#f4f4f4"/>
+      <stop offset="35%" stop-color="#cfcfcf"/>
+      <stop offset="70%" stop-color="#7d7d7d"/>
+      <stop offset="100%" stop-color="#3e3e3e"/>
+    </linearGradient>
+
+    <!-- Subtle inner shadow filter for depth -->
+    <filter id="depth" x="-5%" y="-5%" width="110%" height="110%">
+      <feGaussianBlur stdDeviation="0.6" result="blur"/>
+      <feOffset dx="0" dy="3"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.5"/></feComponentTransfer>
+      <feComposite in2="SourceGraphic" operator="arithmetic" k1="0" k2="1" k3="0" k4="0"/>
+    </filter>
+  </defs>
+
+  <!-- Black background -->
+  <rect width="1080" height="1350" fill="#000000"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       GOLD CHEVRON STACK
+       Three nested chevrons, each smaller + lower than the last.
+       Path order: outer → middle → inner so the inner ones paint
+       on top in the rare case of overlap.
+       ════════════════════════════════════════════════════════════ -->
+
+  <!-- Outer chevron (largest, topmost) -->
+  <path id="chevron-outer"
+        d="M 540 130
+           L 980 530
+           L 940 580
+           L 540 295
+           L 140 580
+           L 100 530
+           Z"
+        fill="url(#gold)"/>
+
+  <!-- Middle chevron -->
+  <path id="chevron-middle"
+        d="M 540 295
+           L 875 595
+           L 835 645
+           L 540 425
+           L 245 645
+           L 205 595
+           Z"
+        fill="url(#gold)"/>
+
+  <!-- Inner chevron -->
+  <path id="chevron-inner"
+        d="M 540 425
+           L 790 660
+           L 750 705
+           L 540 540
+           L 330 705
+           L 290 660
+           Z"
+        fill="url(#gold)"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SILVER ARCHITECTURAL CREST
+       Approximates the building-column motif inside the inner gold
+       chevron. Composed of: a small silver chevron crown +
+       central vertical column + two angled diagonal columns.
+       Real geometry would have more refined intersections; this
+       is the simplification suitable for clean 3D extrusion.
+       ════════════════════════════════════════════════════════════ -->
+
+  <!-- Silver crown (small chevron at top of crest) -->
+  <path id="crest-crown"
+        d="M 540 540
+           L 720 700
+           L 685 735
+           L 540 615
+           L 395 735
+           L 360 700
+           Z"
+        fill="url(#silver)"/>
+
+  <!-- Central vertical column -->
+  <path id="crest-column-center"
+        d="M 510 700
+           L 570 700
+           L 570 940
+           L 510 940
+           Z"
+        fill="url(#silver)"/>
+
+  <!-- Right diagonal support (angles outward + down) -->
+  <path id="crest-column-right"
+        d="M 570 720
+           L 615 720
+           L 720 940
+           L 680 940
+           Z"
+        fill="url(#silver)"/>
+
+  <!-- Left diagonal support (mirror of right) -->
+  <path id="crest-column-left"
+        d="M 510 720
+           L 465 720
+           L 360 940
+           L 400 940
+           Z"
+        fill="url(#silver)"/>
+
+  <!-- Tiny horizontal cross-bar tying the column structure together -->
+  <path id="crest-crossbar"
+        d="M 380 850
+           L 700 850
+           L 700 880
+           L 380 880
+           Z"
+        fill="url(#silver)"/>
+
+  <!-- ════════════════════════════════════════════════════════════
+       WORDMARK
+       Two-line gold lockup: "BEIT BUILDING" / "CONTRACTORS LLC".
+       Georgia-bold placeholder until you have the original font.
+       ════════════════════════════════════════════════════════════ -->
+
+  <g id="wordmark"
+     font-family="Georgia, 'Times New Roman', serif"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="url(#gold)">
+    <text x="540" y="1100" font-size="105" letter-spacing="6">BEIT BUILDING</text>
+    <text x="540" y="1220" font-size="78"  letter-spacing="6">CONTRACTORS LLC</text>
+  </g>
+</svg>

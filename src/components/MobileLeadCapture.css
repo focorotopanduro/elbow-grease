@@ -1,0 +1,716 @@
+/* MobileLeadCapture — speakeasy aesthetic matching TrustBadge.
+   The palette uses the same --tb-* custom properties so the visual
+   language stays consistent: deep ink background, burnished gold
+   accents, oxblood for the action red. */
+
+.mlc {
+  --mlc-ink: #06050a;
+  --mlc-ink-2: #0f0d14;
+  --mlc-gold: #9c7a26;
+  --mlc-gold-bright: #d4a04a;
+  --mlc-red: #6b1d1d;
+  --mlc-cream: #f3ead6;
+  --mlc-line: rgba(212, 160, 74, 0.32);
+
+  display: grid;
+  gap: 18px;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 22px 18px 30px;
+  color: var(--mlc-cream);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(156, 122, 38, 0.18), transparent 70%),
+    linear-gradient(to bottom, var(--mlc-ink) 0%, var(--mlc-ink-2) 100%);
+  border: 1px solid var(--mlc-line);
+  border-radius: 14px;
+  box-shadow:
+    0 1px 0 rgba(255, 240, 200, 0.08) inset,
+    0 24px 60px -20px rgba(0, 0, 0, 0.55);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ─── Hero preview tile ─────────────────────────────────────────────── */
+.mlc__preview {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1a2030 0%, #2a2418 100%);
+  border: 1px solid var(--mlc-line);
+}
+.mlc__preview-sky {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 30%, rgba(80, 130, 120, 0.55), transparent 70%),
+    linear-gradient(180deg, #1a2030 0%, #2a3848 50%, #3a3128 100%);
+  animation: mlc-sky-drift 10s ease-in-out infinite alternate;
+}
+@keyframes mlc-sky-drift {
+  from { background-position: 0% 50%, 0 0; }
+  to   { background-position: 100% 50%, 0 0; }
+}
+.mlc__preview-house {
+  position: absolute;
+  inset: 30% 8% 0 8%;
+}
+.mlc__preview-house svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.55));
+}
+.mlc__preview-rain {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    105deg,
+    rgba(168, 200, 224, 0.25) 0,
+    rgba(168, 200, 224, 0.25) 1px,
+    transparent 1px,
+    transparent 9px
+  );
+  animation: mlc-rain-fall 0.6s linear infinite;
+}
+@keyframes mlc-rain-fall {
+  from { background-position: 0 0; }
+  to   { background-position: -20px 40px; }
+}
+.mlc__preview-pulse {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 60px;
+  height: 60px;
+  margin: -30px 0 0 -30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 240, 180, 0.38), transparent 70%);
+  display: grid;
+  place-items: center;
+  animation: mlc-pulse 1.2s ease-in-out infinite;
+}
+@keyframes mlc-pulse {
+  0%, 100% { transform: scale(0.85); opacity: 0.6; }
+  50%      { transform: scale(1.15); opacity: 1.0; }
+}
+.mlc__preview-bolt {
+  font-size: 22px;
+  text-shadow: 0 0 8px rgba(255, 240, 180, 0.85);
+}
+.mlc__preview-tag {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  padding: 4px 10px;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid var(--mlc-gold);
+  border-radius: 12px;
+  color: var(--mlc-gold-bright);
+  backdrop-filter: blur(4px);
+}
+.mlc__preview-tag span {
+  color: #c83030;
+  margin-right: 4px;
+  animation: mlc-blink 1.4s ease-in-out infinite;
+}
+@keyframes mlc-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+/* ─── Pitch ──────────────────────────────────────────────────────────── */
+.mlc__pitch { text-align: center; }
+.mlc__eyebrow {
+  margin: 0 0 4px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mlc-gold);
+}
+.mlc__title {
+  margin: 0 0 8px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 26px;
+  line-height: 1.15;
+  font-weight: 700;
+  color: var(--mlc-cream);
+}
+.mlc__body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(243, 234, 214, 0.78);
+}
+.mlc__body strong { color: var(--mlc-gold-bright); }
+
+/* ─── Form ───────────────────────────────────────────────────────────── */
+.mlc__form { display: grid; gap: 12px; }
+.mlc__field { display: grid; gap: 4px; }
+.mlc__label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mlc-gold);
+}
+.mlc__field input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 16px; /* 16px prevents iOS zoom-on-focus */
+  font-family: inherit;
+  color: var(--mlc-cream);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--mlc-line);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.mlc__field input:focus {
+  border-color: var(--mlc-gold-bright);
+  background: rgba(0, 0, 0, 0.55);
+}
+.mlc__field input::placeholder {
+  color: rgba(243, 234, 214, 0.32);
+}
+
+/* INVALID-FIELD STATE — only applied after the field is `touched`
+   (blurred at least once) so we never shout at the user before they
+   even tried to fill it in. Subtle red border + error text below. */
+.mlc__field--invalid input {
+  border-color: rgba(200, 75, 75, 0.85);
+}
+.mlc__field--invalid input:focus {
+  border-color: rgba(220, 95, 95, 1);
+  background: rgba(40, 0, 0, 0.45);
+}
+.mlc__error {
+  display: block;
+  margin-top: 4px;
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  color: rgba(220, 130, 130, 0.95);
+}
+
+/* HONEYPOT — must be invisible to humans but in the DOM so bots
+   can find + auto-fill it. position:absolute + clip + opacity 0 +
+   off-screen so it's not announced by screen readers either
+   (aria-hidden on the wrapper covers screen readers; this covers
+   visual + interactive removal). Pointer-events:none stops any
+   accidental tab-target behavior. */
+.mlc__honeypot {
+  position: absolute;
+  left: -10000px;
+  top: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mlc__submit {
+  margin-top: 4px;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 0.02em;
+  color: var(--mlc-cream);
+  background:
+    linear-gradient(180deg, rgba(212, 160, 74, 0.18) 0%, rgba(0, 0, 0, 0.35) 100%),
+    var(--mlc-red);
+  border: 1px solid var(--mlc-gold);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 1px 0 rgba(255, 240, 200, 0.18) inset, 0 6px 18px -6px rgba(107, 29, 29, 0.65);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.mlc__submit:active { transform: translateY(1px); }
+.mlc__submit:disabled { opacity: 0.6; cursor: progress; }
+
+.mlc__small {
+  margin: 0;
+  text-align: center;
+  font-size: 11.5px;
+  color: rgba(243, 234, 214, 0.55);
+  line-height: 1.5;
+}
+
+/* ─── Sent state ─────────────────────────────────────────────────────── */
+.mlc__sent {
+  text-align: center;
+  padding: 20px 12px;
+  background: rgba(212, 160, 74, 0.08);
+  border: 1px solid var(--mlc-line);
+  border-radius: 10px;
+}
+.mlc__sent-mark {
+  margin: 0 0 6px;
+  font-size: 32px;
+  color: var(--mlc-gold-bright);
+  text-shadow: 0 0 10px rgba(212, 160, 74, 0.55);
+}
+.mlc__sent h3 {
+  margin: 0 0 8px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 22px;
+  color: var(--mlc-cream);
+}
+.mlc__sent p {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(243, 234, 214, 0.8);
+}
+.mlc__sent strong { color: var(--mlc-gold-bright); }
+.mlc__cta-secondary {
+  display: inline-block;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mlc-gold-bright);
+  text-decoration: none;
+  border: 1px solid var(--mlc-gold);
+  border-radius: 6px;
+  transition: background-color 0.15s;
+}
+.mlc__cta-secondary:active { background: rgba(212, 160, 74, 0.18); }
+
+/* ─── Privacy pledge — moral-stance commitment block ──────────────── */
+.mlc__privacy-pledge {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: linear-gradient(
+    180deg,
+    rgba(76, 110, 96, 0.18),
+    rgba(76, 110, 96, 0.08)
+  );
+  border: 1px solid rgba(120, 180, 150, 0.30);
+  border-left: 3px solid #6fc8a4;
+  border-radius: 8px;
+}
+.mlc__privacy-pledge-mark {
+  flex: 0 0 auto;
+  font-size: 18px;
+  color: #6fc8a4;
+}
+.mlc__privacy-pledge strong {
+  display: block;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: #b6e8d0;
+}
+.mlc__privacy-pledge p {
+  margin: 4px 0 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: rgba(243, 234, 214, 0.78);
+}
+.mlc__privacy-pledge em {
+  color: #b6e8d0;
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* ─── Trust strip ────────────────────────────────────────────────────── */
+.mlc__trust {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid var(--mlc-line);
+  border-radius: 8px;
+}
+.mlc__trust-mark {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  background: var(--mlc-gold);
+  color: var(--mlc-ink);
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 14px;
+}
+.mlc__trust strong {
+  display: block;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--mlc-gold-bright);
+  text-transform: uppercase;
+}
+.mlc__trust p {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: rgba(243, 234, 214, 0.72);
+}
+
+/* ─── Desktop CTA ────────────────────────────────────────────────────── */
+.mlc__desktop-cta {
+  text-align: center;
+  padding: 14px 12px;
+  background: rgba(15, 13, 20, 0.65);
+  border: 1px dashed var(--mlc-line);
+  border-radius: 8px;
+}
+.mlc__desktop-eyebrow {
+  margin: 0 0 4px;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mlc-gold);
+}
+.mlc__desktop-body {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: rgba(243, 234, 214, 0.72);
+}
+.mlc__copy {
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--mlc-gold-bright);
+  background: transparent;
+  border: 1px solid var(--mlc-gold);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.mlc__copy:hover { background: rgba(212, 160, 74, 0.12); }
+.mlc__copy:active { background: rgba(212, 160, 74, 0.20); }
+
+/* ─── Trust counter (social proof) ──────────────────────────────────── */
+.mlc__trust-counter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(212, 160, 74, 0.08);
+  border: 1px solid var(--mlc-line);
+  border-radius: 8px;
+}
+.mlc__trust-counter-num {
+  flex: 0 0 auto;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--mlc-gold-bright);
+  text-shadow: 0 0 12px rgba(212, 160, 74, 0.30);
+}
+.mlc__trust-counter-label {
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: rgba(243, 234, 214, 0.78);
+}
+
+/* ─── Network-offline banner ────────────────────────────────────────── */
+.mlc__network-offline {
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #ffd9a8;
+  background: rgba(180, 100, 30, 0.18);
+  border: 1px solid rgba(212, 130, 50, 0.55);
+  border-left: 3px solid #d4a04a;
+  border-radius: 6px;
+}
+.mlc__network-offline span {
+  margin-right: 5px;
+  font-weight: 700;
+  color: #ffb74d;
+}
+
+/* ─── Restored-draft banner ─────────────────────────────────────────── */
+.mlc__restored {
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--mlc-gold-bright);
+  background: rgba(212, 160, 74, 0.10);
+  border: 1px solid var(--mlc-line);
+  border-left: 3px solid var(--mlc-gold-bright);
+  border-radius: 6px;
+}
+.mlc__restored span { margin-right: 5px; font-weight: 700; }
+
+/* ─── Screen-reader-only status region ──────────────────────────────── */
+.mlc__sr-status {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ─── TCPA disclosure ──────────────────────────────────────────────── */
+.mlc__tcpa {
+  display: block;
+  margin-top: 6px;
+  padding: 8px 10px;
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: rgba(243, 234, 214, 0.55);
+  background: rgba(0, 0, 0, 0.32);
+  border-radius: 4px;
+  border-left: 2px solid var(--mlc-line);
+}
+
+/* ─── In-form error ────────────────────────────────────────────────── */
+.mlc__inline-error {
+  margin-top: 10px;
+  padding: 12px 14px;
+  background: rgba(107, 29, 29, 0.32);
+  border: 1px solid rgba(200, 75, 75, 0.55);
+  border-radius: 8px;
+  text-align: center;
+}
+.mlc__inline-error p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(243, 234, 214, 0.92);
+}
+
+/* ─── Tap-to-call links ────────────────────────────────────────────── */
+.mlc__call-now {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--mlc-cream);
+  background: var(--mlc-gold);
+  border: 1px solid var(--mlc-gold-bright);
+  border-radius: 6px;
+  text-decoration: none;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.mlc__call-now:active { transform: translateY(1px); }
+.mlc__call-now--inline {
+  background: transparent;
+  color: var(--mlc-gold-bright);
+  font-weight: 600;
+  padding: 6px 10px;
+  font-size: 12.5px;
+}
+
+/* ─── Form footer (privacy + alt contact) ──────────────────────────── */
+.mlc__form-footer {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(212, 160, 74, 0.12);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.mlc__privacy-link {
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(243, 234, 214, 0.55);
+  text-decoration: none;
+}
+.mlc__privacy-link:hover { color: var(--mlc-gold-bright); }
+
+/* ─── Smart call-window emphasis in success copy ───────────────────── */
+.mlc__call-window {
+  display: inline-block;
+  padding: 0 4px;
+  background: rgba(212, 160, 74, 0.18);
+  color: var(--mlc-gold-bright);
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+/* ─── Confirmation # in success card ───────────────────────────────── */
+.mlc__confirmation {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 18px;
+  margin: 6px 0 14px;
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px dashed var(--mlc-line);
+  border-radius: 6px;
+}
+.mlc__confirmation-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mlc-gold);
+}
+.mlc__confirmation-id {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--mlc-gold-bright);
+}
+.mlc__sent-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ─── Returning-visitor warm banner ────────────────────────────────── */
+.mlc__returning {
+  padding: 8px 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--mlc-cream);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(212, 160, 74, 0.18),
+    transparent
+  );
+  border-top: 1px solid rgba(212, 160, 74, 0.25);
+  border-bottom: 1px solid rgba(212, 160, 74, 0.25);
+  border-radius: 4px;
+}
+.mlc__returning span {
+  margin-right: 6px;
+  font-size: 14px;
+}
+
+/* ─── Sticky thumb-reachable CTA ───────────────────────────────────── */
+.mlc__sticky-cta {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: max(12px, env(safe-area-inset-bottom, 12px));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  text-decoration: none;
+  background: linear-gradient(180deg, #1a0f10, var(--mlc-red));
+  color: var(--mlc-cream);
+  border: 1px solid var(--mlc-gold);
+  border-radius: 56px;
+  box-shadow:
+    0 1px 0 rgba(255, 240, 200, 0.18) inset,
+    0 12px 30px -8px rgba(0, 0, 0, 0.65),
+    0 4px 12px -4px rgba(107, 29, 29, 0.55);
+  z-index: 100;
+  /* Show only on mobile-class viewports — the simulator on desktop
+     has its own UI so we don't want a floating CTA covering it. */
+  animation: mlc-sticky-rise 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transition: transform 0.15s ease;
+}
+.mlc__sticky-cta:active { transform: translateY(1px); }
+@keyframes mlc-sticky-rise {
+  from { transform: translateY(80px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.mlc__sticky-cta-icon {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid var(--mlc-gold-bright);
+  border-radius: 50%;
+  font-size: 16px;
+}
+.mlc__sticky-cta-text {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.mlc__sticky-cta-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mlc-gold-bright);
+}
+.mlc__sticky-cta-num {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--mlc-cream);
+}
+.mlc__sticky-cta-arrow {
+  flex: 0 0 auto;
+  font-size: 18px;
+  color: var(--mlc-gold-bright);
+}
+
+/* The form already provides ~80px of bottom padding via the desktop-
+   CTA card; add extra so the sticky CTA never overlaps the last
+   actionable element of the form. */
+.mlc {
+  padding-bottom: 90px;
+}
+
+/* Reduced-motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .mlc__preview-sky,
+  .mlc__preview-rain,
+  .mlc__preview-pulse,
+  .mlc__preview-tag span,
+  .mlc__sticky-cta {
+    animation: none;
+  }
+}
+
+/* ─── Print stylesheet — clean lead-capture for printed/saved-PDF ───
+   Hide animated/decorative elements + flatten the speakeasy palette
+   to ink-on-paper. Useful for users who print the success card with
+   the confirmation # to keep with their records. */
+@media print {
+  .mlc {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #cccccc;
+    box-shadow: none;
+    padding-bottom: 18px;
+  }
+  .mlc__preview,
+  .mlc__sticky-cta,
+  .mlc__network-offline,
+  .mlc__returning,
+  .mlc__copy,
+  .mlc__desktop-cta { display: none; }
+  .mlc__title,
+  .mlc__sent h3,
+  .mlc__pitch .mlc__eyebrow { color: #000000 !important; }
+  .mlc__body,
+  .mlc__sent p { color: #333333 !important; }
+  .mlc__confirmation {
+    background: #f4f4f4 !important;
+    border-color: #999999 !important;
+  }
+  .mlc__confirmation-id { color: #000000 !important; }
+  .mlc__trust-counter,
+  .mlc__trust {
+    background: #f9f4e8 !important;
+    color: #000000 !important;
+    border: 1px solid #d4a04a;
+  }
+  .mlc__trust-counter-num,
+  .mlc__trust strong { color: #000000 !important; }
+}

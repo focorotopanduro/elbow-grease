@@ -1,0 +1,15 @@
+{
+  "verifiedAt": "2026-04-26T03:25:09.051Z",
+  "records": {
+    "CCC1337413": {
+      "number": "CCC1337413",
+      "error": "NUMBER_NOT_IN_RESPONSE",
+      "message": "License number CCC1337413 not present in DBPR response"
+    },
+    "CGC1534077": {
+      "number": "CGC1534077",
+      "error": "NUMBER_NOT_IN_RESPONSE",
+      "message": "License number CGC1534077 not present in DBPR response"
+    }
+  }
+}

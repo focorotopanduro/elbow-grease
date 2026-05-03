@@ -1,0 +1,51 @@
+source_name	tier	url	status	submission_date	profile_url_once_live	login_storage_ref	nap_audit_required	notes
+Google Business Profile	S	https://www.google.com/business/	todo					yes	Phase 12 playbook docs/google-business-profile-setup.md
+Bing Places	S	https://www.bingplaces.com/	todo					yes	Import from Google after GBP live
+Apple Business Connect	S	https://businessconnect.apple.com/	todo					yes	Free; phone verification
+Facebook Business Page	S	https://www.facebook.com/business/	todo					yes	Add 5+ posts before going live
+Yelp Business	S	https://biz.yelp.com/	todo					yes	Watch review-filter algorithm
+BBB Florida	S	https://www.bbb.org/getaccredited	todo					yes	Annual fee ~$500-700
+Angi (HomeAdvisor)	A	https://pro.angi.com/	todo					yes	Opt out of paid leads at signup
+Houzz Pro	A	https://pro.houzz.com/	todo					yes	Photo quality matters most
+Nextdoor Business	A	https://business.nextdoor.com/	todo					yes	Engage neighborhood-by-neighborhood
+Thumbtack Pro	A	https://www.thumbtack.com/pro/	todo					yes	Try free tier first
+BHG Trusted Pros	A	https://www.bhgre.com/	todo					yes	Verify program availability first
+Manta	A	https://www.manta.com/	todo					yes	Free; watch upsells
+MerchantCircle	A	https://www.merchantcircle.com/	todo					yes	Free
+YellowPages.com	A	https://www.yellowpages.com/	todo					yes	Auto-created listing likely exists
+Foursquare Business	A	https://business.foursquare.com/	todo					yes	Free; data feeds many apps
+Local.com	A	https://www.local.com/	todo					yes	Free
+Hotfrog	B	https://www.hotfrog.com/	todo					yes	Free; minor signal
+Brownbook	B	https://www.brownbook.net/	todo					yes	Free
+Cylex USA	B	https://www.cylex-usa.com/	todo					yes	Free
+Citysquares	B	https://citysquares.com/	todo					yes	Auto-created likely exists
+ShowMeLocal	B	https://www.showmelocal.com/	todo					yes	Free
+Find-Us-Here	B	https://find-us-here.com/	todo					yes	Free
+MapQuest	B	https://www.mapquest.com/	todo					yes	Free; Yext partnerships
+Tupalo	B	https://tupalo.com/	todo					yes	Free
+GoLocal247	B	https://www.golocal247.com/	todo					yes	Free
+eBusinessPages	B	https://www.ebusinesspages.com/	todo					yes	Free
+BizCommunity	B		todo					yes	Verify exact directory before submitting
+Industrial Quick Search	B	https://www.iqsdirectory.com/	todo					yes	B2B-leaning; helpful for commercial roofing
+FRSA	FL	https://www.floridaroof.com/	todo					yes	Membership + dues; strongest FL roofing signal
+Florida Chamber of Commerce	FL	https://www.flchamber.com/	todo					yes	State-level; verify ROI
+Orlando Regional Chamber	FL	https://www.orlando.org/	todo					yes	Local chamber; networking
+Seminole County Chamber	FL	https://www.seminolebusiness.org/	todo					yes	Critical for Oviedo + Sanford
+Oviedo-Winter Springs Chamber	FL	https://www.oviedowintersprings.org/	todo					yes	Hyper-local for Oviedo intent
+West Orange Chamber	FL	https://www.westorange.org/	todo					yes	Winter Garden + Apopka coverage
+Visit Orlando Partner Directory	FL	https://www.visitorlando.com/	todo					maybe	Tourism-leaning; verify eligibility
+Florida BBB Regional	FL	https://www.bbb.org/local/0733	todo					yes	See S-tier #6 BBB
+MyFlorida CFO Insurance Resource	FL	https://www.myfloridacfo.com/	todo					maybe	Verify contractor directory exists
+DBPR Public License Lookup	FL	https://www.myfloridalicense.com/wl11.asp	live	(by virtue of licensed)			no	CCC1337413 + CGC1534077 already public
+Florida Restoration Association	FL		todo					yes	Verify currently-active org
+Top Rated Local Florida	FL	https://www.topratedlocal.com/	todo					yes	Free; review aggregator
+NRCA Member Directory	NICHE	https://www.nrca.net/	todo					yes	Largest roofing trade association
+GAF Master Elite Directory	NICHE	https://www.gaf.com/en-us/roofing-contractors/master-elite	todo					yes	Requires GAF install volume + warranty record
+Owens Corning Preferred	NICHE	https://www.owenscorning.com/roofing/contractors	todo					yes	Similar to GAF
+CertainTeed SELECT ShingleMaster	NICHE	https://www.certainteed.com/	todo					yes	Premium-installer program
+Tile Roofing Industry Alliance	NICHE	https://tileroofing.org/	todo					yes	FL is top tile market
+Metal Roofing Alliance	NICHE	https://www.metalroofing.com/	todo					yes	For standing-seam volume
+RoofingContractor.com Directory	NICHE	https://www.roofingcontractor.com/	todo					yes	Trade-publication directory
+ARMA	NICHE	https://www.asphaltroofing.org/	skip					no	Manufacturer trade group; not a contractor directory
+Inspectopedia / Roofing Magazine	NICHE		todo					maybe	Aggregator; verify if free
+Yext Listings (paid aggregator)	NICHE	https://www.yext.com/	skip-unless-budgeted					n/a	$500-1500/yr; only if DIY isn't viable

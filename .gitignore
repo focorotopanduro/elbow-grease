@@ -1,0 +1,29 @@
+node_modules
+dist
+dist-tsc-node
+.env
+.env.local
+*.log
+.DS_Store
+.vscode
+.idea
+*.tsbuildinfo
+
+# Local iteration artifacts and source backups; never upload these to public_html.
+/audit-shots/
+/release/
+/source-assets/
+/codex-*.png
+/debug-*.png
+/iter-*.png
+/marble-*.png
+/polish-*.png
+/prod-audit-*.png
+/ui-*.png
+/ux-*.png
+/public/**/*.bak
+/public/**/*.psd
+
+# Generated Blender render outputs and heavy local scene files.
+/scripts/blender/preview/
+/scripts/blender/**/*.blend

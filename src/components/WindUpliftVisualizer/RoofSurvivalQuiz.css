@@ -1,0 +1,432 @@
+/* RoofSurvivalQuiz — plain-language entry-point card.
+ *
+ * Three visual phases:
+ *   - .rsq            — questions phase (default)
+ *   - .rsq--running   — compact "we're playing your storm" banner
+ *   - .rsq--verdict   — survive/damage/catastrophe reveal (color-coded)
+ *
+ * Reuses the visualizer's existing CSS variables (var(--wuv-*) and
+ * var(--sp-*)) so the panel matches the rest of the sidebar without
+ * having to re-declare the design tokens.
+ */
+
+/* ─── Container (all phases) ──────────────────────────────────────────── */
+.rsq {
+  background: rgba(251, 246, 236, 0.7);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-md);
+  padding: clamp(20px, 3vw, 32px);
+  margin-bottom: var(--sp-5);
+  box-shadow:
+    0 8px 24px rgba(28, 25, 22, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  transition: border-color 0.5s var(--ease), box-shadow 0.5s var(--ease);
+}
+
+/* ─── PHASE: questions ───────────────────────────────────────────────── */
+.rsq__head {
+  margin-bottom: var(--sp-5);
+  max-width: 640px;
+}
+
+.rsq__eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--wuv-warn, #c45a1a);
+  font-weight: 600;
+  margin-bottom: var(--sp-2);
+}
+
+.rsq__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  margin: var(--sp-2) 0 var(--sp-3);
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+  color: var(--wuv-ink, #1c1916);
+}
+
+.rsq__title em {
+  font-style: italic;
+  color: var(--wuv-warn, #c45a1a);
+  font-weight: 400;
+}
+
+.rsq__lead {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--wuv-ink-soft, #4a4540);
+}
+
+/* ─── Question list ──────────────────────────────────────────────────── */
+.rsq__questions {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: 0;
+  margin: 0 0 var(--sp-5);
+}
+
+.rsq__q {
+  padding: var(--sp-4);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--wuv-rule, rgba(28, 25, 22, 0.12));
+  border-radius: var(--radius-sm);
+  transition: border-color 0.4s var(--ease), background 0.4s var(--ease);
+}
+
+.rsq__q.is-done {
+  border-color: rgba(196, 90, 26, 0.35);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.rsq__q-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+
+.rsq__q-n {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  color: var(--wuv-warn, #c45a1a);
+  font-weight: 500;
+  flex-shrink: 0;
+  line-height: 1;
+  min-width: 2ch;
+}
+
+.rsq__q-prompt {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--wuv-ink, #1c1916);
+  margin: 0;
+}
+
+/* ─── Option buttons (radio-group) ───────────────────────────────────── */
+.rsq__opts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--sp-2);
+}
+
+.rsq__opt {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1.5px solid var(--wuv-rule, rgba(28, 25, 22, 0.15));
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 60px;
+  /* The whole button is the click target so even mobile thumbs hit it */
+}
+
+.rsq__opt:hover:not(.is-active) {
+  border-color: rgba(196, 90, 26, 0.3);
+  background: rgba(255, 255, 255, 0.92);
+  transform: translateY(-1px);
+}
+
+.rsq__opt:focus-visible {
+  outline: 2px solid var(--wuv-warn, #c45a1a);
+  outline-offset: 2px;
+}
+
+.rsq__opt.is-active {
+  border-color: var(--wuv-warn, #c45a1a);
+  background: rgba(254, 245, 232, 0.95);
+  box-shadow: 0 2px 8px rgba(196, 90, 26, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.rsq__opt-main {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--wuv-ink, #1c1916);
+  line-height: 1.25;
+}
+
+.rsq__opt-sub {
+  font-size: 0.78rem;
+  color: var(--wuv-ink-soft, #6a655e);
+  line-height: 1.3;
+}
+
+/* ─── Run-the-storm CTA row ──────────────────────────────────────────── */
+.rsq__cta-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.rsq__run {
+  font-size: 1rem;
+  padding: 14px 28px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s var(--ease);
+}
+
+.rsq__run:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.rsq__run:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(196, 90, 26, 0.3);
+}
+
+/* ─── PHASE: running ─────────────────────────────────────────────────── */
+.rsq--running {
+  background: linear-gradient(135deg,
+    rgba(40, 30, 22, 0.92) 0%,
+    rgba(60, 35, 25, 0.92) 100%);
+  color: rgba(255, 248, 232, 0.95);
+  border-color: rgba(196, 90, 26, 0.4);
+  text-align: center;
+}
+
+.rsq__running-eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 200, 130, 0.9);
+  font-weight: 600;
+  margin: 0 0 var(--sp-2);
+}
+
+.rsq__running-headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--sp-2);
+  color: rgba(255, 248, 232, 1);
+  /* Subtle pulse on the headline so it reads as "in progress" without
+     being aggressive. Animation pauses under prefers-reduced-motion. */
+  animation: rsq-running-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes rsq-running-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.75; }
+}
+
+.rsq__running-body {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(255, 240, 215, 0.78);
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rsq__running-headline { animation: none; }
+}
+
+/* ─── PHASE: verdict ─────────────────────────────────────────────────── */
+.rsq--verdict {
+  /* Verdict tone tints the whole card via custom property. Default
+     fallback is the standard glass; tone modifiers override. */
+  --rsq-tone: rgba(45, 110, 63, 1);
+  --rsq-tone-soft: rgba(45, 110, 63, 0.12);
+  --rsq-tone-bg-tint: rgba(220, 240, 224, 0.55);
+  background: linear-gradient(135deg,
+    rgba(251, 246, 236, 0.85) 0%,
+    var(--rsq-tone-bg-tint) 100%);
+  border-color: rgba(45, 110, 63, 0.35);
+  border-left: 4px solid var(--rsq-tone);
+}
+
+.rsq--good {
+  --rsq-tone: rgba(45, 110, 63, 1);
+  --rsq-tone-soft: rgba(45, 110, 63, 0.12);
+  --rsq-tone-bg-tint: rgba(220, 240, 224, 0.55);
+}
+
+.rsq--caution {
+  --rsq-tone: rgba(196, 142, 30, 1);
+  --rsq-tone-soft: rgba(196, 142, 30, 0.14);
+  --rsq-tone-bg-tint: rgba(254, 244, 218, 0.55);
+}
+
+.rsq--warn {
+  --rsq-tone: rgba(196, 90, 26, 1);
+  --rsq-tone-soft: rgba(196, 90, 26, 0.14);
+  --rsq-tone-bg-tint: rgba(255, 232, 210, 0.55);
+}
+
+.rsq--severe {
+  --rsq-tone: rgba(168, 50, 26, 1);
+  --rsq-tone-soft: rgba(168, 50, 26, 0.16);
+  --rsq-tone-bg-tint: rgba(255, 220, 215, 0.55);
+}
+
+.rsq__verdict-eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--rsq-tone);
+  font-weight: 700;
+  margin: 0 0 var(--sp-2);
+}
+
+.rsq__verdict-headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.7rem, 2.6vw, 2.3rem);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+  margin: 0 0 var(--sp-3);
+  color: var(--rsq-tone);
+}
+
+.rsq__verdict-body {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--wuv-ink, #1c1916);
+  margin: 0 0 var(--sp-4);
+}
+
+.rsq__verdict-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.rsq__verdict-cta {
+  background: var(--rsq-tone);
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.rsq__verdict-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px var(--rsq-tone-soft);
+}
+
+.rsq__retake {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--wuv-rule, rgba(28, 25, 22, 0.18));
+  color: var(--wuv-ink-soft, #4a4540);
+  padding: 10px 16px;
+  font: inherit;
+  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.rsq__retake:hover {
+  border-color: var(--wuv-warn, #c45a1a);
+  color: var(--wuv-warn, #c45a1a);
+}
+
+/* ─── More-details disclosure (the optional drill-down) ──────────────── */
+.rsq__details {
+  border-top: 1px solid var(--wuv-rule, rgba(28, 25, 22, 0.12));
+  padding-top: var(--sp-3);
+  margin-top: var(--sp-2);
+}
+
+.rsq__details-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--wuv-ink-soft, #4a4540);
+  padding: var(--sp-2) 0;
+  list-style: none;
+  user-select: none;
+  transition: color 0.2s;
+}
+
+.rsq__details-summary::-webkit-details-marker { display: none; }
+
+.rsq__details-summary:hover { color: var(--wuv-warn, #c45a1a); }
+
+.rsq__details-icon {
+  font-size: 1.1rem;
+  font-weight: 400;
+  transition: transform 0.2s;
+}
+
+.rsq__details[open] .rsq__details-icon {
+  transform: rotate(45deg); /* "+" → "×" rotation */
+}
+
+.rsq__details-body {
+  padding-top: var(--sp-3);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--wuv-ink-soft, #4a4540);
+}
+
+.rsq__details-eyebrow {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rsq-tone, var(--wuv-warn, #c45a1a));
+  font-weight: 700;
+  margin: 0 0 var(--sp-2);
+}
+
+.rsq__details-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rsq__details-list li {
+  padding-left: var(--sp-3);
+  border-left: 2px solid var(--rsq-tone-soft, rgba(28, 25, 22, 0.10));
+}
+
+.rsq__details-list strong {
+  color: var(--wuv-ink, #1c1916);
+  font-weight: 600;
+}
+
+.rsq__details-note {
+  font-size: 0.82rem;
+  color: var(--wuv-ink-soft, #6a655e);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ─── Mobile touch tweaks ────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .rsq { padding: var(--sp-4); }
+  .rsq__opts { grid-template-columns: 1fr 1fr; }
+  .rsq__verdict-actions { flex-direction: column; align-items: stretch; }
+  .rsq__verdict-cta, .rsq__retake { text-align: center; justify-content: center; }
+}

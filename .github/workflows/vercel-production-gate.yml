@@ -1,0 +1,65 @@
+name: Vercel Production Gate
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vercel-production-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Test, build, and audit Vercel release
+    runs-on: ubuntu-latest
+    env:
+      VITE_WEB3FORMS_KEY: ${{ secrets.VITE_WEB3FORMS_KEY }}
+      VITE_BUSINESS_PHONE: ${{ vars.VITE_BUSINESS_PHONE }}
+      VITE_BUSINESS_EMAIL: ${{ vars.VITE_BUSINESS_EMAIL }}
+      VITE_BUSINESS_WHATSAPP: ${{ vars.VITE_BUSINESS_WHATSAPP }}
+      VITE_ZOOM_URL: ${{ vars.VITE_ZOOM_URL }}
+      ADDITIONAL_ALLOWED_ORIGINS: ${{ vars.ADDITIONAL_ALLOWED_ORIGINS }}
+      LEAD_NOTIFY_TO: ${{ vars.LEAD_NOTIFY_TO }}
+      LEAD_NOTIFY_CC: ${{ vars.LEAD_NOTIFY_CC }}
+      EMAIL_FROM: ${{ vars.EMAIL_FROM }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+      MAILCHANNELS_API_KEY: ${{ secrets.MAILCHANNELS_API_KEY }}
+      EMAIL_WEBHOOK_URL: ${{ secrets.EMAIL_WEBHOOK_URL }}
+      SLACK_LEADS_WEBHOOK: ${{ secrets.SLACK_LEADS_WEBHOOK }}
+      DISCORD_LEADS_WEBHOOK: ${{ secrets.DISCORD_LEADS_WEBHOOK }}
+      KV_REST_API_URL: ${{ secrets.KV_REST_API_URL }}
+      KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Vercel release gate
+        run: npm run release:vercel
+
+      - name: Upload verified Vercel build
+        uses: actions/upload-artifact@v4
+        with:
+          name: beitbuilding-vercel-dist-${{ github.sha }}
+          path: dist/**
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,171 @@
+/**
+ * InstallPrompt — small floating affordance bottom-right on desktop,
+ * full-width banner at bottom on mobile. Two visual variants share
+ * the same base shape (web vs iOS hint).
+ */
+
+.iprompt {
+  position: fixed;
+  z-index: 95;
+  right: clamp(16px, 3vw, 32px);
+  bottom: clamp(16px, 3vw, 32px);
+  max-width: 360px;
+  padding: var(--sp-3);
+  background: rgba(15, 14, 16, 0.92);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: var(--radius-md);
+  color: var(--cream);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.45),
+    0 0 24px rgba(212, 175, 55, 0.15);
+  animation: iprompt-rise 0.4s var(--ease-back) both;
+}
+
+@keyframes iprompt-rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iprompt {
+    animation: none;
+  }
+}
+
+/* Mobile becomes full-width banner — coexists with MobileStickyCta
+   which sits 70px below it. The InstallPrompt floats above it. */
+@media (max-width: 540px) {
+  .iprompt {
+    right: 12px;
+    left: 12px;
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    max-width: none;
+  }
+}
+
+/* ─── Body copy ──────────────────────────────────────────────────────── */
+
+.iprompt__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.iprompt__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--cream);
+}
+
+.iprompt__hint {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: rgba(245, 239, 225, 0.75);
+}
+
+.iprompt__hint strong {
+  color: var(--gold-light);
+  font-weight: 600;
+}
+
+.iprompt__icon-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  width: 18px;
+  height: 18px;
+  margin: 0 2px;
+  padding: 2px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 4px;
+  color: var(--gold-light);
+}
+
+/* ─── Actions ────────────────────────────────────────────────────────── */
+
+.iprompt__actions {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: 4px;
+}
+
+.iprompt__install {
+  appearance: none;
+  background: var(--gold);
+  color: var(--black);
+  border: 0;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-family: var(--font-condensed);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s var(--ease),
+              transform 0.2s var(--ease-back);
+  flex: 1;
+}
+
+.iprompt__install:hover,
+.iprompt__install:focus-visible {
+  background: var(--gold-light);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.iprompt__close {
+  appearance: none;
+  background: transparent;
+  color: rgba(245, 239, 225, 0.55);
+  border: 1px solid rgba(245, 239, 225, 0.18);
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-family: var(--font-condensed);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s var(--ease),
+              border-color 0.2s var(--ease),
+              color 0.2s var(--ease);
+}
+
+.iprompt__close:hover,
+.iprompt__close:focus-visible {
+  background: rgba(245, 239, 225, 0.06);
+  border-color: rgba(245, 239, 225, 0.4);
+  color: var(--cream);
+  outline: none;
+}
+
+/* iOS variant doesn't have an "Install" button (system handles it),
+   so the close button stretches to fill */
+.iprompt--ios .iprompt__close {
+  align-self: flex-start;
+}
+
+/* ─── Variant tweaks ────────────────────────────────────────────────── */
+
+.iprompt--ios .iprompt__hint {
+  /* iOS hint includes inline icons + emphasised words; tighter
+     line-height keeps everything visually compact */
+  line-height: 1.55;
+}

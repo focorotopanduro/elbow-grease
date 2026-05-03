@@ -1,0 +1,98 @@
+name: Deploy Hostinger Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_deploy:
+        description: Deploy the verified static release to Hostinger public_html
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hostinger-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build, verify, and deploy
+    if: ${{ inputs.confirm_deploy == true }}
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      VITE_WEB3FORMS_KEY: ${{ secrets.VITE_WEB3FORMS_KEY }}
+      VITE_BUSINESS_PHONE: ${{ vars.VITE_BUSINESS_PHONE }}
+      VITE_BUSINESS_EMAIL: ${{ vars.VITE_BUSINESS_EMAIL }}
+      VITE_BUSINESS_WHATSAPP: ${{ vars.VITE_BUSINESS_WHATSAPP }}
+      VITE_ZOOM_URL: ${{ vars.VITE_ZOOM_URL }}
+      ADDITIONAL_ALLOWED_ORIGINS: ${{ vars.ADDITIONAL_ALLOWED_ORIGINS }}
+      HOSTINGER_FTP_SERVER_DIR: ${{ vars.HOSTINGER_FTP_SERVER_DIR || 'public_html/' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate production deploy settings
+        env:
+          HOSTINGER_FTP_SERVER: ${{ secrets.HOSTINGER_FTP_SERVER }}
+          HOSTINGER_FTP_USERNAME: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+          HOSTINGER_FTP_PASSWORD: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+          VITE_WEB3FORMS_KEY: ${{ secrets.VITE_WEB3FORMS_KEY }}
+          VITE_BUSINESS_PHONE: ${{ vars.VITE_BUSINESS_PHONE }}
+          VITE_BUSINESS_EMAIL: ${{ vars.VITE_BUSINESS_EMAIL }}
+          VITE_BUSINESS_WHATSAPP: ${{ vars.VITE_BUSINESS_WHATSAPP }}
+        run: |
+          missing=0
+          for name in HOSTINGER_FTP_SERVER HOSTINGER_FTP_USERNAME HOSTINGER_FTP_PASSWORD VITE_WEB3FORMS_KEY VITE_BUSINESS_PHONE VITE_BUSINESS_EMAIL VITE_BUSINESS_WHATSAPP; do
+            if [ -z "${!name}" ]; then
+              echo "::error title=Missing production setting::$name is not configured in GitHub secrets or variables."
+              missing=1
+            fi
+          done
+
+          if [ "${HOSTINGER_FTP_SERVER_DIR#*public_html}" = "$HOSTINGER_FTP_SERVER_DIR" ]; then
+            echo "::warning title=Review deploy folder::HOSTINGER_FTP_SERVER_DIR is '$HOSTINGER_FTP_SERVER_DIR'. Hostinger root-domain uploads usually target public_html/."
+          fi
+
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+
+          echo "Production deploy settings are present. Hostinger server dir: $HOSTINGER_FTP_SERVER_DIR"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run full Hostinger release gate
+        run: npm run release:hostinger
+
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: beitbuilding-hostinger-deployed-${{ github.sha }}
+          path: |
+            release/hostinger-upload/**
+            release/beitbuilding-hostinger-upload.zip
+            release/RELEASE_MANIFEST.json
+            release/HOSTINGER_UPLOAD_README.txt
+          if-no-files-found: error
+          retention-days: 60
+
+      - name: Deploy static package to Hostinger
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.HOSTINGER_FTP_SERVER }}
+          username: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+          local-dir: ./release/hostinger-upload/
+          server-dir: ${{ env.HOSTINGER_FTP_SERVER_DIR }}
+          dangerous-clean-slate: false

@@ -1,0 +1,367 @@
+/* TouchSimPreview — interactive 5-tier mobile sim that lives above
+   the lead form in MobileLeadCapture. All animations are pure CSS
+   transform/opacity (compositor-only), no JS in the hot path.
+   Aspect ratio is locked at 16:9 so the scene composes consistently
+   across phone sizes (320–500px viewport). */
+
+.tsp {
+  /* Driven by JS — the current tier intensity 0 → 1, scales sky
+     darkening + rain + lightning + funnel via CSS calc(). */
+  --tsp-intensity: 0;
+
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0a0e16;
+  border: 1px solid rgba(212, 160, 74, 0.32);
+  box-shadow:
+    0 1px 0 rgba(255, 240, 200, 0.08) inset,
+    0 16px 40px -12px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: pan-y; /* allow vertical scroll, intercept horizontal */
+}
+
+/* ─── SCENE LAYERS ──────────────────────────────────────────────────── */
+.tsp__scene {
+  position: absolute;
+  inset: 0;
+}
+
+.tsp__sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    /* Sky color shifts via tier: light blue → grey → green-tint */
+    hsl(
+      calc(210 - var(--tsp-intensity) * 60),
+      calc(45% - var(--tsp-intensity) * 20%),
+      calc(70% - var(--tsp-intensity) * 50%)
+    ) 0%,
+    hsl(
+      calc(210 - var(--tsp-intensity) * 80),
+      calc(40% - var(--tsp-intensity) * 25%),
+      calc(55% - var(--tsp-intensity) * 45%)
+    ) 100%
+  );
+  transition: background 0.5s ease;
+}
+
+.tsp__sun {
+  position: absolute;
+  top: 14%;
+  right: 18%;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe18a 0%, #ffaa55 60%, transparent 100%);
+  filter: blur(2px);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.tsp__sun.is-visible { opacity: 0.85; }
+
+.tsp__storm-tint {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center 30%,
+    rgba(140, 165, 110, 0.35) 0%,
+    transparent 60%
+  );
+  mix-blend-mode: multiply;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.tsp__storm-tint.is-visible { opacity: calc(0.7 * var(--tsp-intensity)); }
+
+/* ─── CLOUDS ───────────────────────────────────────────────────────── */
+.tsp__clouds {
+  position: absolute;
+  inset: 0 0 50% 0;
+  opacity: calc(0.4 + var(--tsp-intensity) * 0.55);
+  transition: opacity 0.5s ease;
+}
+.tsp__cloud {
+  position: absolute;
+  width: 80px;
+  height: 22px;
+  background: radial-gradient(
+    ellipse,
+    rgba(60, 70, 85, 0.85) 0%,
+    rgba(60, 70, 85, 0.55) 60%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  animation: tsp-cloud-drift 14s linear infinite;
+  filter: blur(1px);
+}
+.tsp__cloud--1 { top: 10%; left: -20%; }
+.tsp__cloud--2 { top: 20%; left: 30%; animation-duration: 18s; animation-delay: -6s; }
+.tsp__cloud--3 { top: 14%; left: 60%; animation-duration: 22s; animation-delay: -12s; }
+@keyframes tsp-cloud-drift {
+  from { transform: translateX(-30%); }
+  to   { transform: translateX(140%); }
+}
+
+/* ─── LIGHTNING ────────────────────────────────────────────────────── */
+.tsp__lightning {
+  position: absolute;
+  inset: 0;
+  background: rgba(220, 230, 245, 0.8);
+  opacity: 0;
+  pointer-events: none;
+  animation: tsp-flash 4s linear infinite;
+}
+@keyframes tsp-flash {
+  0%, 88%, 100% { opacity: 0; }
+  90%, 91%      { opacity: 0.65; }
+  92%, 93%      { opacity: 0; }
+  94%           { opacity: 0.45; }
+  95%           { opacity: 0; }
+}
+
+/* ─── TORNADO FUNNEL ───────────────────────────────────────────────── */
+.tsp__funnel {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  width: 14%;
+  height: 60%;
+  transform: translateX(-50%);
+  opacity: 0;
+  animation: tsp-funnel-enter 0.6s ease-out 0.1s both, tsp-funnel-spin 1.4s linear infinite 0.7s;
+  transform-origin: 50% 30%;
+}
+@keyframes tsp-funnel-enter {
+  from { opacity: 0; transform: translateX(-50%) scaleY(0.3); }
+  to   { opacity: 0.85; transform: translateX(-50%) scaleY(1); }
+}
+@keyframes tsp-funnel-spin {
+  0%, 100% { transform: translateX(-50%) skewX(-2deg); }
+  50%      { transform: translateX(-50%) skewX(2deg); }
+}
+
+/* ─── PALM TREE — bends with intensity ─────────────────────────────── */
+.tsp__palm {
+  position: absolute;
+  bottom: 14%;
+  left: 4%;
+  width: 14%;
+  height: 50%;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+}
+.tsp__palm-bend {
+  transform-origin: 50px 200px; /* base of trunk */
+  transform: rotate(calc(var(--tsp-intensity) * 25deg));
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.6, 1);
+  animation: tsp-palm-sway calc(0.8s - var(--tsp-intensity) * 0.4s) ease-in-out infinite alternate;
+}
+@keyframes tsp-palm-sway {
+  from { transform: rotate(calc(var(--tsp-intensity) * 25deg - 2deg)); }
+  to   { transform: rotate(calc(var(--tsp-intensity) * 25deg + 4deg)); }
+}
+
+/* ─── HOUSE — central focal point, doesn't move ───────────────────── */
+.tsp__house {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  width: 60%;
+  height: 50%;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55));
+}
+
+/* ─── DAMAGE LAYERS ────────────────────────────────────────────────── */
+.tsp__damage-shingles {
+  animation: tsp-shingle-flap 0.8s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+@keyframes tsp-shingle-flap {
+  from { opacity: 0.95; }
+  to   { opacity: 1; transform: translateY(-1px); }
+}
+
+.tsp__damage-tear {
+  animation: tsp-tear-pulse 1.2s ease-in-out infinite;
+}
+@keyframes tsp-tear-pulse {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(235, 105, 36, 0.45)); }
+  50%      { filter: drop-shadow(0 0 8px rgba(235, 105, 36, 0.85)); }
+}
+
+/* ─── RAIN ─────────────────────────────────────────────────────────── */
+.tsp__rain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Rain tilts harder at higher tiers via shear */
+  transform: skewX(calc(var(--tsp-intensity) * -18deg));
+}
+.tsp__raindrop {
+  position: absolute;
+  top: -10%;
+  width: 1.4px;
+  height: 12px;
+  background: linear-gradient(180deg, transparent, rgba(180, 210, 235, 0.78));
+  border-radius: 2px;
+  animation: tsp-rain-fall 0.7s linear infinite;
+  will-change: transform;
+}
+.tsp__rain[data-tier="3"] .tsp__raindrop { animation-duration: 0.55s; height: 14px; }
+.tsp__rain[data-tier="4"] .tsp__raindrop { animation-duration: 0.40s; height: 16px; background: linear-gradient(180deg, transparent, rgba(200, 225, 245, 0.95)); }
+@keyframes tsp-rain-fall {
+  from { transform: translateY(-20px); }
+  to   { transform: translateY(120%); }
+}
+
+/* ─── GROUND ───────────────────────────────────────────────────────── */
+.tsp__ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 16%;
+  background: linear-gradient(
+    180deg,
+    hsl(
+      calc(85 - var(--tsp-intensity) * 30),
+      calc(35% - var(--tsp-intensity) * 18%),
+      calc(28% - var(--tsp-intensity) * 14%)
+    ) 0%,
+    hsl(
+      calc(70 - var(--tsp-intensity) * 30),
+      calc(28% - var(--tsp-intensity) * 14%),
+      calc(18% - var(--tsp-intensity) * 8%)
+    ) 100%
+  );
+  transition: background 0.5s ease;
+}
+
+/* ─── HUD overlay — tier label + wind speed ────────────────────────── */
+.tsp__hud {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  z-index: 4;
+  pointer-events: none;
+}
+.tsp__hud-cat {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #d4a04a;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+}
+.tsp__hud-mph {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 2px;
+}
+.tsp__hud-mph-num {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  color: #f3ead6;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.85),
+    0 0 12px rgba(0, 0, 0, 0.65);
+  transition: color 0.3s ease;
+}
+.tsp[style*="--tsp-intensity: 1"] .tsp__hud-mph-num,
+.tsp[style*="--tsp-intensity:1"] .tsp__hud-mph-num {
+  color: #ff7a4a;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.85),
+    0 0 14px rgba(255, 122, 74, 0.45);
+}
+.tsp__hud-mph-unit {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 11px;
+  color: rgba(243, 234, 214, 0.65);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+}
+.tsp__hud-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(243, 234, 214, 0.85);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+  margin-top: 1px;
+}
+
+/* ─── Tier pips ────────────────────────────────────────────────────── */
+.tsp__pips {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 4;
+  pointer-events: none;
+}
+.tsp__pip {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(243, 234, 214, 0.18);
+  border: 1px solid rgba(212, 160, 74, 0.45);
+  transition: background-color 0.25s ease, transform 0.25s ease;
+}
+.tsp__pip.is-passed { background: rgba(212, 160, 74, 0.55); }
+.tsp__pip.is-active {
+  background: #d4a04a;
+  transform: scale(1.4);
+  box-shadow: 0 0 8px rgba(212, 160, 74, 0.85);
+}
+
+/* ─── Tap hint — fades after first interaction ─────────────────────── */
+.tsp__hint {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #d4a04a;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  border-radius: 14px;
+  border: 1px solid rgba(212, 160, 74, 0.65);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 5;
+  animation: tsp-hint-pulse 1.6s ease-in-out infinite;
+}
+.tsp__hint.is-visible { opacity: 1; }
+@keyframes tsp-hint-pulse {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50%      { transform: translateX(-50%) scale(1.06); }
+}
+
+/* Reduced-motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .tsp__cloud,
+  .tsp__lightning,
+  .tsp__funnel,
+  .tsp__palm-bend,
+  .tsp__damage-shingles,
+  .tsp__damage-tear,
+  .tsp__raindrop,
+  .tsp__hint { animation: none; }
+}
+
+/* Print stylesheet — hide entirely (the sim doesn't print well) */
+@media print {
+  .tsp { display: none; }
+}

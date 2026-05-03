@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- Theme-color split for light/dark schemes — iOS Safari + Chrome
+         Android use the matching color for the URL bar tint. -->
+    <meta name="theme-color" content="#06050a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#0a0908" media="(prefers-color-scheme: light)" />
+    <!-- iOS Safari: enable phone-number tap detection for tel: links
+         in MobileLeadCapture's tap-to-call CTA. Default is "telephone=yes"
+         on iOS but explicit is safer across in-app browsers. -->
+    <meta name="format-detection" content="telephone=yes" />
+    <!-- Apple-specific: PWA-style standalone behavior if user "Add to
+         Home Screen". Page becomes app-shell-like. -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Hurricane Sim" />
+
+    <!-- ╔═══════════ SECURITY HEADERS (HTTP-EQUIV equivalents) ═══════════╗
+         These meta tags supplement the HTTP headers configured in
+         vercel.json (which is the canonical place for response-level
+         security policy). HTTP headers ALWAYS win over meta-equivs but
+         the meta versions are defense-in-depth: they apply even if a
+         CDN strips a header, and they apply to file:// protocol too.
+         ╚══════════════════════════════════════════════════════════════╝ -->
+
+    <!-- CONTENT SECURITY POLICY — first-party only. Removed Google +
+         Meta whitelist entries in the privacy pivot since this site
+         no longer loads gtag/fbq trackers. The TIGHTER whitelist
+         doubles as a code-level enforcement: any future attempt to
+         re-add a third-party tracker would be BLOCKED by the browser
+         (script-src would refuse to load it) until someone explicitly
+         loosens this policy — which forces a code-review conversation.
+         The whitelist now matches ONLY what the site actually uses:
+           * Vite chunks served from same origin (self)
+           * Google Fonts (CSS + WOFF2) — fonts only, no tracking
+           * Inline JSON-LD scripts (need 'unsafe-inline' for type=application/ld+json)
+         Production CSP also served via header in vercel.json for tighter control. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline';
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+        font-src 'self' https://fonts.gstatic.com;
+        img-src 'self' data:;
+        connect-src 'self';
+        frame-ancestors 'none';
+        base-uri 'self';
+        form-action 'self' mailto:;
+        object-src 'none';
+        upgrade-insecure-requests;
+      "
+    />
+
+    <!-- REFERRER POLICY — when the browser navigates away from this
+         page (or loads cross-origin assets), strip query strings + path
+         from the Referer header. Prevents leaking URL params that might
+         contain PII to third parties. -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- PERMISSIONS POLICY — disable browser features we don't use.
+         If a third-party script gets injected, it can't fingerprint
+         the user via camera/mic/geolocation/etc. -->
+    <meta
+      http-equiv="Permissions-Policy"
+      content="
+        camera=(),
+        microphone=(),
+        geolocation=(),
+        payment=(),
+        usb=(),
+        magnetometer=(),
+        gyroscope=(),
+        accelerometer=(),
+        autoplay=(self),
+        fullscreen=(self),
+        picture-in-picture=()
+      "
+    />
+
+    <!-- X-CONTENT-TYPE-OPTIONS — prevents the browser from MIME-
+         sniffing a response away from the declared content-type.
+         Mitigates an attack where a malicious upload could be
+         served as HTML/JS even if the server says it's an image. -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
+    <!-- Primary SEO -->
+    <title>Hurricane Wind-Uplift Visualizer | Beit Building Contractors — Orlando, FL</title>
+    <meta name="description" content="Interactive ASCE 7-22 wind-uplift visualizer for Orlando homeowners. See exactly how a one-story ranch responds to hurricane suction across the four stages of roof failure. Free inspection." />
+    <meta name="keywords" content="hurricane wind uplift Orlando, roof wind resistance, ASCE 7-22 calculator, FBC 708.7, secondary water barrier, sheathing nail withdrawal, roof failure cascade, Beit Building Contractors" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Beit Building Contractors LLC" />
+    <link rel="canonical" href="https://www.beitbuilding.com/hurricane-uplift.html" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://www.beitbuilding.com/hurricane-uplift.html" />
+    <meta property="og:title" content="Hurricane Wind-Uplift Visualizer | Beit Building Contractors" />
+    <meta property="og:description" content="Interactive ASCE 7-22 visualizer for Orlando homeowners. See how your roof responds to hurricane wind. Free inspection." />
+    <meta property="og:image" content="https://www.beitbuilding.com/og-image.jpg" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="Beit Building Contractors" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Hurricane Wind-Uplift Visualizer — Beit Building Contractors" />
+    <meta name="twitter:description" content="Interactive ASCE 7-22 visualizer. See how your Orlando roof responds to hurricane wind." />
+    <meta name="twitter:image" content="https://www.beitbuilding.com/og-image.jpg" />
+
+    <!-- Article schema (this page) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Hurricane Wind-Uplift Visualizer",
+      "description": "Interactive ASCE 7-22 wind-uplift visualizer educating Orlando homeowners about hurricane roof failure modes.",
+      "author": {
+        "@type": "Organization",
+        "name": "Beit Building Contractors LLC",
+        "url": "https://www.beitbuilding.com"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Beit Building Contractors LLC",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.beitbuilding.com/logo.png"
+        }
+      },
+      "datePublished": "2026-04-24",
+      "dateModified": "2026-04-24",
+      "mainEntityOfPage": "https://www.beitbuilding.com/hurricane-uplift.html",
+      "image": "https://www.beitbuilding.com/og-image.jpg",
+      "about": [
+        { "@type": "Thing", "name": "ASCE 7-22 wind load standard" },
+        { "@type": "Thing", "name": "Florida Building Code Section 708.7" },
+        { "@type": "Thing", "name": "Roof component and cladding wind resistance" },
+        { "@type": "Thing", "name": "Hurricane preparedness for Central Florida homeowners" }
+      ],
+      "citation": [
+        "ASCE 7-22 Minimum Design Loads and Associated Criteria for Buildings and Other Structures",
+        "Florida Building Code 8th Edition (2023)",
+        "NDS 2018 National Design Specification for Wood Construction",
+        "ASTM D7158 Standard Test Method for Wind Resistance of Asphalt Shingles"
+      ]
+    }
+    </script>
+
+    <!-- LocalBusiness schema (same as homepage) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HomeAndConstructionBusiness",
+      "name": "Beit Building Contractors LLC",
+      "alternateName": "FL Best Construction Company",
+      "url": "https://www.beitbuilding.com",
+      "telephone": "+1-407-942-6459",
+      "email": "beitbuilding@gmail.com",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "2703 Dobbin Dr",
+        "addressLocality": "Orlando",
+        "addressRegion": "FL",
+        "postalCode": "32817",
+        "addressCountry": "US"
+      },
+      "geo": { "@type": "GeoCoordinates", "latitude": 28.5383, "longitude": -81.3792 },
+      "areaServed": ["Orlando", "Central Florida", "Orange County", "Seminole County", "Osceola County"],
+      "priceRange": "$$"
+    }
+    </script>
+
+    <!-- Service schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Hurricane-Resistant Roofing Inspection & Replacement",
+      "serviceType": "Roofing inspection and replacement",
+      "provider": {
+        "@type": "Organization",
+        "name": "Beit Building Contractors LLC",
+        "url": "https://www.beitbuilding.com"
+      },
+      "areaServed": {
+        "@type": "City",
+        "name": "Orlando, FL"
+      },
+      "description": "Free roof inspections by Florida-licensed contractors evaluating fastener type, secondary water barrier, and shingle wind class for hurricane preparedness."
+    }
+    </script>
+
+    <!-- FAQ schema — answers questions Orlando homeowners actually
+         search for. Eligible for Google's FAQ rich-result treatment
+         (expanded answer cards directly in search). Targets long-tail
+         queries like "what wind speed will my roof survive". -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "At what wind speed does a typical Orlando roof start to fail?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Per ASCE 7-22, a single-story Orlando ranch built to current Florida Building Code (FBC 8th Ed) is designed for 150 mph 3-second wind gusts on Risk Category II. Older homes built before the 2007 code update typically begin shingle uplift around 90 mph and lose sheathing around 120 mph. The exact threshold for your home depends on fastener type, deck-edge nailing pattern, and the presence of a secondary water barrier (FBC §1518)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a secondary water barrier and do I need one?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A secondary water barrier (SWB) is a layer of self-adhered roofing membrane installed directly over the sheathing before underlayment. Required by FBC §1518 for any reroofing in the high-velocity hurricane zone (HVHZ) and strongly recommended elsewhere in Florida. If your shingles fail in a storm, the SWB is what keeps the rain out of your insulation and ceilings."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much does a hurricane-rated roof inspection cost?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Beit Building Contractors LLC offers free hurricane-readiness inspections to Central Florida homeowners. A licensed inspector will evaluate your fastener type and pattern, check the seal-strip bond on your shingles, look for any deck-edge separation, and confirm whether your roof meets current FBC code. No obligation."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does the My Safe Florida Home program cover roof reinforcement?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The 2024 My Safe Florida Home program reimburses up to $10,000 in matching grants for hurricane mitigation upgrades, including roof-deck attachment improvements, secondary water barrier installation, and gable-end bracing. Beit Building Contractors can document the work for grant submission."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- HowTo schema — eligible for Google's HowTo rich result. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How to prepare your Orlando roof for hurricane season",
+      "description": "Five-step checklist to evaluate and reinforce your roof before Atlantic hurricane season (June 1 – November 30).",
+      "totalTime": "P3D",
+      "estimatedCost": { "@type": "MonetaryAmount", "currency": "USD", "value": "0" },
+      "tool": [
+        { "@type": "HowToTool", "name": "Binoculars (for ground-level inspection)" },
+        { "@type": "HowToTool", "name": "Flashlight (for attic inspection)" }
+      ],
+      "step": [
+        {
+          "@type": "HowToStep",
+          "name": "Schedule a free pre-season inspection",
+          "text": "Book a free roof inspection between January and April so any required repairs can be completed before peak season. A FL-licensed contractor will evaluate fastener pattern, deck condition, and seal-strip bond."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Verify your shingle wind rating",
+          "text": "Find your shingle warranty paperwork or check the manufacturer's mark on installed shingles. Class H shingles are rated to 150 mph; Class G to 130 mph; Class F to 110 mph. If you can't find documentation, the inspector can identify the class on-site."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Confirm your secondary water barrier",
+          "text": "If your roof was installed before 2008 you likely have only felt underlayment, not an SWB. Adding an SWB during your next reroof is an FBC §1518 requirement in the HVHZ and strongly recommended elsewhere in Florida — eligible for My Safe Florida Home grant matching."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Check the deck-edge attachment",
+          "text": "From the attic, verify that sheathing nails along the perimeter are 6-inch on-center and penetrate the rafter at least three-quarters of an inch. Edge zones are where uplift forces are highest (corner Z3 ≈ 2.0× field load per ASCE 7-22)."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Trim overhanging tree limbs",
+          "text": "Limbs within 10 feet of the roof deck are the leading cause of impact damage during named storms. Trim by May to give wounds time to seal before peak season."
+        }
+      ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="/logo-mark.png" />
+    <link rel="apple-touch-icon" href="/logo-mark.png" />
+
+    <!-- PWA manifest — enables "Install app" affordance on Chrome
+         desktop + Android. iOS Safari uses apple-mobile-web-app-*
+         meta tags above for the same effect. The manifest declares
+         display:standalone so the installed app launches without
+         browser chrome (game-like, full-screen feel). -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- DNS prefetch hints removed for googletagmanager / google-
+         analytics / facebook in the privacy pivot — we don't load
+         those services so prefetching their DNS would be wasted
+         work AND would expose visitors' DNS resolver to those
+         domains' edge networks. First-party only means even DNS
+         lookups stay first-party. -->
+    <link rel="dns-prefetch" href="/api/leads" />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;500;600;700&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/hurricane-main.tsx"></script>
+  </body>
+</html>

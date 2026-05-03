@@ -1,0 +1,53 @@
+name: Build Hostinger Release Artifact
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-release:
+    name: Test and package static release
+    runs-on: ubuntu-latest
+    env:
+      VITE_WEB3FORMS_KEY: ${{ secrets.VITE_WEB3FORMS_KEY }}
+      VITE_BUSINESS_PHONE: ${{ vars.VITE_BUSINESS_PHONE }}
+      VITE_BUSINESS_EMAIL: ${{ vars.VITE_BUSINESS_EMAIL }}
+      VITE_BUSINESS_WHATSAPP: ${{ vars.VITE_BUSINESS_WHATSAPP }}
+      VITE_ZOOM_URL: ${{ vars.VITE_ZOOM_URL }}
+      ADDITIONAL_ALLOWED_ORIGINS: ${{ vars.ADDITIONAL_ALLOWED_ORIGINS }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run full Hostinger release gate
+        run: npm run release:hostinger
+
+      - name: Upload Hostinger release package
+        uses: actions/upload-artifact@v4
+        with:
+          name: beitbuilding-hostinger-release-${{ github.sha }}
+          path: |
+            release/hostinger-upload/**
+            release/beitbuilding-hostinger-upload.zip
+            release/RELEASE_MANIFEST.json
+            release/HOSTINGER_UPLOAD_README.txt
+          if-no-files-found: error
+          retention-days: 30

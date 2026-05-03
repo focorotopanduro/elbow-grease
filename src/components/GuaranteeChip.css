@@ -1,0 +1,60 @@
+/**
+ * GuaranteeChip — inline trust-signal chips.
+ *
+ * Three variants tuned for different surrounding contexts (gold for the
+ * primary brand signal, cream for use on dark sections, orange for
+ * urgency). All share the same baseline shape + spacing for visual
+ * cohesion across the site.
+ */
+
+.gchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-family: var(--font-condensed);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  line-height: 1;
+  border: 1px solid currentColor;
+}
+
+.gchip__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.gchip__label {
+  display: inline-block;
+  letter-spacing: 0.14em;
+}
+
+/* ─── Gold (default) — primary brand chip ───────────────────────────── */
+
+.gchip--gold {
+  color: var(--gold-light);
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.45);
+}
+
+/* ─── Cream — for dark sections where gold can clash ────────────────── */
+
+.gchip--cream {
+  color: var(--cream);
+  background: rgba(245, 239, 225, 0.06);
+  border-color: rgba(245, 239, 225, 0.25);
+}
+
+/* ─── Orange — urgency / emphasis ──────────────────────────────────── */
+
+.gchip--orange {
+  color: #f5d4ad;
+  background: rgba(235, 105, 36, 0.1);
+  border-color: rgba(235, 105, 36, 0.5);
+}

@@ -1,0 +1,240 @@
+/**
+ * Booking widget — dark-themed section that mounts a Calendly / Cal.com
+ * embed on demand. The card → loading → embed → success state machine
+ * is driven by the `data-status` attribute on `.booking__embed`.
+ */
+
+.booking {
+  background: var(--dark);
+  color: var(--cream);
+  position: relative;
+  overflow: hidden;
+  padding-block: var(--section-y);
+}
+
+.booking::before {
+  content: '';
+  position: absolute;
+  top: -180px;
+  right: -120px;
+  width: 540px;
+  height: 540px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.18), transparent 65%);
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.booking__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 880px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────── */
+
+.booking__header {
+  margin-bottom: var(--sp-6);
+}
+
+.booking__title {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-block: var(--sp-3);
+  color: var(--cream);
+}
+
+.booking__title em {
+  font-style: italic;
+  font-weight: 400;
+  background: var(--grad-gold-text);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.booking__lead {
+  margin: 0 auto;
+  max-width: 56ch;
+  font-size: clamp(1rem, 1.05vw, 1.0625rem);
+  line-height: 1.65;
+  color: rgba(245, 239, 225, 0.78);
+}
+
+/* ─── Initial idle card ─────────────────────────────────────────────── */
+
+.booking__card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-5);
+  padding: var(--sp-6) clamp(var(--sp-5), 4vw, var(--sp-7));
+  background: rgba(15, 14, 16, 0.62);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.45),
+    0 0 30px rgba(212, 175, 55, 0.12);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.booking__advantages {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.booking__advantages li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  font-size: 0.95rem;
+  color: rgba(245, 239, 225, 0.82);
+  line-height: 1.45;
+}
+
+.booking__advantage-icon {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  background: rgba(212, 175, 55, 0.14);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 50%;
+  color: var(--gold-light);
+  font-size: 14px;
+}
+
+.booking__open {
+  width: 100%;
+  justify-content: center;
+  font-size: var(--fs-md);
+}
+
+/* ─── Loading state ─────────────────────────────────────────────────── */
+
+.booking__loading {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-5);
+  font-family: var(--font-condensed);
+  font-size: var(--fs-sm);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(245, 239, 225, 0.75);
+}
+
+.booking__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: booking-spin 0.9s linear infinite;
+  flex: 0 0 auto;
+}
+
+@keyframes booking-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .booking__spinner {
+    animation: none;
+    border-top-color: var(--gold);
+  }
+}
+
+/* ─── Failed-fallback state ─────────────────────────────────────────── */
+
+.booking__fallback {
+  display: inline-block;
+  max-width: 540px;
+  margin: 0 auto;
+  padding: var(--sp-4) var(--sp-5);
+  background: rgba(220, 70, 70, 0.08);
+  border: 1px solid rgba(220, 70, 70, 0.3);
+  border-radius: var(--radius-md);
+  color: #f5a3a3;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.booking__fallback a {
+  color: var(--gold-light);
+  text-decoration: none;
+  border-bottom: 1px dashed currentColor;
+}
+
+.booking__fallback a:hover,
+.booking__fallback a:focus-visible {
+  color: var(--cream);
+  outline: none;
+}
+
+/* ─── Embed container ───────────────────────────────────────────────── */
+
+/**
+ * Container is always rendered so the third-party library has a stable
+ * mount point in the DOM. Hidden via `data-status` until the embed
+ * actually mounts; from then on, the iframe inside takes over the
+ * sizing.
+ */
+.booking__embed {
+  display: none;
+  width: 100%;
+  min-height: 700px;
+  margin-top: var(--sp-5);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+}
+
+.booking__embed[data-status='open'] {
+  display: block;
+}
+
+/* Calendly + Cal.com both inject an iframe that fills the parent.
+ * Force it to the full container width so the embed isn't margin-bound. */
+.booking__embed iframe {
+  width: 100% !important;
+  min-height: 700px;
+  border: 0;
+}
+
+/* ─── Mobile ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 540px) {
+  .booking__card {
+    padding: var(--sp-5) var(--sp-4);
+  }
+  .booking__embed,
+  .booking__embed iframe {
+    min-height: 620px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .booking__card,
+  .booking__open {
+    transition: none;
+  }
+}

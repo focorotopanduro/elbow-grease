@@ -1,0 +1,332 @@
+/**
+ * FAQ section — cream-themed accordion, matched to the site's
+ * "ServiceFeatures / About" pages so the visual rhythm reads as
+ * dark-cream-dark across Testimonials → FAQ → Contact.
+ */
+
+.faq {
+  background:
+    var(--grad-marble-veins),
+    linear-gradient(rgba(245, 239, 225, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 239, 225, 0.03) 1px, transparent 1px),
+    linear-gradient(135deg, #050507 0%, #111217 54%, #050507 100%);
+  background-size: 100% 100%, 40px 40px, 40px 40px, 100% 100%;
+  color: var(--cream);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle cream-on-cream halo behind the heading — same gold-glow
+ * vocabulary as Stats / About sections. */
+.faq::before {
+  content: '';
+  position: absolute;
+  top: -200px;
+  right: -200px;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.12), transparent 65%);
+  pointer-events: none;
+  filter: blur(120px);
+  z-index: 0;
+}
+
+.faq > .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Header ──────────────────────────────────────────────────────────── */
+
+.faq__header {
+  max-width: 720px;
+  margin-bottom: var(--sp-7);
+}
+
+.faq__title {
+  font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+  margin-top: var(--sp-3);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--cream);
+}
+
+.faq__title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--orange);
+}
+
+.faq__lead {
+  margin-top: var(--sp-3);
+  font-size: clamp(1rem, 1.05vw, 1.0625rem);
+  line-height: 1.65;
+  color: rgba(245, 239, 225, 0.68);
+  max-width: 60ch;
+}
+
+.faq__lead-link {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--orange);
+  text-decoration: none;
+  border-bottom: 1px dashed currentColor;
+  transition: color 0.2s var(--ease);
+}
+
+.faq__lead-link:hover,
+.faq__lead-link:focus-visible {
+  color: var(--gold);
+}
+
+/* ─── List + items ────────────────────────────────────────────────────── */
+
+.faq__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+}
+
+.faq__item {
+  position: relative;
+  background:
+    var(--grad-marble-veins),
+    var(--grad-glass-black),
+    rgba(7, 6, 10, 0.68);
+  backdrop-filter: blur(18px) saturate(142%);
+  -webkit-backdrop-filter: blur(18px) saturate(142%);
+  border: 1px solid var(--marble-border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.35s var(--ease),
+              box-shadow 0.35s var(--ease),
+              background 0.35s var(--ease);
+  overflow: hidden;
+}
+
+.faq__item:hover {
+  border-color: rgba(234, 208, 122, 0.32);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
+  background:
+    var(--grad-marble-veins),
+    linear-gradient(180deg, rgba(245, 239, 225, 0.07), rgba(245, 239, 225, 0.02)),
+    rgba(10, 11, 15, 0.78);
+}
+
+.faq__item[data-open='true'] {
+  border-color: rgba(234, 208, 122, 0.4);
+  background:
+    var(--grad-marble-veins),
+    linear-gradient(180deg, rgba(245, 239, 225, 0.08), rgba(245, 239, 225, 0.024)),
+    rgba(10, 11, 15, 0.84);
+  box-shadow:
+    0 14px 38px rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(234, 208, 122, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Subtle gold edge on opened item — terracotta-bronze vocabulary
+ * consistent with the brand's gold accents. */
+.faq__item[data-open='true']::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--gold-light), var(--gold), var(--gold-light));
+  border-top-left-radius: var(--radius-md);
+  border-bottom-left-radius: var(--radius-md);
+}
+
+/* ─── Trigger heading + button ───────────────────────────────────────── */
+
+.faq__heading {
+  margin: 0;
+  /* The h3 itself stays unstyled; the button inside drives the visuals. */
+}
+
+.faq__trigger {
+  appearance: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: clamp(var(--sp-3), 1.6vw, var(--sp-4)) clamp(var(--sp-3), 2.4vw, var(--sp-5));
+  font: inherit;
+  text-align: left;
+  color: var(--cream);
+  transition: color 0.2s var(--ease);
+}
+
+.faq__trigger:focus {
+  outline: none;
+}
+
+.faq__trigger:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+  border-radius: var(--radius-md);
+}
+
+.faq__trigger:hover .faq__q,
+.faq__trigger[aria-expanded='true'] .faq__q {
+  color: var(--orange);
+}
+
+.faq__q {
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  line-height: 1.3;
+  transition: color 0.2s var(--ease);
+}
+
+/* Plus → minus icon — rotate the vertical bar away on open, identity
+ * on the horizontal bar so it stays centred. */
+.faq__icon {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: var(--gold);
+  transition: background 0.3s var(--ease),
+              border-color 0.3s var(--ease),
+              color 0.3s var(--ease);
+}
+
+.faq__icon svg {
+  display: block;
+}
+
+.faq__icon-vertical {
+  transform-origin: center;
+  transition: transform 0.35s var(--ease-back);
+}
+
+.faq__trigger[aria-expanded='true'] .faq__icon {
+  background: var(--orange);
+  color: var(--cream);
+  border-color: var(--orange);
+}
+
+.faq__trigger[aria-expanded='true'] .faq__icon-vertical {
+  transform: scaleY(0);
+}
+
+/* ─── Panel — animated grid trick for smooth height transitions ─────── */
+
+.faq__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.45s var(--ease-quart);
+}
+
+.faq__panel[data-open='true'] {
+  grid-template-rows: 1fr;
+}
+
+.faq__panel-inner {
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 clamp(var(--sp-3), 2.4vw, var(--sp-5));
+  transition: padding-bottom 0.45s var(--ease-quart);
+}
+
+.faq__panel[data-open='true'] .faq__panel-inner {
+  padding-bottom: clamp(var(--sp-3), 1.6vw, var(--sp-4));
+}
+
+.faq__answer-para {
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: clamp(0.95rem, 1.05vw, 1.0625rem);
+  line-height: 1.7;
+  color: rgba(245, 239, 225, 0.72);
+  margin: 0;
+}
+
+.faq__answer-para + .faq__answer-para {
+  margin-top: var(--sp-2);
+}
+
+/* Inline link list under answers — buttons-as-cards style, cream chips
+ * with gold accent on hover. */
+.faq__links {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+}
+
+.faq__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  font-family: var(--font-condensed);
+  font-size: var(--fs-xs, 0.78rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  background:
+    var(--grad-glass-black),
+    rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(234, 208, 122, 0.28);
+  border-radius: var(--radius-xs);
+  text-decoration: none;
+  transition: background 0.25s var(--ease),
+              border-color 0.25s var(--ease),
+              color 0.25s var(--ease),
+              transform 0.25s var(--ease-back);
+}
+
+.faq__link:hover,
+.faq__link:focus-visible {
+  background: var(--orange);
+  color: var(--cream);
+  border-color: var(--orange);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .faq__panel,
+  .faq__panel-inner,
+  .faq__icon,
+  .faq__icon-vertical,
+  .faq__item,
+  .faq__link {
+    transition: none;
+  }
+}
+
+/* ─── Mobile ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .faq__list {
+    gap: var(--sp-2);
+  }
+  .faq__icon {
+    width: 32px;
+    height: 32px;
+  }
+}

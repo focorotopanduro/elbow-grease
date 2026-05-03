@@ -1,0 +1,32 @@
+# Keep Vercel source uploads small and private.
+node_modules
+dist
+dist-tsc-node
+release
+audit-shots
+source-assets
+
+# Local env, logs, and editor state.
+.env
+.env.*
+!.env.example
+*.log
+*.tsbuildinfo
+.DS_Store
+.vscode
+.idea
+
+# Local visual iteration artifacts. These are useful for audits but
+# should not ride along with production deploy uploads.
+codex-*.png
+debug-*.png
+iter-*.png
+marble-*.png
+polish-*.png
+prod-audit-*.png
+ui-*.png
+ux-*.png
+
+# Generated Blender artifacts are not needed by Vercel builds.
+scripts/blender/preview
+scripts/blender/**/*.blend

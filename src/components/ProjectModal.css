@@ -1,0 +1,381 @@
+/**
+ * ProjectModal — accessible lightbox for project portfolio detail view.
+ *
+ * Backdrop covers the full viewport; modal centred. On mobile becomes
+ * full-screen sheet. Body scroll-locked while open (handled by JS).
+ */
+
+.pmodal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(7, 6, 10, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(0px, 4vw, 32px);
+  overflow-y: auto;
+  /* Quick fade-in entrance — bypassed by reduced-motion */
+  animation: pmodal-fade 0.25s var(--ease) both;
+}
+
+@keyframes pmodal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.pmodal {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  max-height: calc(100vh - 64px);
+  background: var(--dark);
+  color: var(--cream);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.7),
+    0 0 40px rgba(212, 175, 55, 0.15);
+  overflow-y: auto;
+  animation: pmodal-rise 0.3s var(--ease-back) both;
+}
+
+@keyframes pmodal-rise {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)  scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pmodal__backdrop,
+  .pmodal {
+    animation: none;
+  }
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────── */
+
+.pmodal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.18);
+  position: sticky;
+  top: 0;
+  background: var(--dark);
+  z-index: 2;
+}
+
+.pmodal__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.pmodal__service-tag {
+  font-family: var(--font-condensed);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  background: rgba(212, 175, 55, 0.14);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: var(--radius-xs);
+  padding: 4px 10px;
+}
+
+.pmodal__neighborhood {
+  font-family: var(--font-condensed);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(245, 239, 225, 0.65);
+}
+
+.pmodal__close {
+  appearance: none;
+  background: rgba(15, 14, 16, 0.55);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: var(--cream);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s var(--ease),
+              border-color 0.2s var(--ease),
+              transform 0.2s var(--ease);
+  flex: 0 0 auto;
+}
+
+.pmodal__close:hover,
+.pmodal__close:focus-visible {
+  background: rgba(212, 175, 55, 0.16);
+  border-color: var(--gold);
+  outline: none;
+  transform: rotate(90deg);
+}
+
+.pmodal__close:focus-visible {
+  box-shadow: 0 0 0 2px var(--cream);
+}
+
+/* ─── Title ──────────────────────────────────────────────────────────── */
+
+.pmodal__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--cream);
+  margin: var(--sp-4) var(--sp-5) 0;
+}
+
+/* ─── Body — main + sidebar ─────────────────────────────────────────── */
+
+.pmodal__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-5);
+}
+
+@media (max-width: 880px) {
+  .pmodal__body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pmodal__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+
+.pmodal__main-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  background: rgba(15, 14, 16, 0.6);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+}
+
+.pmodal__main-placeholder {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(circle at 24% 20%, rgba(244, 215, 122, 0.18), transparent 28%),
+    linear-gradient(135deg, rgba(212, 175, 55, 0.16), rgba(139, 105, 20, 0.1));
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  color: rgba(245, 239, 225, 0.62);
+}
+
+.pmodal__main-placeholder span {
+  padding: 8px 14px;
+  font-family: var(--font-condensed);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  background: rgba(7, 6, 10, 0.58);
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  border-radius: var(--radius-xs);
+}
+
+.pmodal__main--placeholder {
+  position: relative;
+}
+
+.pmodal__main--placeholder::after {
+  content: 'Photo coming soon';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-condensed);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(245, 239, 225, 0.55);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.16), rgba(139, 105, 20, 0.1));
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  aspect-ratio: 16 / 9;
+}
+
+.pmodal__thumbs {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+}
+
+.pmodal__thumb {
+  appearance: none;
+  background: rgba(15, 14, 16, 0.6);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-radius: var(--radius-sm);
+  padding: 0;
+  cursor: pointer;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  transition: border-color 0.25s var(--ease), transform 0.2s var(--ease-back);
+}
+
+.pmodal__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pmodal__thumb:hover,
+.pmodal__thumb:focus-visible {
+  border-color: var(--gold);
+  outline: none;
+  transform: translateY(-2px);
+}
+
+.pmodal__thumb--active {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px var(--gold);
+}
+
+.pmodal__thumb--placeholder {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.16), rgba(139, 105, 20, 0.1));
+}
+
+/* ─── Sidebar ────────────────────────────────────────────────────────── */
+
+.pmodal__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.pmodal__summary {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgba(245, 239, 225, 0.85);
+  margin: 0;
+}
+
+.pmodal__details {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.pmodal__details > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pmodal__details dt {
+  font-family: var(--font-condensed);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+}
+
+.pmodal__details dd {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--cream);
+}
+
+.pmodal__tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+}
+
+.pmodal__tags li {
+  font-family: var(--font-condensed);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--gold-light);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: var(--radius-xs);
+}
+
+.pmodal__cta {
+  align-self: stretch;
+  justify-content: center;
+  margin-top: var(--sp-3);
+}
+
+/* ─── Prev/next nav ──────────────────────────────────────────────────── */
+
+.pmodal__nav {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-5) var(--sp-5);
+  border-top: 1px solid rgba(212, 175, 55, 0.18);
+}
+
+.pmodal__nav-btn {
+  appearance: none;
+  background: transparent;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: var(--gold-light);
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-condensed);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s var(--ease),
+              color 0.2s var(--ease),
+              border-color 0.2s var(--ease);
+}
+
+.pmodal__nav-btn:hover,
+.pmodal__nav-btn:focus-visible {
+  background: var(--gold);
+  color: var(--black);
+  border-color: var(--gold);
+  outline: none;
+}
+
+.pmodal__nav-btn--prev:not(:first-child) {
+  margin-right: auto;
+}
+
+.pmodal__nav-btn--next {
+  margin-left: auto;
+}

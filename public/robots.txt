@@ -1,0 +1,43 @@
+# Beit Building Contractors LLC — robots policy
+# Allow all crawlers full access to public pages.
+# Block /api/ + build artifacts to keep them out of the index.
+# Keep /assets/ crawlable; Vite serves production CSS/JS there, and
+# crawlers need those files to render the site accurately.
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dist-tsc-node/
+# Hurricane-uplift sim deferred — keep crawlers from indexing it
+# in case a leftover build artifact gets deployed. Will be removed
+# when the simulator goes live again.
+Disallow: /hurricane-uplift.html
+Disallow: /hurricane-uplift
+
+# Allow all major search-engine bots full crawling
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Block known bad-actor / aggressive scraping bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+# Crawl-delay courtesy hint for less-aggressive bots (Googlebot ignores
+# this and uses its own pacing). Bingbot + others honor it.
+Crawl-delay: 1
+
+# Authoritative sitemap location
+Sitemap: https://www.beitbuilding.com/sitemap.xml

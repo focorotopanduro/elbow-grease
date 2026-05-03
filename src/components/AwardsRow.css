@@ -1,0 +1,168 @@
+/**
+ * AwardsRow — credential strip with two visual variants.
+ *
+ * `subtle`: monochrome chips for the Hero (where competing for the
+ *           primary CTA is bad) — small icon + title only
+ * `full`:   full-color cards for the CredentialsWall (where the
+ *           credentials ARE the focus) — icon + title + subtitle
+ */
+
+.awards {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── Subtle variant (Hero) ─────────────────────────────────────────── */
+
+.awards--subtle {
+  margin-top: var(--sp-4);
+  gap: 8px;
+}
+
+.awards--subtle .awards__item {
+  display: inline-flex;
+}
+
+.awards--subtle .awards__link,
+.awards--subtle .awards__static {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 999px;
+  background: rgba(7, 6, 10, 0.55);
+  text-decoration: none;
+  transition: background 0.25s var(--ease),
+              border-color 0.25s var(--ease);
+}
+
+.awards--subtle .awards__link:hover,
+.awards--subtle .awards__link:focus-visible {
+  background: rgba(212, 175, 55, 0.12);
+  border-color: var(--gold);
+  outline: none;
+}
+
+.awards--subtle .awards__icon {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-light);
+  flex: 0 0 auto;
+}
+
+.awards--subtle .awards__icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.awards--subtle .awards__title {
+  font-family: var(--font-condensed);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+}
+
+/* ─── Full variant (CredentialsWall) ────────────────────────────────── */
+
+.awards--full {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.awards--full .awards__item {
+  display: flex;
+}
+
+.awards--full .awards__link,
+.awards--full .awards__static {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(10, 9, 8, 0.08);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  width: 100%;
+  transition: border-color 0.3s var(--ease),
+              box-shadow 0.3s var(--ease),
+              transform 0.3s var(--ease-back);
+}
+
+.awards--full .awards__link:hover,
+.awards--full .awards__link:focus-visible {
+  border-color: rgba(212, 175, 55, 0.55);
+  box-shadow: 0 12px 32px rgba(10, 9, 8, 0.08);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.awards--full .awards__icon {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.14);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: var(--gold-dark);
+  flex: 0 0 auto;
+}
+
+.awards--full .awards__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.awards--full .awards__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.awards--full .awards__title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--black);
+}
+
+.awards--full .awards__subtitle {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: rgba(10, 9, 8, 0.65);
+}
+
+.awards--full .awards__verify {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-3);
+  font-size: 0.85rem;
+  color: var(--gold-dark);
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .awards--full .awards__link {
+    transition: none;
+  }
+  .awards--full .awards__link:hover {
+    transform: none;
+  }
+}
